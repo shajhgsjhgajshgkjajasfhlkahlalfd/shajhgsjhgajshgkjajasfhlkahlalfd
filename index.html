@@ -467,15 +467,34 @@
     z-index: 150000;
 
     /*
-     * Make sure it is always visible/clickable.
+     * Hidden until the site finishes loading.
+     * JS adds .dock-ready once the loading screen is gone.
      */
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 24px);
+
+    transition:
+        opacity 0.35s ease,
+        transform 0.35s ease,
+        visibility 0s linear 0.35s;
+
+    will-change: transform, opacity;
+
+    user-select: none;
+}
+
+.bottom-dock.dock-ready {
     visibility: visible;
     opacity: 1;
     pointer-events: auto;
+    transform: translate(-50%, 0);
 
-    will-change: transform;
-
-    user-select: none;
+    transition:
+        opacity 0.35s ease,
+        transform 0.35s ease,
+        visibility 0s linear 0s;
 }
 
 .dock-item {
@@ -1283,8 +1302,16 @@
             const statusText = document.getElementById('statusText');
             const loader = document.getElementById('loading-screen');
 
+            const showDock = () => {
+                const dock = document.querySelector('.bottom-dock');
+                if (dock) dock.classList.add('dock-ready');
+            };
+            // Failsafe: dock always appears, even if the loader stalls
+            setTimeout(showDock, 4000);
+
             if (!showLoader) {
                 loader.style.display = 'none';
+                showDock();
             } else {
                 let w = 0;
                 const interval = setInterval(() => {
@@ -1296,7 +1323,10 @@
                         clearInterval(interval);
                         setTimeout(() => {
                             loader.style.opacity = '0';
-                            setTimeout(() => loader.style.display = 'none', 300);
+                            setTimeout(() => {
+                                loader.style.display = 'none';
+                                showDock();
+                            }, 300);
                         }, 150);
                     } else {
                         progressBar.style.width = w + '%';
