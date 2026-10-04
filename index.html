@@ -204,6 +204,32 @@
             display: block;
         }
 
+        /* ===== TAB TRANSITION ANIMATIONS ===== */
+        @keyframes tabIn {
+            from { opacity: 0; transform: translateY(18px) scale(0.985); filter: blur(3px); }
+            to   { opacity: 1; transform: none; filter: blur(0); }
+        }
+        @keyframes itemIn {
+            from { opacity: 0; transform: translateY(22px) scale(0.94); }
+            to   { opacity: 1; transform: none; }
+        }
+        @keyframes dockPop {
+            0%   { transform: scale(1); }
+            40%  { transform: scale(0.82); }
+            100% { transform: scale(1); }
+        }
+        /* 'backwards' fill so hover transforms still work after the animation ends */
+        .tab-content.tab-anim {
+            animation: tabIn 0.38s cubic-bezier(.22,.8,.3,1) backwards;
+        }
+        .tab-content.tab-anim .item-card,
+        .tab-content.tab-anim .settings-col,
+        .tab-content.tab-anim .suggest-panel {
+            animation: itemIn 0.45s cubic-bezier(.22,.8,.3,1) backwards;
+            animation-delay: calc(var(--i, 0) * 45ms + 60ms);
+        }
+        .dock-item.pop { animation: dockPop 0.28s ease; }
+
         /* Section Headings */
         .section-title {
             font-size: 1.1rem;
@@ -1722,6 +1748,10 @@
             const showDock = () => {
                 const dock = document.querySelector('.bottom-dock');
                 if (dock) dock.classList.add('dock-ready');
+                if (!window.__introAnimated) {
+                    window.__introAnimated = true;
+                    animateTab(document.querySelector('.tab-content.active'));
+                }
                 maybeShowSetup();
             };
             // Failsafe: dock always appears, even if the loader stalls
@@ -1763,20 +1793,39 @@
         });
 
         // 2. TAB SWITCHING
+        // Restart the enter animation on a tab (stagger its cards/panels)
+        function animateTab(el) {
+            if (!el) return;
+            el.classList.remove('tab-anim');
+            el.querySelectorAll('.item-card, .settings-col, .suggest-panel').forEach((c, i) => {
+                c.style.setProperty('--i', Math.min(i, 14));
+            });
+            void el.offsetWidth; // force reflow so the animation restarts
+            el.classList.add('tab-anim');
+        }
+
         function switchTab(tabId, btn) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.dock-item').forEach(b => b.classList.remove('active'));
 
             const targetTab = document.getElementById(tabId);
-            if (targetTab) targetTab.classList.add('active');
+            if (targetTab) {
+                targetTab.classList.add('active');
+                animateTab(targetTab);
+            }
 
-            if (btn) {
-                btn.classList.add('active');
-            } else {
+            let activeBtn = btn;
+            if (!activeBtn) {
                 // Find matching button
                 const btnIdx = ['home', 'games', 'tools', 'partners', 'suggest', 'settings'].indexOf(tabId);
                 const buttons = document.querySelectorAll('.dock-item');
-                if (btnIdx >= 0 && buttons[btnIdx]) buttons[btnIdx].classList.add('active');
+                if (btnIdx >= 0 && buttons[btnIdx]) activeBtn = buttons[btnIdx];
+            }
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+                activeBtn.classList.remove('pop');
+                void activeBtn.offsetWidth;
+                activeBtn.classList.add('pop');
             }
         }
 
