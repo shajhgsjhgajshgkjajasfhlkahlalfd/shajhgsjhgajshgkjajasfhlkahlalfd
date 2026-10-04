@@ -1530,7 +1530,7 @@
         // ===== GAME SUGGESTIONS =====
         // Optional: paste a form endpoint (e.g. a Formspree URL) to receive suggestions as JSON.
         // Left empty, suggestions are saved on the visitor's device only.
-        const SUGGESTION_ENDPOINT = '';
+        const SUGGESTION_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyiO3Wiqi-x1eVM3DgxxluK11sQ9gR5azHvma0zlq-tcltSMEj3ZQ5v-qEayDaiWZ8ERQ/exec';
         const SUGGEST_KEY = PRE + 'suggestions';
         const SUGGEST_COOLDOWN_MS = 30000;
         const byId = id => document.getElementById(id);
@@ -1578,7 +1578,6 @@
                 try {
                     const res = await fetch(SUGGESTION_ENDPOINT, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                         body: JSON.stringify({ game, link, notes, site: location.hostname })
                     });
                     entry.sent = res.ok;
