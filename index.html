@@ -1,20 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script>
-    /* Startup block screen: runs before anything renders so the real page never flashes */
-    (function () {
-        try {
-            if (!/^(https?|file):$/.test(location.protocol)) return;
-            if (localStorage.getItem('cxz_block_screen') !== 'true') return;
-            if (sessionStorage.getItem('cxz_block_unlocked') === 'true') return;
-            var themes = ['securly', 'lightspeed', 'goguardian', 'classlink'];
-            var t = localStorage.getItem('cxz_block_theme');
-            if (themes.indexOf(t) === -1) t = 'lightspeed';
-            location.replace('./blockscreens/' + t + '.html');
-        } catch (e) {}
-    })();
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classroom-x-zone</title>
@@ -774,6 +760,43 @@
     </style>
 </head>
 <body>
+    <!-- Startup block screen: shown in an iframe, then dismissed automatically -->
+    <style>
+        #block-overlay { position: fixed; inset: 0; z-index: 2000000; background: #000; opacity: 1; transition: opacity 0.4s ease; }
+        #block-overlay iframe { width: 100%; height: 100%; border: 0; display: block; }
+    </style>
+    <div id="block-overlay" style="display:none"><iframe id="block-frame" title="Blocked"></iframe></div>
+    <script>
+    (function () {
+        var BLOCK_SCREEN_MS = 4000;
+        var THEMES = ['securly', 'lightspeed', 'goguardian', 'classlink'];
+        var overlay = document.getElementById('block-overlay');
+        var frame = document.getElementById('block-frame');
+        try {
+            if (!/^(https?|file):$/.test(location.protocol)) return;
+            if (localStorage.getItem('cxz_block_screen') !== 'true') return;
+            var theme = localStorage.getItem('cxz_block_theme');
+            if (THEMES.indexOf(theme) === -1) theme = 'lightspeed';
+            frame.src = './blockscreens/' + theme + '.html';
+            overlay.style.display = 'block';
+        } catch (e) { return; }
+
+        var timer = setTimeout(dismiss, BLOCK_SCREEN_MS);
+        window.addEventListener('message', onMessage);
+
+        function onMessage(ev) {
+            if (ev.origin === location.origin && ev.source === frame.contentWindow && ev.data === 'cxz-block-dismiss') dismiss();
+        }
+        function dismiss() {
+            clearTimeout(timer);
+            window.removeEventListener('message', onMessage);
+            overlay.style.opacity = '0';
+            overlay.style.pointerEvents = 'none';
+            setTimeout(function () { overlay.remove(); }, 450);
+        }
+    })();
+    </script>
+
 
     <!-- Background Canvas (Matrix / Starfield / Particles) -->
     <canvas id="bg-canvas"></canvas>
