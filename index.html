@@ -844,13 +844,7 @@
         <!-- TAB: HOME -->
         <div id="home" class="tab-content active">
             <h2 class="section-title">Featured Games</h2>
-            <div class="grid" id="featured-grid">
-                <a href="./g/games/html/player.html?url=gd.html&title=Geometry%20Dash" class="card item-card" data-title="Geometry Dash">
-                    <img src="./g/assets/Geometry-Dash.png" alt="Geometry Dash" loading="lazy" decoding="async">
-                    <h3>Geometry Dash</h3>
-                    <p>Rhythm Platformer</p>
-                </a>
-            </div>
+            <div class="grid" id="featured-grid"></div>
         </div>
 
         <!-- TAB: GAMES -->
@@ -874,26 +868,12 @@
         <div id="tools" class="tab-content">
             <h2 class="section-title">Tools &amp; Utilities</h2>
             <div class="grid" id="tools-grid">
-                <div class="tool-card item-card" data-title="About:Blank Launcher">
-                    <div>
-                        <h3>About:Blank Launcher</h3>
-                        <p>Launches site inside a stealth about:blank iframe to cloak browser history.</p>
-                    </div>
-                    <button class="btn-action" onclick="openAboutBlank()">Launch About:Blank</button>
-                </div>
                 <div class="tool-card item-card" data-title="Blob URL Launcher">
                     <div>
                         <h3>Open in Blob</h3>
                         <p>Generates an in-memory blob URL to bypass simple domain and filter blocks.</p>
                     </div>
                     <button class="btn-action" onclick="openInBlob()">Open Blob</button>
-                </div>
-                <div class="tool-card item-card" data-title="History Flood">
-                    <div>
-                        <h3>History Flood</h3>
-                        <p>Floods the current browser tab history with 50 decoy entries.</p>
-                    </div>
-                    <button class="btn-action" onclick="floodHistory()">Flood History</button>
                 </div>
                 <div class="tool-card item-card" data-title="Download Offline HTML">
                     <div>
@@ -1347,6 +1327,50 @@
 
     <script>
         const PRE = 'cxz_';
+
+        // Games on the site. Add a game here and it can appear on the home page.
+        const GAMES = [
+            { file: 'gd.html',      title: 'Geometry Dash', tagline: 'Rhythm Platformer',  img: './g/assets/Geometry-Dash.png' },
+            { file: '1v1_LOL.html', title: '1v1.lol',       tagline: 'Multiplayer Shooter', img: './g/assets/1v1-lol.png' }
+        ];
+        const FEATURED_COUNT = 5;
+
+        // Fisher-Yates shuffle on a copy, then take up to `count` (never more than exist)
+        function pickRandom(list, count) {
+            const pool = list.slice();
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+            return pool.slice(0, Math.min(count, pool.length));
+        }
+
+        function renderFeaturedGames() {
+            const grid = document.getElementById('featured-grid');
+            if (!grid) return;
+            grid.textContent = '';
+            pickRandom(GAMES, FEATURED_COUNT).forEach(g => {
+                const a = document.createElement('a');
+                a.className = 'card item-card';
+                a.dataset.title = g.title;
+                a.href = './g/games/html/player.html?url=' + encodeURIComponent(g.file) + '&title=' + encodeURIComponent(g.title);
+
+                const img = document.createElement('img');
+                img.src = g.img;
+                img.alt = g.title;
+                img.loading = 'lazy';
+                img.decoding = 'async';
+
+                const h3 = document.createElement('h3');
+                h3.textContent = g.title;
+                const p = document.createElement('p');
+                p.textContent = g.tagline;
+
+                a.append(img, h3, p);
+                grid.appendChild(a);
+            });
+        }
+        window.addEventListener('DOMContentLoaded', renderFeaturedGames);
 
         // Standalone tools live at ./g/games/other/{Tool_Name}.html
         const TOOLS_BASE = './g/games/other/';
