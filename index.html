@@ -771,6 +771,22 @@
     #cxz-player .cxz-title { max-width:150px; font-size:9px; }
 }
 
+
+        /* ===== SETUP MODAL + SUGGESTIONS ===== */
+        #setup-modal { position: fixed; inset: 0; z-index: 1000000; display: none; align-items: center; justify-content: center; background: rgba(4,4,8,0.88); padding: 16px; }
+        #setup-modal.open { display: flex; }
+        .setup-box { width: 100%; max-width: 520px; max-height: 92vh; overflow: auto; background: #09090f; border: 2px solid var(--accent-color); border-radius: 10px; padding: 22px 20px; box-shadow: var(--accent-glow); display: flex; flex-direction: column; gap: 12px; }
+        .setup-box h2 { font-size: 0.95rem; color: var(--accent-color); text-shadow: var(--accent-glow); line-height: 1.5; }
+        .setup-sub { font-size: 0.6rem; color: var(--text-muted); line-height: 1.7; }
+        .setup-section { border-top: 1px solid rgba(255,102,0,0.3); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+        .swatch-box.selected { border-color: #fff; box-shadow: 0 0 0 2px var(--accent-color); }
+        .setup-actions { display: flex; gap: 8px; margin-top: 6px; }
+        .setup-actions .btn-action { flex: 1; }
+        .btn-ghost { border-color: #555; color: var(--text-muted); }
+        textarea { width: 100%; resize: vertical; background: #0d0d15; border: 1.5px solid var(--accent-color); color: var(--text-white); padding: 7px 10px; border-radius: 4px; font-size: 0.65rem; line-height: 1.6; outline: none; }
+        .suggest-panel { max-width: 560px; display: flex; flex-direction: column; gap: 10px; background: #09090f; border: 1.5px solid var(--accent-color); border-radius: 6px; padding: 18px 16px; }
+        .suggest-item { font-size: 0.6rem; color: var(--text-white); line-height: 1.6; padding: 6px 8px; border: 1px dashed rgba(255,102,0,0.4); border-radius: 4px; word-break: break-word; }
+        .suggest-item small { color: var(--text-muted); }
     </style>
 </head>
 <body>
@@ -786,17 +802,7 @@
         var THEMES = ['securly', 'lightspeed', 'goguardian', 'classlink'];
         var overlay = document.getElementById('block-overlay');
         var frame = document.getElementById('block-frame');
-        try {
-            if (!/^(https?|file):$/.test(location.protocol)) return;
-            if (localStorage.getItem('cxz_block_screen') !== 'true') return;
-            var theme = localStorage.getItem('cxz_block_theme');
-            if (THEMES.indexOf(theme) === -1) theme = 'lightspeed';
-            frame.src = './blockscreens/' + theme + '.html';
-            overlay.style.display = 'block';
-        } catch (e) { return; }
-
-        var timer = setTimeout(dismiss, BLOCK_SCREEN_MS);
-        window.addEventListener('message', onMessage);
+        var timer = null, hideTimer = null;
 
         function onMessage(ev) {
             if (ev.origin === location.origin && ev.source === frame.contentWindow && ev.data === 'cxz-block-dismiss') dismiss();
@@ -806,8 +812,26 @@
             window.removeEventListener('message', onMessage);
             overlay.style.opacity = '0';
             overlay.style.pointerEvents = 'none';
-            setTimeout(function () { overlay.remove(); }, 450);
+            hideTimer = setTimeout(function () { overlay.style.display = 'none'; frame.removeAttribute('src'); }, 450);
         }
+        function show(force) {
+            try {
+                if (!/^(https?|file):$/.test(location.protocol)) return;
+                if (!force && localStorage.getItem('cxz_block_screen') !== 'true') return;
+                var theme = localStorage.getItem('cxz_block_theme');
+                if (THEMES.indexOf(theme) === -1) theme = 'lightspeed';
+                clearTimeout(timer); clearTimeout(hideTimer);
+                frame.src = './blockscreens/' + theme + '.html';
+                overlay.style.display = 'block';
+                overlay.style.opacity = '1';
+                overlay.style.pointerEvents = 'auto';
+            } catch (e) { return; }
+            window.removeEventListener('message', onMessage);
+            window.addEventListener('message', onMessage);
+            timer = setTimeout(dismiss, BLOCK_SCREEN_MS);
+        }
+        window.cxzShowBlockScreen = function () { show(true); };
+        show(false);
     })();
     </script>
 
@@ -850,18 +874,7 @@
         <!-- TAB: GAMES -->
         <div id="games" class="tab-content">
             <h2 class="section-title">All Games</h2>
-            <div class="grid" id="all-games-grid">
-                <a href="./g/games/html/player.html?url=gd.html&title=Geometry%20Dash" class="card item-card" data-title="Geometry Dash">
-                    <img src="./g/assets/Geometry-Dash.png" alt="Geometry Dash" loading="lazy" decoding="async">
-                    <h3>Geometry Dash</h3>
-                    <p>Rhythm Platformer</p>
-                </a>
-                <a href="./g/games/html/player.html?url=1v1.lol.html&title=1v1.lol" class="card item-card" data-title="Geometry Dash">
-                    <img src="./g/assets/1v1-lol.png" alt="Geometry Dash" loading="lazy" decoding="async">
-                    <h3>1v1.lol</h3>
-                    <p>Multiplayer Shooter</p>
-                </a>
-            </div>
+            <div class="grid" id="all-games-grid"></div>
         </div>
 
         <!-- TAB: TOOLS -->
@@ -875,13 +888,24 @@
         <!-- TAB: PARTNERS -->
         <div id="partners" class="tab-content">
             <h2 class="section-title">Partners</h2>
-            <div class="grid">
-                <a href=https://sites.google.com/view/jaimescheesegrater/>
-                <div class="card item-card" data-title="Jaime Grater">
-                    <h3>Jaime's Cheese Grater</h3>
-                    <p>Owned by Jaime the grate who loves cheese.</p>
-                </div>
-                </a>    
+            <div class="grid" id="partners-grid"></div>
+        </div>
+
+        <!-- TAB: SUGGEST -->
+        <div id="suggest" class="tab-content">
+            <h2 class="section-title">Suggest a Game</h2>
+            <div class="suggest-panel">
+                <p class="setup-sub">Want a game added to the site? Tell us which one.</p>
+                <div class="setting-subhead" style="text-align:left;">Game name *</div>
+                <input type="text" id="suggest-name" maxlength="60" placeholder="e.g. Slope">
+                <div class="setting-subhead" style="text-align:left;">Link (optional)</div>
+                <input type="text" id="suggest-link" maxlength="200" placeholder="https://...">
+                <div class="setting-subhead" style="text-align:left;">Notes (optional)</div>
+                <textarea id="suggest-notes" maxlength="300" rows="4" placeholder="Why should we add it?"></textarea>
+                <button class="btn-action" onclick="submitSuggestion()">Send Suggestion</button>
+                <div class="setup-sub" id="suggest-status" role="status" aria-live="polite"></div>
+                <div class="setting-subhead" style="text-align:left;">Your recent suggestions</div>
+                <div id="suggest-list"></div>
             </div>
         </div>
 
@@ -1081,6 +1105,15 @@
                         <option value="goguardian">GoGuardian</option>
                         <option value="classlink">Classlink</option>
                     </select>
+
+                    <div style="font-size:0.6rem;color:var(--text-muted);margin-top:4px;">Block Screen Title</div>
+                    <input type="text" id="block-title-input" maxlength="60" placeholder="Website Blocked" onchange="savePerfSettings()">
+                    <div style="font-size:0.6rem;color:var(--text-muted);margin-top:4px;">Block Screen Message</div>
+                    <input type="text" id="block-msg-input" maxlength="160" placeholder="Leave empty for the theme default" onchange="savePerfSettings()">
+                    <div class="btn-row">
+                        <button class="btn-action" onclick="previewBlockScreen()">Preview</button>
+                        <button class="btn-action" onclick="resetBlockText()">Reset Text</button>
+                    </div>
 
                     <div class="setting-subhead" style="text-align:left; margin-top:8px;">Startup Options</div>
                     <label class="checkbox-label">
@@ -1285,11 +1318,49 @@
         <button class="dock-item" onclick="switchTab('partners', this)" title="Partners">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-handshake"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></svg>
         </button>
+        <!-- Lucide lightbulb -->
+        <button class="dock-item" onclick="switchTab('suggest', this)" title="Suggest a Game">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lightbulb"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+        </button>
         <!-- Lucide volume-x -->
         <button class="dock-item" onclick="toggleMuteSound()" id="dock-mute-btn" title="Mute">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-volume-x"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg>
         </button>
     </nav>
+
+    <!-- First-run Setup Modal (skippable) -->
+    <div id="setup-modal" role="dialog" aria-modal="true" aria-labelledby="setup-title">
+        <div class="setup-box">
+            <h2 id="setup-title">Welcome! Quick Setup</h2>
+            <p class="setup-sub">Pick a few options now, or skip. You can change everything later in Settings.</p>
+
+            <div class="setup-section">
+                <div class="setting-subhead" style="text-align:left;">Accent Color</div>
+                <div class="color-swatches-grid" id="setup-swatches"></div>
+            </div>
+
+            <div class="setup-section">
+                <div class="setting-subhead" style="text-align:left;">Tab Cloak</div>
+                <select id="setup-preset"></select>
+                <input type="text" id="setup-cloak-name" placeholder="Tab name">
+                <input type="text" id="setup-cloak-icon" placeholder="Favicon URL">
+            </div>
+
+            <div class="setup-section">
+                <div class="setting-subhead" style="text-align:left;">Block Screen</div>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="setup-block-on">
+                    Show block screen on startup
+                </label>
+                <select id="setup-block-theme"></select>
+            </div>
+
+            <div class="setup-actions">
+                <button class="btn-action btn-ghost" onclick="skipSetup()">Skip for now</button>
+                <button class="btn-action" onclick="finishSetup()">Save &amp; Finish</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Toast Container -->
     <div class="toast-container" id="toast-container"></div>
@@ -1297,10 +1368,20 @@
     <script>
         const PRE = 'cxz_';
 
-        // Games on the site. Add a game here and it can appear on the home page.
+        // Games on the site. Add a game here and it appears in the Games tab and the home-page pick.
+        // file = the .html name inside /g/games/html/   img = card image (leave '' for a generated placeholder)
         const GAMES = [
-            { file: 'gd.html',      title: 'Geometry Dash', tagline: 'Rhythm Platformer',  img: './g/assets/Geometry-Dash.png' },
-            { file: '1v1_LOL.html', title: '1v1.lol',       tagline: 'Multiplayer Shooter', img: './g/assets/1v1-lol.png' }
+            { file: '1v1.lol.html',          title: '1v1.lol',            tagline: 'Multiplayer Shooter',     img: './g/assets/1v1-lol.png' },
+            { file: 'FNAF.html',             title: 'FNAF',               tagline: "Five Nights at Freddy's", img: '' },
+            { file: 'FNAF2.html',            title: 'FNAF 2',             tagline: "Five Nights at Freddy's", img: '' },
+            { file: 'FNAF3.html',            title: 'FNAF 3',             tagline: "Five Nights at Freddy's", img: '' },
+            { file: 'FNAF4.html',            title: 'FNAF 4',             tagline: "Five Nights at Freddy's", img: '' },
+            { file: 'Moto-X3M.html',         title: 'Moto X3M',           tagline: 'Bike Racing',             img: '' },
+            { file: 'basket-bros.html',      title: 'Basket Bros',        tagline: 'Basketball',              img: '' },
+            { file: 'cookie-clicker.html',   title: 'Cookie Clicker',     tagline: 'Idle Clicker',            img: '' },
+            { file: 'escape-road-city-2.html', title: 'Escape Road City 2', tagline: 'Driving Escape',        img: '' },
+            { file: 'gd.html',               title: 'Geometry Dash',      tagline: 'Rhythm Platformer',       img: './g/assets/Geometry-Dash.png' },
+            { file: 'slope.html',            title: 'Slope',              tagline: 'Endless Runner',          img: '' }
         ];
         const FEATURED_COUNT = 5;
 
@@ -1314,32 +1395,52 @@
             return pool.slice(0, Math.min(count, pool.length));
         }
 
-        function renderFeaturedGames() {
-            const grid = document.getElementById('featured-grid');
-            if (!grid) return;
-            grid.textContent = '';
-            pickRandom(GAMES, FEATURED_COUNT).forEach(g => {
-                const a = document.createElement('a');
-                a.className = 'card item-card';
-                a.dataset.title = g.title;
-                a.href = './g/games/html/player.html?url=' + encodeURIComponent(g.file) + '&title=' + encodeURIComponent(g.title);
-
-                const img = document.createElement('img');
-                img.src = g.img;
-                img.alt = g.title;
-                img.loading = 'lazy';
-                img.decoding = 'async';
-
-                const h3 = document.createElement('h3');
-                h3.textContent = g.title;
-                const p = document.createElement('p');
-                p.textContent = g.tagline;
-
-                a.append(img, h3, p);
-                grid.appendChild(a);
-            });
+        // Generated card art for games without an image (or whose image fails to load)
+        function placeholderImg(title) {
+            const t = String(title).replace(/[<>&"']/g, '');
+            const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="420" height="240" viewBox="0 0 420 240">' +
+                '<rect width="420" height="240" fill="#0e0e16"/>' +
+                '<rect x="6" y="6" width="408" height="228" fill="none" stroke="#ff6600" stroke-opacity=".5" stroke-width="2" stroke-dasharray="8 6"/>' +
+                '<text x="210" y="130" text-anchor="middle" font-family="monospace" font-size="28" fill="#ff6600">' + t + '</text></svg>';
+            return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
         }
-        window.addEventListener('DOMContentLoaded', renderFeaturedGames);
+
+        function buildGameCard(g) {
+            const a = document.createElement('a');
+            a.className = 'card item-card';
+            a.dataset.title = g.title;
+            a.href = './g/games/html/player.html?url=' + encodeURIComponent(g.file) + '&title=' + encodeURIComponent(g.title);
+
+            const img = document.createElement('img');
+            img.alt = g.title;
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            img.onerror = () => { img.onerror = null; img.src = placeholderImg(g.title); };
+            img.src = g.img || placeholderImg(g.title);
+
+            const h3 = document.createElement('h3');
+            h3.textContent = g.title;
+            const p = document.createElement('p');
+            p.textContent = g.tagline;
+
+            a.append(img, h3, p);
+            return a;
+        }
+
+        function renderGames() {
+            const featured = document.getElementById('featured-grid');
+            if (featured) {
+                featured.textContent = '';
+                pickRandom(GAMES, FEATURED_COUNT).forEach(g => featured.appendChild(buildGameCard(g)));
+            }
+            const all = document.getElementById('all-games-grid');
+            if (all) {
+                all.textContent = '';
+                GAMES.slice().sort((x, y) => x.title.localeCompare(y.title, undefined, { numeric: true }))
+                    .forEach(g => all.appendChild(buildGameCard(g)));
+            }
+        }
+        window.addEventListener('DOMContentLoaded', renderGames);
 
         // Standalone tools live at ./g/games/other/{Tool_Name}.html
         const TOOLS_BASE = './g/games/other/';
@@ -1386,6 +1487,228 @@
             });
         });
 
+        // ===== PARTNERS (click a card to open the partner's main site in a new tab) =====
+        const PARTNERS = [
+            { name: "Jaime's Cheese Grater", desc: 'Owned by Jaime the grate who loves cheese.', url: 'https://sites.google.com/view/jaimescheesegrater/', logo: '' }
+        ];
+
+        function renderPartners() {
+            const grid = document.getElementById('partners-grid');
+            if (!grid) return;
+            grid.textContent = '';
+            PARTNERS.forEach(p => {
+                if (!/^https?:\/\//i.test(p.url)) return;
+                const a = document.createElement('a');
+                a.className = 'card item-card';
+                a.dataset.title = p.name;
+                a.href = p.url;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                a.title = 'Visit ' + p.name;
+                if (p.logo) {
+                    const img = document.createElement('img');
+                    img.src = p.logo;
+                    img.alt = p.name;
+                    img.loading = 'lazy';
+                    img.onerror = () => img.remove();
+                    a.appendChild(img);
+                }
+                const h3 = document.createElement('h3');
+                h3.textContent = p.name;
+                const d = document.createElement('p');
+                d.textContent = p.desc;
+                a.append(h3, d);
+                grid.appendChild(a);
+            });
+        }
+        window.addEventListener('DOMContentLoaded', renderPartners);
+
+        // ===== GAME SUGGESTIONS =====
+        // Optional: paste a form endpoint (e.g. a Formspree URL) to receive suggestions as JSON.
+        // Left empty, suggestions are saved on the visitor's device only.
+        const SUGGESTION_ENDPOINT = '';
+        const SUGGEST_KEY = PRE + 'suggestions';
+        const SUGGEST_COOLDOWN_MS = 30000;
+        const byId = id => document.getElementById(id);
+
+        function loadSuggestions() {
+            try { return JSON.parse(localStorage.getItem(SUGGEST_KEY)) || []; } catch (e) { return []; }
+        }
+
+        function renderSuggestions() {
+            const box = byId('suggest-list');
+            if (!box) return;
+            box.textContent = '';
+            const list = loadSuggestions().slice(0, 5);
+            if (!list.length) {
+                const none = document.createElement('div');
+                none.className = 'setup-sub';
+                none.textContent = 'None yet.';
+                box.appendChild(none);
+                return;
+            }
+            list.forEach(sg => {
+                const row = document.createElement('div');
+                row.className = 'suggest-item';
+                row.textContent = sg.game + ' ';
+                const tag = document.createElement('small');
+                tag.textContent = sg.sent ? '(sent)' : '(saved)';
+                row.appendChild(tag);
+                box.appendChild(row);
+            });
+        }
+
+        async function submitSuggestion() {
+            const status = msg => { byId('suggest-status').textContent = msg; };
+            const game = byId('suggest-name').value.trim();
+            const link = byId('suggest-link').value.trim();
+            const notes = byId('suggest-notes').value.trim();
+
+            if (!game) return status('Enter a game name first.');
+            if (link && !/^https?:\/\/\S+$/i.test(link)) return status('The link must start with http:// or https://');
+            const last = Number(localStorage.getItem(PRE + 'suggest_last')) || 0;
+            if (Date.now() - last < SUGGEST_COOLDOWN_MS) return status('Please wait a few seconds before sending another one.');
+
+            const entry = { game, link, notes, ts: Date.now(), sent: false };
+            if (SUGGESTION_ENDPOINT) {
+                try {
+                    const res = await fetch(SUGGESTION_ENDPOINT, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({ game, link, notes, site: location.hostname })
+                    });
+                    entry.sent = res.ok;
+                } catch (e) { entry.sent = false; }
+            }
+
+            const list = loadSuggestions();
+            list.unshift(entry);
+            try {
+                localStorage.setItem(SUGGEST_KEY, JSON.stringify(list.slice(0, 50)));
+                localStorage.setItem(PRE + 'suggest_last', String(entry.ts));
+            } catch (e) {}
+
+            byId('suggest-name').value = '';
+            byId('suggest-link').value = '';
+            byId('suggest-notes').value = '';
+            if (entry.sent) status('Thanks! Your suggestion was sent.');
+            else if (SUGGESTION_ENDPOINT) status('Could not send right now. Saved on this device.');
+            else status('Suggestion saved on this device.');
+            showToast('Suggestion saved: ' + game);
+            renderSuggestions();
+        }
+        window.addEventListener('DOMContentLoaded', renderSuggestions);
+
+        // ===== BLOCK SCREEN TEXT =====
+        function previewBlockScreen() {
+            window.__quietToasts = true;
+            try { savePerfSettings(); } finally { window.__quietToasts = false; }
+            if (typeof window.cxzShowBlockScreen === 'function') window.cxzShowBlockScreen();
+        }
+
+        function resetBlockText() {
+            byId('block-title-input').value = '';
+            byId('block-msg-input').value = '';
+            localStorage.removeItem(PRE + 'block_title');
+            localStorage.removeItem(PRE + 'block_message');
+            showToast('Block screen text reset');
+        }
+
+        // ===== FIRST-RUN SETUP MODAL =====
+        let setupShown = false;
+        let setupAccent = '#ff6600';
+
+        function buildSetupUI() {
+            const sw = byId('setup-swatches');
+            if (!sw.children.length) {
+                document.querySelectorAll('#settings .color-swatches-grid .swatch-box').forEach(src => {
+                    const m = /'(#[0-9a-f]{6})'/i.exec(src.getAttribute('onclick') || '');
+                    if (!m) return;
+                    const box = document.createElement('div');
+                    box.className = 'swatch-box';
+                    box.style.background = m[1];
+                    box.dataset.color = m[1];
+                    box.onclick = () => selectSetupAccent(m[1]);
+                    sw.appendChild(box);
+                });
+            }
+            const preset = byId('setup-preset');
+            if (!preset.options.length) {
+                preset.innerHTML = byId('preset-dropdown').innerHTML;
+                preset.onchange = () => {
+                    if (!preset.value) return;
+                    const [title, icon] = preset.value.split('|');
+                    byId('setup-cloak-name').value = title;
+                    byId('setup-cloak-icon').value = icon || '';
+                };
+            }
+            const theme = byId('setup-block-theme');
+            if (!theme.options.length) theme.innerHTML = byId('block-theme-select').innerHTML;
+        }
+
+        function selectSetupAccent(hex) {
+            setupAccent = hex;
+            document.querySelectorAll('#setup-swatches .swatch-box').forEach(b => {
+                b.classList.toggle('selected', b.dataset.color.toLowerCase() === hex.toLowerCase());
+            });
+        }
+
+        function openSetup() {
+            const modal = byId('setup-modal');
+            if (!modal) return;
+            buildSetupUI();
+            selectSetupAccent(localStorage.getItem(PRE + 'accent') || '#ff6600');
+            byId('setup-cloak-name').value = localStorage.getItem(PRE + 'cloak_title') || '';
+            byId('setup-cloak-icon').value = localStorage.getItem(PRE + 'cloak_icon') || '';
+            byId('setup-preset').value = '';
+            byId('setup-block-on').checked = localStorage.getItem(PRE + 'block_screen') === 'true';
+            let bt = localStorage.getItem(PRE + 'block_theme') || 'lightspeed';
+            if (!['securly', 'lightspeed', 'goguardian', 'classlink'].includes(bt)) bt = 'lightspeed';
+            byId('setup-block-theme').value = bt;
+            modal.classList.add('open');
+        }
+
+        function closeSetup() {
+            byId('setup-modal').classList.remove('open');
+            localStorage.setItem(PRE + 'setup_done', 'true');
+        }
+
+        function skipSetup() { closeSetup(); }
+
+        function finishSetup() {
+            window.__quietToasts = true;
+            try {
+                setThemeAccent(setupAccent);
+
+                const name = byId('setup-cloak-name').value.trim();
+                const icon = byId('setup-cloak-icon').value.trim();
+                if (name || icon) {
+                    byId('cloak-name-input').value = name;
+                    byId('cloak-icon-input').value = icon;
+                    saveCloak();
+                }
+
+                byId('block-screen-check').checked = byId('setup-block-on').checked;
+                byId('block-theme-select').value = byId('setup-block-theme').value;
+                savePerfSettings();
+            } finally {
+                window.__quietToasts = false;
+            }
+            closeSetup();
+            showToast('Setup saved!');
+        }
+
+        function maybeShowSetup() {
+            if (setupShown) return;
+            setupShown = true;
+            if (localStorage.getItem(PRE + 'setup_done') !== 'true') openSetup();
+        }
+
+        document.addEventListener('keydown', e => {
+            const m = byId('setup-modal');
+            if (e.key === 'Escape' && m && m.classList.contains('open')) skipSetup();
+        });
+
         // 1. FAST STARTUP LOADER (Respects settings)
         window.addEventListener('DOMContentLoaded', () => {
             const showLoader = localStorage.getItem(PRE + 'loadscreen') !== 'false';
@@ -1396,6 +1719,7 @@
             const showDock = () => {
                 const dock = document.querySelector('.bottom-dock');
                 if (dock) dock.classList.add('dock-ready');
+                maybeShowSetup();
             };
             // Failsafe: dock always appears, even if the loader stalls
             setTimeout(showDock, 4000);
@@ -1447,7 +1771,7 @@
                 btn.classList.add('active');
             } else {
                 // Find matching button
-                const btnIdx = ['home', 'games', 'tools', 'partners', null, null, null, 'settings'].indexOf(tabId);
+                const btnIdx = ['home', 'games', 'tools', 'partners', 'suggest'].indexOf(tabId);
                 const buttons = document.querySelectorAll('.dock-item');
                 if (btnIdx >= 0 && buttons[btnIdx]) buttons[btnIdx].classList.add('active');
             }
@@ -1476,6 +1800,7 @@
 
         // 5. TOAST NOTIFICATIONS
         function showToast(msg) {
+            if (window.__quietToasts) return;
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = 'toast-msg';
@@ -1737,7 +2062,7 @@ setTimeout(function() {
 
         function interceptGameLinks() {
             const useBlob = localStorage.getItem(PRE + 'games_in_blob') === 'true';
-            document.querySelectorAll('a.item-card').forEach(a => {
+            document.querySelectorAll('a.item-card[href*="player.html"]').forEach(a => {
                 a.onclick = (e) => {
                     if (useBlob) {
                         e.preventDefault();
@@ -1761,8 +2086,8 @@ setTimeout(function() {
         }
 
         function rerunSetup() {
-            localStorage.removeItem(PRE + 'loadscreen');
-            location.reload();
+            localStorage.removeItem(PRE + 'setup_done');
+            openSetup();
         }
 
         function saveSettingsTxt() {
@@ -1889,6 +2214,10 @@ setTimeout(function() {
             localStorage.setItem(PRE + 'block_theme', document.getElementById('block-theme-select').value);
             localStorage.setItem(PRE + 'music_startup', document.getElementById('music-startup-check').checked);
             localStorage.setItem(PRE + 'loadscreen', document.getElementById('loadscreen-startup-check').checked);
+            const bTitle = document.getElementById('block-title-input').value.trim();
+            const bMsg = document.getElementById('block-msg-input').value.trim();
+            if (bTitle) localStorage.setItem(PRE + 'block_title', bTitle); else localStorage.removeItem(PRE + 'block_title');
+            if (bMsg) localStorage.setItem(PRE + 'block_message', bMsg); else localStorage.removeItem(PRE + 'block_message');
             showToast("Performance Settings Saved");
         }
 
@@ -2002,6 +2331,8 @@ setTimeout(function() {
             let bt = localStorage.getItem(PRE + 'block_theme') || 'lightspeed';
             if (!['securly', 'lightspeed', 'goguardian', 'classlink'].includes(bt)) bt = 'lightspeed';
             document.getElementById('block-theme-select').value = bt;
+            document.getElementById('block-title-input').value = localStorage.getItem(PRE + 'block_title') || '';
+            document.getElementById('block-msg-input').value = localStorage.getItem(PRE + 'block_message') || '';
 
             const ms = localStorage.getItem(PRE + 'music_startup') === 'true';
             document.getElementById('music-startup-check').checked = ms;
