@@ -1229,15 +1229,6 @@
 
         </button>
 
-        <button
-            class="cxz-tool"
-            onclick="CXZPlayer.openNewTab()"
-            title="Open Game in New Tab">
-
-            <i data-lucide="square-arrow-out-up-right"></i>
-
-        </button>
-
         <div class="cxz-volume">
 
             <i data-lucide="volume-2"></i>
@@ -1509,7 +1500,9 @@
 
                 const a = document.createElement('a');
                 a.className = 'btn-action';
-                a.href = TOOLS_BASE + encodeURIComponent(t.name) + '.html';
+                // Same CDN folder the games use, but /other/ instead of /html/
+                const toolUrl = CXZ_GAME_BASE.replace('/g/games/html/', '/g/games/other/') + encodeURIComponent(t.name) + '.html';
+                a.href = './g/games/html/player.html?url=' + encodeURIComponent(toolUrl) + '&title=' + encodeURIComponent(t.title);
                 a.textContent = t.label;
 
                 card.append(info, a);
@@ -2661,7 +2654,7 @@ const CXZPlayer = (() => {
             );
         }
 
-        const html = await response.text();
+        let html = await response.text();
 
         if (!html || !html.trim()) {
             throw new Error(
@@ -2674,6 +2667,14 @@ const CXZPlayer = (() => {
             html.length.toLocaleString() +
             ' characters'
         );
+
+        // srcdoc pages have no real location, so add a <base> if the page lacks one
+        if (!/<base\s/i.test(html)) {
+            const baseTag = '<base href="' + new URL('./', url).href + '">';
+            html = /<head[^>]*>/i.test(html)
+                ? html.replace(/<head[^>]*>/i, m => m + baseTag)
+                : baseTag + html;
+        }
 
         return html;
     }
@@ -3054,48 +3055,6 @@ FRAME.srcdoc =
         );
     }
 
-    /*
-     * Open the actual fetched HTML directly
-     * in an about:blank document.
-     */
-    function openNewTab() {
-
-        if (!currentHTML) {
-
-            showToast(
-                'Game is still loading'
-            );
-
-            return;
-        }
-
-        const win =
-            window.open(
-                'about:blank',
-                '_blank'
-            );
-
-        if (!win) {
-
-            alert(
-                'Pop-ups are blocked. Please allow pop-ups for this site.'
-            );
-
-            return;
-        }
-
-        const doc =
-            win.document;
-
-        doc.open();
-
-        doc.write(
-            currentHTML
-        );
-
-        doc.close();
-    }
-
     async function download() {
 
         if (!currentHTML) {
@@ -3223,7 +3182,6 @@ FRAME.srcdoc =
         close,
         reload,
         fullscreen,
-        openNewTab,
         openBlank,
         download,
         toggleConsole
