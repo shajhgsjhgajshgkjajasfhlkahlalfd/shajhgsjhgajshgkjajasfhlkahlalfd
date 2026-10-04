@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+    /* Startup block screen: runs before anything renders so the real page never flashes */
+    (function () {
+        try {
+            if (!/^(https?|file):$/.test(location.protocol)) return;
+            if (localStorage.getItem('cxz_block_screen') !== 'true') return;
+            if (sessionStorage.getItem('cxz_block_unlocked') === 'true') return;
+            var themes = ['securly', 'lightspeed', 'goguardian', 'classlink'];
+            var t = localStorage.getItem('cxz_block_theme');
+            if (themes.indexOf(t) === -1) t = 'lightspeed';
+            location.replace('./blockscreens/' + t + '.html');
+        } catch (e) {}
+    })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classroom-x-zone</title>
@@ -1056,9 +1070,10 @@
                     
                     <div style="font-size:0.6rem;color:var(--text-muted);margin-top:4px;">Block Screen Theme</div>
                     <select id="block-theme-select" onchange="savePerfSettings()">
+                        <option value="securly">Securly</option>
                         <option value="lightspeed">Lightspeed</option>
-                        <option value="matrix">Matrix Code</option>
-                        <option value="minimal">Minimal</option>
+                        <option value="goguardian">GoGuardian</option>
+                        <option value="classlink">Classlink</option>
                     </select>
 
                     <div class="setting-subhead" style="text-align:left; margin-top:8px;">Startup Options</div>
@@ -1909,7 +1924,8 @@ setTimeout(function() {
             const bs = localStorage.getItem(PRE + 'block_screen') === 'true';
             document.getElementById('block-screen-check').checked = bs;
 
-            const bt = localStorage.getItem(PRE + 'block_theme') || 'lightspeed';
+            let bt = localStorage.getItem(PRE + 'block_theme') || 'lightspeed';
+            if (!['securly', 'lightspeed', 'goguardian', 'classlink'].includes(bt)) bt = 'lightspeed';
             document.getElementById('block-theme-select').value = bt;
 
             const ms = localStorage.getItem(PRE + 'music_startup') === 'true';
