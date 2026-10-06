@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classroom-x-zone</title>
     <meta name="color-scheme" content="dark">
+    <!-- Integrated player; game HTML is cache-busted on fetch. -->
     <link rel="icon" id="favicon" href="./g/assets/favicon.ico">
     
     <!-- Non-blocking optimized font loading -->
@@ -1430,7 +1431,10 @@
             const a = document.createElement('a');
             a.className = 'card item-card';
             a.dataset.title = g.title;
-            a.href = './g/games/html/player.html?url=' + encodeURIComponent(g.file) + '&title=' + encodeURIComponent(g.title);
+            a.dataset.gameUrl = g.file;
+            a.href = '#';
+            a.setAttribute('role', 'button');
+            a.setAttribute('aria-label', 'Play ' + g.title);
 
             const img = document.createElement('img');
             img.alt = g.title;
@@ -1500,9 +1504,12 @@
 
                 const a = document.createElement('a');
                 a.className = 'btn-action';
-                // Same CDN folder the games use, but /other/ instead of /html/
+                // Tools use the same integrated player, but load from /other/.
                 const toolUrl = CXZ_GAME_BASE.replace('/g/games/html/', '/g/games/other/') + encodeURIComponent(t.name) + '.html';
-                a.href = './g/games/html/player.html?url=' + encodeURIComponent(toolUrl) + '&title=' + encodeURIComponent(t.title);
+                a.dataset.gameUrl = toolUrl;
+                a.dataset.title = t.title;
+                a.href = '#';
+                a.setAttribute('role', 'button');
                 a.textContent = t.label;
 
                 card.append(info, a);
@@ -2105,19 +2112,10 @@ setTimeout(function() {
             interceptGameLinks();
         }
 
+        // Kept for compatibility with the old settings checkbox.
+        // Games are now always handled by the integrated CXZPlayer.
         function interceptGameLinks() {
-            const useBlob = localStorage.getItem(PRE + 'games_in_blob') === 'true';
-            document.querySelectorAll('a.item-card[href*="player.html"]').forEach(a => {
-                a.onclick = (e) => {
-                    if (useBlob) {
-                        e.preventDefault();
-                        fetch(a.href).then(r => r.text()).then(html => {
-                            const blob = new Blob([html], { type: 'text/html' });
-                            window.open(URL.createObjectURL(blob), '_blank');
-                        }).catch(() => window.location.href = a.href);
-                    }
-                };
-            });
+            return;
         }
 
         // 9. BACKUP & RESTORE
@@ -2536,7 +2534,7 @@ setTimeout(function() {
    ========================================================= */
 
 const CXZ_GAME_BASE =
-    'https://cdn.jsdelivr.net/gh/shajhgsjhgajshgkjajasfhlkahlalfd/shajhgsjhgajshgkjajasfhlkahlalfd@main/g/games/html/';
+    'https://raw.githubusercontent.com/shajhgsjhgajshgkjajasfhlkahlalfd/shajhgsjhgajshgkjajasfhlkahlalfd/main/g/games/html/';
 
 const CXZPlayer = (() => {
 
@@ -2588,50 +2586,59 @@ const CXZPlayer = (() => {
         }
     }
 
+    function finishLoader() {
+        clearInterval(progressTimer);
+
+        const bar = $('cxz-progress');
+        const loader = $('cxz-loader');
+
+        if (bar) {
+            bar.style.width = '100%';
+        }
+
+        if (loader) {
+            loader.classList.add('hidden');
+        }
+
+        log(
+            '[Loaded] ' +
+            currentTitle +
+            ' loaded successfully.'
+        );
+
+        showToast(
+            currentTitle +
+            ' loaded'
+        );
+    }
+
     function startLoader() {
         resetLoader();
 
         progressTimer = setInterval(() => {
-
-            progress += Math.floor(Math.random() * 18) + 8;
-
-            if (progress > 100) {
-                progress = 100;
-            }
+            progress = Math.min(
+                progress + Math.floor(Math.random() * 12) + 5,
+                92
+            );
 
             const bar = $('cxz-progress');
 
             if (bar) {
                 bar.style.width = progress + '%';
             }
-
-            if (progress >= 100) {
-
-                clearInterval(progressTimer);
-
-                setTimeout(() => {
-
-                    const loader = $('cxz-loader');
-
-                    if (loader) {
-                        loader.classList.add('hidden');
-                    }
-
-                    log(
-                        '[Loaded] ' +
-                        currentTitle +
-                        ' loaded successfully.'
-                    );
-
-                    showToast(
-                        currentTitle +
-                        ' loaded'
-                    );
-
-                }, 250);
-            }
-
         }, 80);
+
+        // Never leave the loader stuck if a game does not fire iframe load.
+        setTimeout(() => {
+            const loader = $('cxz-loader');
+            if (
+                loader &&
+                !loader.classList.contains('hidden') &&
+                currentGame
+            ) {
+                finishLoader();
+            }
+        }, 12000);
     }
 
     /*
@@ -2644,8 +2651,19 @@ const CXZPlayer = (() => {
 
         log('[Fetch] ' + url);
 
-        const response = await fetch(url, {
-            cache: 'no-store'
+        // GitHub Pages/CDN layers can cache game HTML. The timestamp makes
+        // every launch request the current file from the repository.
+        const freshURL =
+            url +
+            (url.includes('?') ? '&' : '?') +
+            'cxz_version=' +
+            Date.now();
+
+        log('[Fetch] ' + freshURL);
+
+        const response = await fetch(freshURL, {
+            cache: 'no-store',
+            credentials: 'omit'
         });
 
         if (!response.ok) {
@@ -2697,6 +2715,11 @@ const CXZPlayer = (() => {
         }
 
         frame.removeAttribute('src');
+
+        // srcdoc is the actual embedded game page. It does not depend on a separate player page.
+        frame.onload = () => {
+            finishLoader();
+        };
 
         frame.srcdoc = html;
     }
@@ -2841,6 +2864,8 @@ ${String(error.message)
             frame.removeAttribute(
                 'src'
             );
+
+            frame.onload = null;
         }
 
         currentGame = '';
@@ -3192,64 +3217,35 @@ FRAME.srcdoc =
 
 
 /* =========================================================
-   GAME CARD INTERCEPTOR
+   INTEGRATED GAME CARD LAUNCHER
+   =========================================================
+   Cards point directly to the integrated player.
    ========================================================= */
 
 document.addEventListener(
     'click',
     event => {
+        const card = event.target.closest(
+            '[data-game-url]'
+        );
 
-        const card =
-            event.target.closest(
-                'a[href*="/g/games/html/player.html"]'
-            );
-
-        if (!card) {
-            return;
-        }
+        if (!card) return;
 
         event.preventDefault();
         event.stopPropagation();
 
-        try {
+        const gameURL = card.dataset.gameUrl;
+        const title =
+            card.dataset.title ||
+            card.querySelector('h3')?.textContent ||
+            'Game';
 
-            const url =
-                new URL(
-                    card.href,
-                    location.href
-                );
-
-            const gameURL =
-                url.searchParams.get(
-                    'url'
-                );
-
-            const title =
-                url.searchParams.get(
-                    'title'
-                ) ||
-                card.dataset.title ||
-                card.querySelector(
-                    'h3'
-                )?.textContent ||
-                'Game';
-
-            if (gameURL) {
-
-                CXZPlayer.open(
-                    gameURL,
-                    title
-                );
-            }
-
-        } catch (error) {
-
-            console.error(
-                'Game player error:',
-                error
-            );
+        if (!gameURL) {
+            console.error('[CXZ] Game card has no data-game-url.');
+            return;
         }
 
+        CXZPlayer.open(gameURL, title);
     },
     true
 );
