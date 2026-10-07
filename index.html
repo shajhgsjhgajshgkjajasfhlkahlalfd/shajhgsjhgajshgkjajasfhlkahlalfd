@@ -830,6 +830,7 @@
         var overlay = document.getElementById('block-overlay');
         var frame = document.getElementById('block-frame');
         var timer = null, hideTimer = null;
+        window.__cxzBlockDone = false;
 
         function onMessage(ev) {
             if (ev.origin === location.origin && ev.source === frame.contentWindow && ev.data === 'cxz-block-dismiss') dismiss();
@@ -839,12 +840,27 @@
             window.removeEventListener('message', onMessage);
             overlay.style.opacity = '0';
             overlay.style.pointerEvents = 'none';
-            hideTimer = setTimeout(function () { overlay.style.display = 'none'; frame.removeAttribute('src'); }, 450);
+            hideTimer = setTimeout(function () {
+                overlay.style.display = 'none';
+                frame.removeAttribute('src');
+                window.__cxzBlockDone = true;
+                if (typeof window.__cxzStartLoadingScreen === 'function') {
+                    window.__cxzStartLoadingScreen();
+                }
+            }, 450);
         }
         function show(force) {
             try {
-                if (!/^(https?|file):$/.test(location.protocol)) return;
-                if (!force && localStorage.getItem('cxz_block_screen') !== 'true') return;
+                if (!/^(https?|file):$/.test(location.protocol)) {
+                    window.__cxzBlockDone = true;
+                    if (typeof window.__cxzStartLoadingScreen === 'function') window.__cxzStartLoadingScreen();
+                    return;
+                }
+                if (!force && localStorage.getItem('cxz_block_screen') !== 'true') {
+                    window.__cxzBlockDone = true;
+                    if (typeof window.__cxzStartLoadingScreen === 'function') window.__cxzStartLoadingScreen();
+                    return;
+                }
                 var theme = localStorage.getItem('cxz_block_theme');
                 if (THEMES.indexOf(theme) === -1) theme = 'lightspeed';
                 clearTimeout(timer); clearTimeout(hideTimer);
@@ -1739,12 +1755,13 @@
             if (e.key === 'Escape' && m && m.classList.contains('open')) skipSetup();
         });
 
-        // 1. FAST STARTUP LOADER (Respects settings)
+        // 1. STARTUP LOADER — runs AFTER the optional block screen
         window.addEventListener('DOMContentLoaded', () => {
             const showLoader = localStorage.getItem(PRE + 'loadscreen') !== 'false';
             const progressBar = document.getElementById('progressBar');
             const statusText = document.getElementById('statusText');
             const loader = document.getElementById('loading-screen');
+            let loaderStarted = false;
 
             const showDock = () => {
                 const dock = document.querySelector('.bottom-dock');
@@ -1755,20 +1772,29 @@
                 }
                 maybeShowSetup();
             };
-            // Failsafe: dock always appears, even if the loader stalls
-            setTimeout(showDock, 4000);
 
-            if (!showLoader) {
-                loader.style.display = 'none';
-                showDock();
-            } else {
+            function startLoadingScreen() {
+                if (loaderStarted) return;
+                loaderStarted = true;
+
+                if (!showLoader) {
+                    loader.style.display = 'none';
+                    showDock();
+                    return;
+                }
+
+                loader.style.display = 'flex';
+                loader.style.opacity = '1';
+                progressBar.style.width = '0%';
+                statusText.innerText = 'INITIALIZING...';
+
                 let w = 0;
                 const interval = setInterval(() => {
                     w += Math.floor(Math.random() * 20) + 10;
                     if (w >= 100) {
                         w = 100;
                         progressBar.style.width = '100%';
-                        statusText.innerText = "READY!";
+                        statusText.innerText = 'READY!';
                         clearInterval(interval);
                         setTimeout(() => {
                             loader.style.opacity = '0';
@@ -1781,6 +1807,14 @@
                         progressBar.style.width = w + '%';
                     }
                 }, 50);
+            }
+
+            // The block-screen script calls this after its fade-out.
+            window.__cxzStartLoadingScreen = startLoadingScreen;
+
+            // If no block screen is enabled, start the loader immediately.
+            if (window.__cxzBlockDone !== false) {
+                startLoadingScreen();
             }
 
             // Sync with query param e.g. ?tab=settings
