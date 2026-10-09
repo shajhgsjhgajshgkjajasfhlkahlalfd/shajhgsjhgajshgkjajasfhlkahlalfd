@@ -633,39 +633,20 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: min(96vw, 1600px);
-    height: 94dvh;
-    max-height: 100dvh;
-    min-width: 0;
+    width: 78vw;
+    max-width: 1200px;
+    height: 82vh;
 }
 #cxz-player .cxz-window {
     position: relative;
     width: 100%;
-    height: 0;
-    flex: 1 1 auto;
+    flex: 1;
     min-height: 0;
-    min-width: 0;
     border-radius: 12px;
     border: 2px solid var(--accent-color);
     box-shadow: 0 0 20px rgba(255,102,0,.35);
-    background: #000;
+    background: #1b1b22;
     overflow: hidden;
-}
-#cxz-player:fullscreen,
-#cxz-player .cxz-window:fullscreen {
-    width: 100vw;
-    height: 100dvh;
-    max-width: none;
-    max-height: none;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: #000;
-}
-#cxz-player .cxz-window:fullscreen .cxz-frame-wrap,
-#cxz-player .cxz-window:fullscreen .cxz-game-frame {
-    width: 100vw;
-    height: 100dvh;
 }
 #cxz-player .cxz-close {
     position: absolute;
@@ -812,15 +793,9 @@
     color: #00ff66;
 }
 @media (max-width:900px) {
-    #cxz-player .cxz-stage { width:100vw; height:100dvh; }
-    #cxz-player .cxz-window { border-radius:0; border-left:0; border-right:0; }
-    #cxz-player .cxz-toolbar { flex: 0 0 auto; margin: 6px 8px; width: calc(100% - 16px); gap: 6px; }
+    #cxz-player .cxz-stage { width:96vw; height:80vh; }
     #cxz-player .cxz-volume { display:none; }
     #cxz-player .cxz-title { max-width:150px; font-size:9px; }
-}
-@media (max-height:500px) {
-    #cxz-player .cxz-stage { height:100dvh; }
-    #cxz-player .cxz-toolbar { margin-top:4px; }
 }
 
 
@@ -2680,38 +2655,7 @@ const CXZPlayer = (() => {
         if (!frame) throw new Error('Game iframe was not found.');
 
         frame.onload = () => {
-            if (token !== launchToken) return;
-            // For same-origin GitHub Pages games, make common game roots and
-            // canvases fill the iframe viewport. Cross-origin games keep their
-            // own responsive layout, but still receive the correctly sized frame.
-            try {
-                const doc = frame.contentDocument;
-                if (doc && doc.head && !doc.getElementById('cxz-responsive-game-fit')) {
-                    const fitStyle = doc.createElement('style');
-                    fitStyle.id = 'cxz-responsive-game-fit';
-                    fitStyle.textContent = `
-                        html, body { width:100% !important; height:100% !important; min-width:0 !important; min-height:0 !important; margin:0 !important; overflow:hidden !important; }
-                        body { position:relative !important; }
-                        canvas, video, object, embed { max-width:100% !important; }
-                        canvas { display:block; }
-                        #game, #game-container, #gameContainer, #unity-container, #unityContainer,
-                        #unity-canvas-container, #root, #app, #phaser-game, .game-container,
-                        .game-container, .unity-container { width:100% !important; height:100% !important; max-width:none !important; max-height:none !important; }
-                        #game canvas, #game-container canvas, #gameContainer canvas,
-                        #unity-container canvas, #unityContainer canvas, #unity-canvas,
-                        #phaser-game canvas, .game-container canvas, canvas#canvas {
-                            width:100% !important; height:100% !important; max-width:none !important; max-height:none !important;
-                        }
-                        iframe, video { max-width:100% !important; max-height:100% !important; }
-                    `;
-                    doc.head.appendChild(fitStyle);
-                }
-                frame.contentWindow.dispatchEvent(new Event('resize'));
-                setTimeout(() => { try { frame.contentWindow.dispatchEvent(new Event('resize')); } catch (_) {} }, 100);
-            } catch (_) {
-                // A cross-origin game cannot be restyled from the portal.
-            }
-            finishLoader(token);
+            if (token === launchToken) finishLoader(token);
         };
         frame.onerror = () => {
             if (token === launchToken) {
@@ -2895,20 +2839,6 @@ const CXZPlayer = (() => {
     function toggleConsole() {
         $('cxz-console').classList.toggle('open');
     }
-
-    window.addEventListener('resize', () => {
-        const frame = $('cxz-game-frame');
-        try {
-            if (frame && frame.contentWindow) frame.contentWindow.dispatchEvent(new Event('resize'));
-        } catch (_) {}
-    });
-
-    document.addEventListener('fullscreenchange', () => {
-        const frame = $('cxz-game-frame');
-        try {
-            if (frame && frame.contentWindow) frame.contentWindow.dispatchEvent(new Event('resize'));
-        } catch (_) {}
-    });
 
     const volume = $('cxz-volume-slider');
     if (volume) {
