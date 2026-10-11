@@ -578,6 +578,42 @@
     box-shadow:
         var(--accent-glow);
 }
+        /* Compact square logo tabs matching the reference image */
+        .bottom-dock {
+            gap: 8px;
+            background: transparent;
+            border: 0;
+            border-radius: 0;
+            padding: 0;
+            box-shadow: none;
+            bottom: 16px;
+        }
+        .dock-item {
+            width: 60px;
+            height: 60px;
+            padding: 5px;
+            border: 3px solid var(--accent-color);
+            border-radius: 7px;
+            background: #111118;
+            box-shadow: 0 0 8px rgba(255,102,0,.25);
+        }
+        .dock-item img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 2px;
+        }
+        .dock-item.active {
+            background: #1b1b25;
+            box-shadow: 0 0 10px rgba(255,102,0,.55);
+        }
+        .dock-item:hover { background: #252530; }
+        @media (max-width: 420px) {
+            .bottom-dock { gap: 6px; }
+            .dock-item { width: 54px; height: 54px; }
+        }
+
         /* Toast notifications */
         .toast-container {
             position: fixed;
@@ -1363,35 +1399,13 @@ html:-webkit-full-screen body {
 </div><!-- /#cxz-player -->
 
 
-    <!-- Floating Bottom Dock Navigation Bar - Identical to Image 1 & 2 with Lucide Icons -->
-    <nav class="bottom-dock">
-        <!-- Lucide home -->
-        <button class="dock-item active" onclick="switchTab('home', this)" title="Home">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <!-- Two-provider game dock -->
+    <nav class="bottom-dock" aria-label="Game providers">
+        <button class="dock-item active" onclick="switchGameDock('cxz', this)" title="Classroom-X-Zone games" aria-label="Classroom-X-Zone games">
+            <img src="./g/assets/favicon.ico" alt="Classroom-X-Zone logo">
         </button>
-        <!-- Lucide gamepad-2 -->
-        <button class="dock-item" onclick="switchTab('games', this)" title="Games">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gamepad-2"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><rect width="20" height="12" x="2" y="6" rx="6"/></svg>
-        </button>
-        <!-- Lucide wrench -->
-        <button class="dock-item" onclick="switchTab('tools', this)" title="Tools">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wrench"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-        </button>
-        <!-- Lucide handshake -->
-        <button class="dock-item" onclick="switchTab('partners', this)" title="Partners">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-handshake"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></svg>
-        </button>
-        <!-- Lucide lightbulb -->
-        <button class="dock-item" onclick="switchTab('suggest', this)" title="Suggest a Game">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lightbulb"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-        </button>
-        <!-- Lucide settings -->
-        <button class="dock-item" onclick="switchTab('settings', this)" title="Settings">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
-        <!-- Lucide volume-x -->
-        <button class="dock-item" onclick="toggleMuteSound()" id="dock-mute-btn" title="Mute">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-volume-x"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg>
+        <button class="dock-item" onclick="switchGameDock('gamepix', this)" title="GamePix games" aria-label="GamePix games">
+            <img src="https://gamepix.com/favicon.png" alt="GamePix logo">
         </button>
     </nav>
 
@@ -1848,7 +1862,7 @@ html:-webkit-full-screen body {
 
 
         const GAMEPIX_PAGE_SIZE = 48;
-        const GAMEPIX_FEED = 'https://feeds.gamepix.com/v2/json/?order=quality&page=1&pagination=' + GAMEPIX_PAGE_SIZE + '&sid=1';
+        const GAMEPIX_FEED = 'https://games.gamepix.com/games?sid=1&order=q&limit=' + GAMEPIX_PAGE_SIZE + '&offset=0';
         let gamePixNextUrl = GAMEPIX_FEED;
         let gamePixTotal = 0;
         let gamePixLoading = false;
@@ -1877,12 +1891,15 @@ html:-webkit-full-screen body {
         }
 
         function createGamePixCard(game) {
-            const card = document.createElement('div');
-            card.className = 'item-card';
-            card.dataset.gameUrl = game.url || ('https://play.gamepix.com/' + game.namespace + '/embed?sid=1');
+            const card = document.createElement('a');
+            card.className = 'card item-card';
+            card.href = '#';
+            card.setAttribute('role', 'button');
+            card.setAttribute('aria-label', 'Play ' + (game.title || 'GamePix Game'));
+            card.dataset.gameUrl = game.url || (game.namespace ? 'https://play.gamepix.com/' + game.namespace + '/embed?sid=1' : '');
             card.dataset.title = game.title || 'GamePix Game';
 
-            const image = game.banner_image || game.image || '';
+            const image = game.banner_image || game.image || game.thumbnailUrl || game.thumbnailUrl100 || '';
             card.innerHTML = `
                 <div class="item-image">
                     ${image ? `<img src="${image}" alt="${escapeHtml(game.title || 'Game')}" loading="lazy">` : ''}
@@ -1919,13 +1936,26 @@ html:-webkit-full-screen body {
                 if (!response.ok) throw new Error('GamePix feed returned ' + response.status);
 
                 const data = await response.json();
-                const items = Array.isArray(data.items) ? data.items : [];
+                const items = Array.isArray(data.items) ? data.items :
+                    Array.isArray(data.data) ? data.data :
+                    Array.isArray(data.games) ? data.games :
+                    Array.isArray(data) ? data : [];
                 const grid = document.getElementById('gamepix-grid');
 
-                items.forEach(game => grid.appendChild(createGamePixCard(game)));
+                items.forEach(game => {
+                    const card = createGamePixCard(game);
+                    if (card.dataset.gameUrl) grid.appendChild(card);
+                });
 
                 gamePixLoaded = true;
-                gamePixNextUrl = data.next_page_url || data.next_url || '';
+                const currentUrl = new URL(url, location.href);
+                const currentOffset = Number(currentUrl.searchParams.get('offset')) || 0;
+                const limit = Number(currentUrl.searchParams.get('limit')) || GAMEPIX_PAGE_SIZE;
+                const totalFromApi = Number(data.total || data.totalCount || (data.pagination && data.pagination.total)) || 0;
+                gamePixNextUrl = data.next_page_url || data.next_url ||
+                    ((items.length === limit && (!totalFromApi || currentOffset + items.length < totalFromApi))
+                        ? 'https://games.gamepix.com/games?sid=1&order=q&limit=' + limit + '&offset=' + (currentOffset + items.length)
+                        : '');
 
                 if (!gamePixTotal && data.last_page_url) {
                     try {
@@ -1998,6 +2028,22 @@ html:-webkit-full-screen body {
             });
             void el.offsetWidth; // force reflow so the animation restarts
             el.classList.add('tab-anim');
+        }
+
+        function switchGameDock(provider, button) {
+            const gamesTab = document.getElementById('games');
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            if (gamesTab) {
+                gamesTab.classList.add('active');
+                animateTab(gamesTab);
+            }
+            document.querySelectorAll('.dock-item').forEach(b => b.classList.remove('active'));
+            if (button) button.classList.add('active');
+            const providerButton = document.querySelector('.game-provider-button[onclick*="' + provider + '"]');
+            switchGameProvider(provider, providerButton);
+            const search = document.getElementById('searchInput');
+            if (search) search.value = '';
+            document.querySelectorAll('#gamepix-grid .item-card, #all-games-grid .item-card').forEach(card => card.style.display = '');
         }
 
         function switchTab(tabId, btn) {
