@@ -824,6 +824,59 @@ html:-webkit-full-screen body {
         .suggest-panel { max-width: 560px; display: flex; flex-direction: column; gap: 10px; background: #09090f; border: 1.5px solid var(--accent-color); border-radius: 6px; padding: 18px 16px; }
         .suggest-item { font-size: 0.6rem; color: var(--text-white); line-height: 1.6; padding: 6px 8px; border: 1px dashed rgba(255,102,0,0.4); border-radius: 4px; word-break: break-word; }
         .suggest-item small { color: var(--text-muted); }
+
+        /* Provider tabs live inside the Games page; the original dock stays untouched. */
+        .game-provider-buttons {
+            display: flex;
+            align-items: stretch;
+            gap: 12px;
+            margin: 0 0 24px;
+            flex-wrap: wrap;
+        }
+        .game-provider-button {
+            appearance: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 66px;
+            min-width: 190px;
+            padding: 10px 16px;
+            border: 2px solid var(--accent-color);
+            border-radius: 8px;
+            background: rgba(255,102,0,.05);
+            color: var(--text-white);
+            cursor: pointer;
+            font: inherit;
+            font-size: .62rem;
+            box-shadow: 0 0 0 rgba(255,102,0,0);
+            transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
+        }
+        .game-provider-button:hover,
+        .game-provider-button.active {
+            background: rgba(255,102,0,.16);
+            box-shadow: 0 0 14px rgba(255,102,0,.45), inset 0 0 10px rgba(255,102,0,.08);
+            transform: translateY(-1px);
+        }
+        .game-provider-logo {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+            flex: 0 0 30px;
+            image-rendering: auto;
+        }
+        .game-provider-name { line-height: 1.5; }
+        .game-provider-button span:not(.game-provider-name) {
+            opacity: .72;
+            font-size: .8em;
+        }
+        .game-provider-content { display: none; }
+        .game-provider-content.active { display: block; }
+        #gamepix-load-more { display: block; }
+        @media (max-width: 520px) {
+            .game-provider-button { min-width: 0; flex: 1 1 145px; padding: 10px; gap: 7px; }
+            .game-provider-logo { width: 25px; height: 25px; flex-basis: 25px; }
+        }
     </style>
 </head>
 <body>
@@ -929,11 +982,13 @@ html:-webkit-full-screen body {
             <h2 class="section-title">All Games</h2>
 
             <div class="game-provider-buttons">
-                <button class="game-provider-button active" type="button" onclick="switchGameProvider('cxz', this)">
-                    Classroom-X-Zone <span id="cxz-game-count">0</span>
+                <button class="game-provider-button active" type="button" aria-selected="true" onclick="window.switchGameProvider('cxz', this)">
+                    <img class="game-provider-logo" src="./g/assets/favicon.ico" alt="" />
+                    <span class="game-provider-name">Classroom-X-Zone</span> <span id="cxz-game-count">0</span>
                 </button>
-                <button class="game-provider-button" type="button" onclick="switchGameProvider('gamepix', this)">
-                    GamePix <span id="gamepix-game-count">Loading...</span>
+                <button class="game-provider-button" type="button" aria-selected="false" onclick="window.switchGameProvider('gamepix', this)">
+                    <img class="game-provider-logo" src="https://gamepix.com/favicon.png" alt="" />
+                    <span class="game-provider-name">GamePix</span> <span id="gamepix-game-count">Loading...</span>
                 </button>
             </div>
 
@@ -1848,7 +1903,7 @@ html:-webkit-full-screen body {
 
 
         const GAMEPIX_PAGE_SIZE = 48;
-        const GAMEPIX_FEED = 'https://games.gamepix.com/games?sid=1&order=q&limit=' + GAMEPIX_PAGE_SIZE + '&offset=0';
+        const GAMEPIX_FEED = 'https://feeds.gamepix.com/v2/json?order=quality&page=1&pagination=' + GAMEPIX_PAGE_SIZE + '&sid=1';
         let gamePixNextUrl = GAMEPIX_FEED;
         let gamePixTotal = 0;
         let gamePixLoading = false;
@@ -1925,46 +1980,30 @@ html:-webkit-full-screen body {
                 if (!response.ok) throw new Error('GamePix feed returned ' + response.status);
 
                 const data = await response.json();
-                const payload = data && data.data && !Array.isArray(data.data) ? data.data : data;
-                const items = Array.isArray(data) ? data :
-                    Array.isArray(data.items) ? data.items :
-                    Array.isArray(data.games) ? data.games :
-                    Array.isArray(payload.items) ? payload.items :
-                    Array.isArray(payload.games) ? payload.games :
-                    Array.isArray(payload.data) ? payload.data : [];
+                const items = Array.isArray(data.items) ? data.items : [];
                 const grid = document.getElementById('gamepix-grid');
 
-                if (!Array.isArray(items)) throw new Error('Unexpected GamePix API response format');
+                if (!Array.isArray(items)) throw new Error('Unexpected GamePix feed response format');
                 items.forEach(game => {
                     const card = createGamePixCard(game);
                     if (card.dataset.gameUrl) grid.appendChild(card);
                 });
 
                 if (!items.length && !grid.children.length) {
-                    throw new Error('GamePix API returned no games in a recognized response format');
+                    throw new Error('GamePix feed returned no games. Check the network response and browser CORS policy.');
                 }
                 gamePixLoaded = true;
-                const currentUrl = new URL(url, location.href);
-                const currentOffset = Number(currentUrl.searchParams.get('offset')) || 0;
-                const limit = Number(currentUrl.searchParams.get('limit')) || GAMEPIX_PAGE_SIZE;
-                const meta = Array.isArray(data) ? {} : (data.data && !Array.isArray(data.data) ? data.data : data);
-                const totalFromApi = Number(meta.total || meta.totalCount || (meta.pagination && meta.pagination.total)) || 0;
-                gamePixNextUrl = meta.next_page_url || meta.next_url ||
-                    ((items.length === limit && (!totalFromApi || currentOffset + items.length < totalFromApi))
-                        ? 'https://games.gamepix.com/games?sid=1&order=q&limit=' + limit + '&offset=' + (currentOffset + items.length)
-                        : '');
-
-                if (!gamePixTotal && meta.last_page_url) {
+                gamePixNextUrl = data.next_url || '';
+                const lastPageUrl = data.last_page_url || '';
+                if (lastPageUrl) {
                     try {
-                        const lastUrl = new URL(meta.last_page_url, location.href);
+                        const lastUrl = new URL(lastPageUrl);
                         const lastPage = Number(lastUrl.searchParams.get('page')) || 1;
                         const pagination = Number(lastUrl.searchParams.get('pagination')) || GAMEPIX_PAGE_SIZE;
-                        gamePixTotal = Math.max(items.length, (lastPage - 1) * pagination + items.length);
-                    } catch (_) {}
-                }
-
-                if (!gamePixTotal && meta.pagination && meta.pagination.total) {
-                    gamePixTotal = Number(meta.pagination.total) || 0;
+                        gamePixTotal = Math.max(items.length, lastPage * pagination);
+                    } catch (_) { gamePixTotal = items.length; }
+                } else {
+                    gamePixTotal = items.length;
                 }
 
                 updateGamePixCount();
@@ -1983,6 +2022,9 @@ html:-webkit-full-screen body {
                 if (button) {
                     button.disabled = false;
                     button.textContent = 'Retry GamePix';
+                    button.style.display = 'block';
+                    gamePixLoaded = false;
+                    gamePixNextUrl = GAMEPIX_FEED;
                 }
             } finally {
                 gamePixLoading = false;
@@ -1991,6 +2033,7 @@ html:-webkit-full-screen body {
 
         function loadMoreGamePix() {
             if (gamePixNextUrl) loadGamePixPage(gamePixNextUrl);
+            else if (!gamePixLoaded) loadGamePixPage(GAMEPIX_FEED);
         }
 
         window.loadMoreGamePix = loadMoreGamePix;
@@ -2039,7 +2082,7 @@ html:-webkit-full-screen body {
             document.querySelectorAll('.dock-item').forEach(b => b.classList.remove('active'));
             if (button) button.classList.add('active');
             const providerButton = document.querySelector('.game-provider-button[onclick*="' + provider + '"]');
-            switchGameProvider(provider, providerButton);
+            if (typeof window.switchGameProvider === 'function') window.switchGameProvider(provider, providerButton);
             const search = document.getElementById('searchInput');
             if (search) search.value = '';
             document.querySelectorAll('#gamepix-grid .item-card, #all-games-grid .item-card').forEach(card => card.style.display = '');
@@ -3027,50 +3070,7 @@ const CXZPlayer = (() => {
 <html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${safeTitle}</title>
-<style>html,body,iframe{margin:0;width:100%;height:100%;overflow:hidden;background:#000}iframe{display:block;border:0}
-        .game-provider-buttons {
-            display: flex;
-            gap: 12px;
-            margin: 0 0 24px;
-            flex-wrap: wrap;
-        }
-
-        .game-provider-button {
-            appearance: none;
-            border: 1px solid rgba(255,255,255,.12);
-            background: rgba(255,255,255,.04);
-            color: inherit;
-            border-radius: 10px;
-            padding: 10px 16px;
-            cursor: pointer;
-            font: inherit;
-            transition: .2s ease;
-        }
-
-        .game-provider-button:hover,
-        .game-provider-button.active {
-            border-color: rgba(255,102,0,.65);
-            background: rgba(255,102,0,.12);
-        }
-
-        .game-provider-button span {
-            opacity: .65;
-            margin-left: 6px;
-            font-size: .82em;
-        }
-
-        .game-provider-content {
-            display: none;
-        }
-
-        .game-provider-content.active {
-            display: block;
-        }
-
-        #gamepix-load-more {
-            display: block;
-        }
-</style>
+<style>html,body,iframe{margin:0;width:100%;height:100%;overflow:hidden;background:#000}iframe{display:block;border:0}</style>
 </head><body>
 <iframe id="game" allowfullscreen allow="autoplay; fullscreen; gamepad; clipboard-write" title="${safeTitle}"></iframe>
 <script>document.getElementById('game').src=${JSON.stringify(targetURL)};<\/script>
