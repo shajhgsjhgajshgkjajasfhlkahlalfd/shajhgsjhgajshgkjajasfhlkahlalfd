@@ -1565,8 +1565,25 @@ html:-webkit-full-screen body {
                 GAMES.slice().sort((x, y) => x.title.localeCompare(y.title, undefined, { numeric: true }))
                     .forEach(g => all.appendChild(buildGameCard(g)));
             }
+            updateClassroomXZoneCount();
         }
-        window.addEventListener('DOMContentLoaded', renderGames);
+
+        function updateClassroomXZoneCount() {
+            const count = document.getElementById('cxz-game-count');
+            const grid = document.getElementById('all-games-grid');
+            if (!count) return;
+            // Prefer the actual rendered provider cards, falling back to the source catalog.
+            const total = grid ? grid.querySelectorAll('.item-card').length : (Array.isArray(GAMES) ? GAMES.length : 0);
+            count.textContent = String(total);
+            count.setAttribute('aria-label', total + ' Classroom-X-Zone games');
+        }
+
+        // Run reliably whether this script executes before or after DOMContentLoaded.
+        if (document.readyState === 'loading') {
+            window.addEventListener('DOMContentLoaded', renderGames, { once: true });
+        } else {
+            renderGames();
+        }
 
         // Standalone tools live at ./g/games/other/{Tool_Name}.html
         const TOOLS_BASE = './g/games/other/';
@@ -2043,12 +2060,12 @@ html:-webkit-full-screen body {
             if (count) count.textContent = gamePixTotal ? gamePixTotal : '...';
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const cxzCount = document.getElementById('cxz-game-count');
-            if (cxzCount && Array.isArray(GAMES)) {
-                cxzCount.textContent = GAMES.length;
-            }
-        });
+        // Keep the Classroom-X-Zone provider badge in sync with its catalog.
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', updateClassroomXZoneCount, { once: true });
+        } else {
+            updateClassroomXZoneCount();
+        }
 
             // Sync with query param e.g. ?tab=settings
             const urlTab = new URLSearchParams(window.location.search).get('tab');
