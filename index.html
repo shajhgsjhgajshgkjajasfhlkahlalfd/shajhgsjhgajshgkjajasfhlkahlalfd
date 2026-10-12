@@ -5,8 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classroom-x-zone</title>
     <meta name="color-scheme" content="dark">
+    <meta name="description" content="Good games. Zero setup. Explore the Classroom-X-Zone pocket arcade and play right in your browser.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Classroom-X-Zone">
+    <meta property="og:title" content="Classroom-X-Zone | Your Pocket Arcade">
+    <meta property="og:description" content="Good games. Zero setup. Explore the Classroom-X-Zone pocket arcade and play right in your browser.">
+    <meta property="og:image" content="https://quantil.jsdelivr.net/gh/shajhgsjhgajshgkjajasfhlkahlalfd/shajhgsjhgajshgkjajasfhlkahlalfd/g/assets/social-preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Classroom-X-Zone, your pocket arcade. Good games. Zero setup.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Classroom-X-Zone | Your Pocket Arcade">
+    <meta name="twitter:description" content="Good games. Zero setup. Explore the Classroom-X-Zone pocket arcade and play right in your browser.">
+    <meta name="twitter:image" content="https://quantil.jsdelivr.net/gh/shajhgsjhgajshgkjajasfhlkahlalfd/shajhgsjhgajshgkjajasfhlkahlalfd/g/assets/social-preview.png">
     <!-- Integrated player; game HTML is cache-busted on fetch. -->
-    <link rel="icon" id="favicon" href="./g/assets/favicon.ico">
+    <link rel="icon" id="favicon" href="./g/assets/favicon-96x96.png">
     
     <!-- Non-blocking optimized font loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -726,6 +739,7 @@ html:-webkit-full-screen body {
     width: 110px;
     height: 110px;
     margin-bottom: 25px;
+    object-fit: contain;
     animation: cxz-pulse 2.5s ease-in-out infinite;
 }
 @keyframes cxz-pulse {
@@ -1451,7 +1465,7 @@ html:-webkit-full-screen body {
         <!-- Header -->
         <div class="header">
             <div class="brand-mark" aria-hidden="true">
-                <img src="./g/assets/favicon.ico" alt="">
+                <img src="./g/assets/favicon-96x96.png" alt="">
             </div>
             <div class="brand-copy">
                 <div class="header-eyebrow">YOUR POCKET ARCADE</div>
@@ -1513,7 +1527,7 @@ html:-webkit-full-screen body {
 
             <div class="game-provider-buttons">
                 <button class="game-provider-button active" type="button" aria-selected="true" onclick="window.switchGameProvider('cxz', this)">
-                    <img class="game-provider-logo" src="./g/assets/favicon.ico" alt="" />
+                    <img class="game-provider-logo" src="./g/assets/favicon-96x96.png" alt="" />
                     <span class="game-provider-name">Classroom-X-Zone</span> <span id="cxz-game-count">0</span>
                 </button>
                 <button class="game-provider-button" type="button" aria-selected="false" onclick="window.switchGameProvider('gamepix', this)">
@@ -1842,11 +1856,7 @@ html:-webkit-full-screen body {
             <button class="cxz-close right" onclick="CXZPlayer.close()" title="Close">✕</button>
 
             <div class="cxz-loader" id="cxz-loader">
-                <svg class="cxz-unity-logo" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M128 32L54 75.2V161.6L128 204.8L202 161.6V75.2L128 32Z" stroke="white" stroke-width="12" stroke-linejoin="round"/>
-                    <path d="M128 32V118.4M54 161.6L128 118.4M202 161.6L128 118.4" stroke="white" stroke-width="12" stroke-linejoin="round"/>
-                    <path d="M102 74L128 89L154 74M82 120L108 135V165M174 120L148 135V165" stroke="white" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+                <img class="cxz-unity-logo" src="./g/assets/favicon-96x96.png" alt="Classroom-X-Zone">
                 <div class="cxz-progress-track">
                     <div class="cxz-progress-fill" id="cxz-progress"></div>
                 </div>
@@ -2773,9 +2783,9 @@ html:-webkit-full-screen body {
                 byId('preview-favicon').src = icon;
                 byId('preview-favicon').style.display = 'inline-block';
             } else {
-                link.href = './g/assets/favicon.ico';
+                link.href = './g/assets/favicon-96x96.png';
                 localStorage.removeItem(PRE + 'cloak_icon');
-                byId('preview-favicon').src = './g/assets/favicon.ico';
+                byId('preview-favicon').src = './g/assets/favicon-96x96.png';
                 byId('preview-favicon').style.display = 'inline-block';
             }
             showToast("Cloak Applied!");
@@ -2785,11 +2795,11 @@ html:-webkit-full-screen body {
             localStorage.removeItem(PRE + 'cloak_title');
             localStorage.removeItem(PRE + 'cloak_icon');
             document.title = "Classroom-x-zone";
-            document.getElementById('favicon').href = "./g/assets/favicon.ico";
+            document.getElementById('favicon').href = "./g/assets/favicon-96x96.png";
             document.getElementById('cloak-name-input').value = "";
             document.getElementById('cloak-icon-input').value = "";
             document.getElementById('preview-tab-text').innerText = "Classroom-x-zone";
-            document.getElementById('preview-favicon').src = "./g/assets/favicon.ico";
+            document.getElementById('preview-favicon').src = "./g/assets/favicon-96x96.png";
             showToast("Cloak Reset to Default");
         }
 
