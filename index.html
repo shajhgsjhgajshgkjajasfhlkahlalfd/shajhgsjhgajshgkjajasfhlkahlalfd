@@ -11,6 +11,7 @@
     <!-- Non-blocking optimized font loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
@@ -27,6 +28,11 @@
             --text-muted: #888899;
         }
 
+        html {
+            min-height: 100%;
+            background: var(--bg-dark);
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -36,13 +42,14 @@
         }
 
         body {
-            background-color: var(--bg-dark);
+            background-color: transparent;
             color: var(--text-color);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
             padding-bottom: 90px;
+            isolation: isolate;
         }
 
         /* Top sidebar mode */
@@ -79,6 +86,11 @@
             max-width: 98vw !important;
             width: 98vw !important;
             padding: 10px !important;
+        }
+        body.stretched-res #cxz-player .cxz-stage {
+            width: 96vw;
+            max-width: none;
+            height: 92vh;
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -823,7 +835,8 @@ html:-webkit-full-screen body {
 }
 @media (max-width:900px) {
     #cxz-player .cxz-stage { width:96vw; height:80vh; }
-    #cxz-player .cxz-volume { display:none; }
+    #cxz-player .cxz-volume { display:flex; gap:4px; padding-inline:5px; }
+    #cxz-player .cxz-volume input { width:48px; }
     #cxz-player .cxz-title { max-width:150px; font-size:9px; }
 }
 
@@ -896,6 +909,427 @@ html:-webkit-full-screen body {
             .game-provider-button { min-width: 0; flex: 1 1 145px; padding: 10px; gap: 7px; }
             .game-provider-logo { width: 25px; height: 25px; flex-basis: 25px; }
         }
+
+        /* =========================================================
+           CXZ REDESIGN — presentation only; existing controls stay wired
+        ========================================================= */
+        :root {
+            --bg-dark: #090b10;
+            --card-bg: rgba(20, 24, 33, 0.94);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-color: #e8ecf4;
+            --text-white: #f7f8fc;
+            --text-muted: #8b93a5;
+            --accent-glow: 0 10px 30px rgba(255, 102, 0, 0.18);
+            --surface: #121620;
+            --surface-raised: #171c27;
+            --line: rgba(255, 255, 255, 0.08);
+        }
+
+        *, *::before, *::after { font-family: 'DM Sans', Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
+        html {
+            background:
+                radial-gradient(ellipse at 88% -10%, rgba(255, 102, 0, 0.105), transparent 34rem),
+                radial-gradient(ellipse at 5% 42%, rgba(70, 93, 140, 0.09), transparent 30rem),
+                #090b10;
+        }
+
+        body {
+            color: var(--text-white);
+            padding-bottom: 112px;
+            background: transparent;
+            isolation: isolate;
+        }
+
+        body.top-sidebar { padding-top: 96px; padding-bottom: 24px; }
+        body.top-sidebar .container { padding-top: 20px; }
+
+        .container {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(270px, 360px);
+            align-content: start;
+            column-gap: clamp(24px, 5vw, 72px);
+            row-gap: 0;
+            width: min(100%, 1500px);
+            max-width: none;
+            padding: 30px clamp(22px, 5vw, 76px) 44px;
+        }
+
+        .header {
+            grid-column: 1;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            min-width: 0;
+            margin: 0;
+            text-align: left;
+        }
+        .brand-mark {
+            width: 52px;
+            height: 52px;
+            display: grid;
+            place-items: center;
+            flex: 0 0 52px;
+            color: #101116;
+            border-radius: 17px;
+            background: transparent;
+            box-shadow: none;
+        }
+        .brand-mark img { width: 82%; height: 82%; object-fit: contain; border-radius: 50%; }
+        .brand-copy { min-width: 0; }
+        .header-eyebrow, .hero-kicker, .hero-art-label, .eyebrow {
+            color: var(--accent-color);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+        }
+        .header-eyebrow { margin-bottom: 4px; }
+        .header h1 {
+            color: #f4f5f8;
+            font-size: clamp(18px, 2vw, 25px);
+            font-weight: 800;
+            letter-spacing: -.055em;
+            line-height: 1.08;
+            text-shadow: none;
+        }
+        .header-tagline { margin-top: 5px; color: #9299a9; font-size: 12px; font-weight: 500; }
+        .header-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+            padding: 8px 11px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: #aeb5c3;
+            background: rgba(255,255,255,.025);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .045em;
+            white-space: nowrap;
+        }
+        .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #83d694; box-shadow: 0 0 12px rgba(131,214,148,.7); }
+
+        .search-box {
+            position: relative;
+            grid-column: 2;
+            grid-row: 1;
+            width: 100%;
+            max-width: none;
+            align-self: center;
+            margin: 0;
+        }
+        .search-icon {
+            position: absolute;
+            top: 50%;
+            left: 16px;
+            z-index: 1;
+            display: grid;
+            color: #81899b;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+        .search-icon svg { width: 17px; height: 17px; }
+        .search-box input {
+            width: 100%;
+            min-height: 48px;
+            padding: 0 16px 0 44px;
+            color: #f4f5f8;
+            border: 1px solid rgba(255,255,255,.11);
+            border-radius: 14px;
+            outline: none;
+            background: rgba(20,24,33,.82);
+            box-shadow: 0 10px 28px rgba(0,0,0,.14), inset 0 1px rgba(255,255,255,.035);
+            font-size: 13px;
+            transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+        }
+        .search-box #searchInput { padding-left: 50px; }
+        .search-box input::placeholder { color: #7f8797; }
+        .search-box input:focus { border-color: color-mix(in srgb, var(--accent-color), white 14%); background: #151a24; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 16%, transparent); }
+
+        .tab-content { grid-column: 1 / -1; min-width: 0; }
+        .tab-content.active { display: block; }
+        .tab-content:not(#home) { padding-top: 40px; }
+        .page-description { max-width: 680px; margin: -10px 0 24px; color: #929aaa; font-size: 13px; font-weight: 500; line-height: 1.65; }
+        .section-title {
+            margin: 0 0 20px;
+            color: #f4f5f8;
+            font-size: clamp(22px, 2.7vw, 30px);
+            font-weight: 800;
+            letter-spacing: -.045em;
+            line-height: 1.2;
+            text-shadow: none;
+        }
+
+        .home-hero {
+            position: relative;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(260px, .88fr);
+            align-items: center;
+            min-height: 330px;
+            margin: 38px 0 42px;
+            padding: clamp(28px, 5vw, 56px) clamp(26px, 5.2vw, 64px);
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 28px;
+            background:
+                radial-gradient(ellipse at 82% 45%, rgba(255, 121, 42, .16), transparent 25rem),
+                linear-gradient(115deg, #171c27 0%, #141821 48%, #1a1a21 100%);
+            box-shadow: 0 28px 80px rgba(0,0,0,.28), inset 0 1px rgba(255,255,255,.055);
+            isolation: isolate;
+        }
+        .home-hero::before {
+            position: absolute;
+            z-index: -1;
+            top: -80px;
+            right: 26%;
+            width: 380px;
+            height: 380px;
+            border: 1px solid rgba(255,255,255,.045);
+            border-radius: 50%;
+            content: '';
+        }
+        .home-hero::after {
+            position: absolute;
+            z-index: -1;
+            top: -30px;
+            right: 29%;
+            width: 280px;
+            height: 280px;
+            border: 1px solid rgba(255,255,255,.04);
+            border-radius: 50%;
+            content: '';
+        }
+        .home-hero-copy { position: relative; z-index: 2; max-width: 560px; }
+        .hero-kicker { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 17px; }
+        .hero-kicker::before { width: 18px; height: 2px; border-radius: 2px; background: var(--accent-color); content: ''; }
+        .home-hero h2 { color: #f5f6fa; font-size: clamp(38px, 5.2vw, 64px); font-weight: 800; letter-spacing: -.075em; line-height: .98; }
+        .home-hero h2 span { color: var(--accent-color); }
+        .home-hero-copy > p { max-width: 430px; margin-top: 17px; color: #a0a7b5; font-size: 14px; font-weight: 500; line-height: 1.7; }
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 11px;
+            min-height: 46px;
+            margin-top: 23px;
+            padding: 0 18px;
+            color: #17130f;
+            border: 0;
+            border-radius: 13px;
+            background: var(--accent-color);
+            box-shadow: 0 9px 25px color-mix(in srgb, var(--accent-color) 23%, transparent);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 800;
+            transition: transform .2s ease, filter .2s ease;
+        }
+        .hero-cta:hover { filter: brightness(1.08); transform: translateY(-2px); }
+        .hero-cta svg { width: 16px; height: 16px; }
+        .hero-note { display: flex; align-items: center; gap: 8px; margin-top: 17px; color: #848c9c; font-size: 11px; font-weight: 600; }
+        .hero-note svg { width: 14px; height: 14px; color: #80cf92; }
+        .hero-art { position: relative; display: grid; place-items: center; min-height: 250px; }
+        .hero-art-glow { position: absolute; width: 230px; height: 180px; border-radius: 50%; background: rgba(255,115,43,.19); filter: blur(52px); }
+        .hero-orbit { position: absolute; width: 260px; height: 260px; border: 1px solid rgba(255,255,255,.08); border-radius: 50%; transform: rotate(-20deg) scaleY(.7); }
+        .hero-orbit::before, .hero-orbit::after { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-color); box-shadow: 0 0 14px var(--accent-color); content: ''; }
+        .hero-orbit::before { top: 44px; left: 28px; }
+        .hero-orbit::after { right: 14px; bottom: 65px; width: 5px; height: 5px; background: #fff; }
+        .hero-game-card { position: absolute; width: min(250px, 68%); overflow: hidden; border: 1px solid rgba(255,255,255,.2); border-radius: 20px; background: #222733; box-shadow: 0 24px 55px rgba(0,0,0,.42); transform: rotate(5deg) translate(5px, 3px); }
+        .hero-game-card img { display: block; width: 100%; height: 150px; object-fit: cover; }
+        .hero-game-meta { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; color: #f4f5f8; font-size: 12px; font-weight: 700; }
+        .hero-game-meta span:last-child { color: var(--accent-color); font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .hero-floating-chip { position: absolute; display: flex; align-items: center; gap: 9px; padding: 11px 13px; color: #eff1f5; border: 1px solid rgba(255,255,255,.14); border-radius: 14px; background: rgba(30,35,47,.9); box-shadow: 0 16px 35px rgba(0,0,0,.32); font-size: 11px; font-weight: 700; backdrop-filter: blur(14px); }
+        .hero-floating-chip svg { width: 17px; height: 17px; color: var(--accent-color); }
+        .hero-floating-chip.top { top: 9%; right: 0; transform: rotate(5deg); }
+        .hero-floating-chip.bottom { bottom: 8%; left: 0; transform: rotate(-5deg); }
+        #home > .section-title { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+        #home > .section-title::after { color: #777f90; content: 'A few picks to get you started'; font-size: 12px; font-weight: 500; letter-spacing: 0; }
+
+        .grid { grid-template-columns: repeat(auto-fill, minmax(205px, 1fr)); gap: 17px; }
+        #featured-grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+        .card {
+            min-width: 0;
+            padding: 9px 9px 15px;
+            overflow: hidden;
+            color: var(--text-white);
+            border: 1px solid rgba(255,255,255,.085);
+            border-radius: 18px;
+            background: linear-gradient(155deg, rgba(25,30,41,.98), rgba(17,21,30,.98));
+            box-shadow: 0 10px 26px rgba(0,0,0,.16), inset 0 1px rgba(255,255,255,.025);
+            text-align: left;
+            transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+        }
+        .card:hover { transform: translateY(-5px); border-color: color-mix(in srgb, var(--accent-color) 50%, rgba(255,255,255,.1)); box-shadow: 0 19px 36px rgba(0,0,0,.3), 0 0 24px color-mix(in srgb, var(--accent-color) 9%, transparent); }
+        .card img, .card .item-image { width: 100%; height: 142px; margin: 0 0 13px; overflow: hidden; border: 0; border-radius: 12px; background: linear-gradient(135deg, #262c3a, #151a25); }
+        .card img, .card .item-image img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .35s ease; }
+        .card:hover img { transform: scale(1.04); }
+        .card h3 { width: 100%; padding: 0 5px; color: #eff1f5; font-size: 14px; font-weight: 700; line-height: 1.35; }
+        .card p { width: 100%; padding: 0 5px; margin-top: 5px; color: #858d9d; font-size: 11px; font-weight: 500; line-height: 1.5; }
+        .tool-card { min-width: 0; padding: 10px; border: 1px solid rgba(255,255,255,.09); border-radius: 18px; background: linear-gradient(155deg, rgba(25,30,41,.98), rgba(17,21,30,.98)); box-shadow: 0 10px 26px rgba(0,0,0,.16); }
+        .tool-card img { width: 100%; height: 142px; border: 0; border-radius: 12px; object-fit: cover; }
+        .tool-card h3 { margin: 4px 5px 7px; color: #eff1f5; font-size: 14px; font-weight: 700; }
+        .tool-card p { margin: 0 5px 14px; color: #858d9d; font-size: 11px; font-weight: 500; line-height: 1.55; }
+
+        .btn-action, a.btn-action {
+            min-height: 40px;
+            padding: 10px 14px;
+            color: #f2f3f7;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 11px;
+            background: #202634;
+            box-shadow: none;
+            font-size: 12px;
+            font-weight: 700;
+            transition: border-color .18s ease, background .18s ease, transform .18s ease;
+        }
+        .btn-action:hover, a.btn-action:hover { color: #15120f; border-color: var(--accent-color); background: var(--accent-color); box-shadow: none; }
+        button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 3px; }
+
+        .game-provider-buttons { gap: 10px; margin-bottom: 22px; }
+        .game-provider-button { min-height: 58px; min-width: 200px; justify-content: flex-start; padding: 10px 15px; color: #dce1eb; border: 1px solid rgba(255,255,255,.1); border-radius: 15px; background: #151a24; box-shadow: none; font-size: 12px; font-weight: 700; }
+        .game-provider-button:hover, .game-provider-button.active { color: #fff; border-color: color-mix(in srgb, var(--accent-color) 62%, rgba(255,255,255,.1)); background: color-mix(in srgb, var(--accent-color) 12%, #151a24); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-color) 16%, transparent); transform: translateY(-1px); }
+        .game-provider-logo { width: 28px; height: 28px; flex-basis: 28px; border-radius: 8px; }
+
+        .bottom-dock {
+            left: 50%;
+            bottom: 18px;
+            gap: 4px;
+            padding: 7px;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 19px;
+            background: rgba(18,22,31,.9);
+            box-shadow: 0 16px 50px rgba(0,0,0,.48), inset 0 1px rgba(255,255,255,.055);
+            backdrop-filter: blur(24px) saturate(150%);
+        }
+        .dock-item {
+            position: relative;
+            width: auto;
+            min-width: 44px;
+            height: 42px;
+            gap: 8px;
+            padding: 0 13px;
+            color: #a6adbb;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .dock-item::after { content: attr(title); white-space: nowrap; }
+        .dock-item svg { width: 17px; height: 17px; flex: 0 0 17px; }
+        .dock-item:hover { color: #fff; background: rgba(255,255,255,.07); transform: translateY(-1px); }
+        .dock-item.active { color: #17130f; background: var(--accent-color); box-shadow: 0 7px 18px color-mix(in srgb, var(--accent-color) 24%, transparent); }
+        .dock-item#dock-mute-btn { min-width: 42px; width: 42px; padding: 0; margin-left: 3px; border-left: 1px solid rgba(255,255,255,.1); border-radius: 0 12px 12px 0; }
+        .dock-item#dock-mute-btn::after { content: ''; }
+
+        .settings-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 15px; }
+        .settings-heading { margin: 0 0 22px; }
+        .settings-heading .section-title { margin-bottom: 12px; }
+        .settings-col { min-width: 0; padding: 18px; gap: 12px; border: 1px solid rgba(255,255,255,.09); border-radius: 18px; background: linear-gradient(155deg, #151a24, #11151e); box-shadow: 0 12px 34px rgba(0,0,0,.18); }
+        .col-header { padding-bottom: 12px; margin-bottom: 4px; color: #f1f3f7; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 800; text-shadow: none; }
+        .col-header svg { color: var(--accent-color); }
+        .setting-subhead { margin: 5px 0 1px; color: #929aaa; font-size: 11px; font-weight: 700; letter-spacing: .045em; }
+        .setting-help { color: #798394; font-size: 11px; font-weight: 500; line-height: 1.55; }
+        .version-tag { display: inline-flex; padding: 6px 10px; margin: 0 0 16px; color: #9da5b4; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,.035); font-size: 11px; font-weight: 600; }
+        input[type="text"], select, textarea { min-height: 39px; padding: 9px 11px; color: #f2f4f8; border: 1px solid rgba(255,255,255,.12); border-radius: 10px; background: #0f131b; font-size: 12px; }
+        input[type="text"]::placeholder, textarea::placeholder { color: #6f7889; }
+        select option { color: #f2f4f8; background: #151a24; }
+        textarea { min-height: 86px; line-height: 1.55; }
+        .checkbox-label { color: #c2c8d3; font-size: 12px; font-weight: 500; }
+        .checkbox-label input[type="checkbox"] { width: 16px; height: 16px; }
+        .color-swatches-grid { gap: 6px; }
+        .swatch-box { min-width: 0; height: 28px; border: 1px solid rgba(255,255,255,.18); border-radius: 8px; }
+        .preview-box { padding: 8px 10px; color: #c6cbd5; border: 1px dashed rgba(255,255,255,.16); border-radius: 9px; font-size: 11px; }
+        .suggest-panel { gap: 12px; max-width: 680px; padding: 22px; border: 1px solid rgba(255,255,255,.1); border-radius: 19px; background: #141923; }
+        .suggest-panel .setup-sub { font-size: 13px; }
+        .suggest-item { padding: 10px 12px; color: #e3e6ec; border: 1px solid rgba(255,255,255,.1); border-radius: 10px; font-size: 12px; }
+
+        .toast-container { right: 22px; bottom: 96px; }
+        .toast-msg { padding: 11px 15px; color: #f1f3f7; border: 1px solid rgba(255,255,255,.13); border-radius: 12px; background: #1a202b; box-shadow: 0 14px 32px rgba(0,0,0,.3); font-size: 12px; }
+        #loading-screen { background: radial-gradient(ellipse at center, #171c28 0%, #090b10 56%); }
+        .loader-title { color: #f5f6fa; font-size: 22px; font-weight: 800; letter-spacing: -.04em; text-shadow: none; }
+        .loader-subtitle, .status-text { font-size: 11px; font-weight: 600; }
+        .progress-container { height: 10px; border: 1px solid rgba(255,255,255,.13); border-radius: 99px; background: #171c26; box-shadow: none; }
+        .progress-bar { border-radius: 99px; }
+
+        #cxz-player { background: radial-gradient(ellipse at 50% 0%, #202536, #090b10 70%); }
+        #cxz-player .cxz-particles { opacity: .2; background: radial-gradient(ellipse at 50% 85%, #5a321d 0%, #11131c 45%, #07080c 100%); }
+        #cxz-player .cxz-window { border: 1px solid rgba(255,255,255,.15); border-radius: 16px; box-shadow: 0 24px 80px rgba(0,0,0,.5); }
+        #cxz-player .cxz-toolbar { color: #c4cad5; font-family: 'DM Sans', Inter, sans-serif; }
+        #cxz-player .cxz-tool, #cxz-player .cxz-volume { border: 1px solid rgba(255,255,255,.13); border-radius: 9px; background: rgba(22,26,36,.88); color: #e2e5ec; }
+        #cxz-player .cxz-tool:hover { color: #16110c; background: var(--accent-color); }
+        #cxz-player .cxz-title { color: #f0f2f6; font-family: 'DM Sans', Inter, sans-serif; font-weight: 700; text-shadow: none; }
+        #cxz-player .cxz-console { border: 1px solid rgba(255,255,255,.15); border-radius: 14px; background: #10141d; }
+        body.custom-cursor, body.custom-cursor * { cursor: var(--custom-cursor) !important; }
+        body.crosshair-enabled #cxz-game-window::after {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            z-index: 15;
+            color: var(--crosshair-color, var(--accent-color));
+            content: var(--crosshair-content, '+');
+            font-family: Arial, sans-serif;
+            font-size: var(--crosshair-size, 20px);
+            font-weight: 400;
+            line-height: 1;
+            text-shadow: 0 0 7px color-mix(in srgb, var(--crosshair-color, var(--accent-color)) 65%, transparent);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        .setup-box { border: 1px solid rgba(255,255,255,.15); border-radius: 20px; background: #151a24; box-shadow: 0 28px 90px rgba(0,0,0,.6); }
+        .setup-box h2 { color: #f2f4f8; font-size: 20px; font-weight: 800; text-shadow: none; }
+        .setup-sub { color: #9ba3b2; font-size: 12px; }
+        .setup-section { border-color: var(--line); }
+
+        @media (max-width: 960px) {
+            .container { column-gap: 26px; padding-inline: 28px; }
+            .settings-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .home-hero { grid-template-columns: minmax(0, 1.1fr) minmax(220px, .8fr); }
+            .header-status { display: none; }
+        }
+        @media (max-width: 700px) {
+            body { padding-bottom: 90px; }
+            body.top-sidebar { padding-top: 78px; }
+            .container { display: block; padding: 22px 18px 36px; }
+            .header { margin-bottom: 19px; }
+            .brand-mark { width: 44px; height: 44px; flex-basis: 44px; border-radius: 14px; }
+            .header-tagline { font-size: 11px; }
+            .search-box { margin-bottom: 23px; }
+            .search-box input { min-height: 46px; }
+            .tab-content:not(#home) { padding-top: 15px; }
+            .page-description { margin: -7px 0 20px; font-size: 12px; }
+            .home-hero { grid-template-columns: 1fr; min-height: 0; margin: 16px 0 31px; padding: 30px 25px 20px; border-radius: 22px; }
+            .home-hero h2 { font-size: clamp(40px, 11vw, 58px); }
+            .home-hero-copy > p { max-width: 410px; font-size: 13px; }
+            .hero-art { min-height: 210px; margin-top: 8px; }
+            .hero-game-card { width: min(240px, 64%); }
+            .hero-game-card img { height: 126px; }
+            .hero-orbit { width: 220px; height: 220px; }
+            #home > .section-title::after { display: none; }
+            .grid, #featured-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+            .card { padding: 7px 7px 12px; border-radius: 15px; }
+            .card img, .card .item-image { height: clamp(96px, 30vw, 135px); margin-bottom: 10px; border-radius: 10px; }
+            .card h3, .tool-card h3 { font-size: 12px; }
+            .card p, .tool-card p { font-size: 10px; }
+            .bottom-dock { bottom: 12px; width: max-content; max-width: calc(100vw - 18px); gap: 1px; padding: 6px; border-radius: 16px; }
+            .dock-item { width: 40px; min-width: 40px; height: 40px; justify-content: center; padding: 0; }
+            .dock-item::after { display: none; }
+            .dock-item#dock-mute-btn { width: 40px; min-width: 40px; margin-left: 1px; border-left: 0; border-radius: 11px; }
+            .settings-grid { grid-template-columns: 1fr; }
+            .game-provider-button { min-width: 0; }
+            .toast-container { right: 12px; bottom: 68px; left: 12px; align-items: flex-end; }
+        }
+        @media (max-width: 400px) {
+            .container { padding-inline: 13px; }
+            .brand-mark { width: 40px; height: 40px; flex-basis: 40px; }
+            .header h1 { font-size: 17px; }
+            .header-eyebrow { font-size: 9px; }
+            .home-hero { padding-inline: 20px; }
+            .grid, #featured-grid { gap: 9px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .card, .card img, .hero-cta { transition: none; }
+        }
     </style>
 </head>
 <body>
@@ -911,7 +1345,7 @@ html:-webkit-full-screen body {
         var THEMES = ['securly', 'lightspeed', 'goguardian', 'classlink'];
         var overlay = document.getElementById('block-overlay');
         var frame = document.getElementById('block-frame');
-        var timer = null, hideTimer = null;
+        var timer = null, hideTimer = null, loadToken = 0;
         window.__cxzBlockDone = false;
 
         function onMessage(ev) {
@@ -919,11 +1353,13 @@ html:-webkit-full-screen body {
         }
         function dismiss() {
             clearTimeout(timer);
+            loadToken++;
             window.removeEventListener('message', onMessage);
             overlay.style.opacity = '0';
             overlay.style.pointerEvents = 'none';
             hideTimer = setTimeout(function () {
                 overlay.style.display = 'none';
+                frame.removeAttribute('srcdoc');
                 frame.removeAttribute('src');
                 window.__cxzBlockDone = true;
                 if (typeof window.__cxzStartLoadingScreen === 'function') {
@@ -931,9 +1367,28 @@ html:-webkit-full-screen body {
                 }
             }, 450);
         }
+        function renderBlockScreen(html, token) {
+            if (token !== loadToken) return;
+            // Some CDN mirrors label HTML files as text/plain. srcdoc parses the
+            // fetched markup as HTML regardless of the response content type.
+            frame.srcdoc = html;
+            // Start the existing timeout after the markup is assigned, rather
+            // than waiting for external fonts or images to finish loading.
+            timer = setTimeout(dismiss, BLOCK_SCREEN_MS);
+        }
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>\"']/g, function (character) {
+                return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', "'": '&#39;' })[character];
+            });
+        }
         function show(force) {
             try {
-                if (!/^(https?|file):$/.test(location.protocol)) {
+                // launch.html writes the fetched site into an about:blank tab;
+                // its absolute <base> keeps the site's relative URLs usable.
+                var launchedBlank = location.protocol === 'about:' &&
+                    location.href.indexOf('about:blank') === 0 &&
+                    !!document.querySelector('base[href]');
+                if (!/^(https?|file):$/.test(location.protocol) && !launchedBlank) {
                     window.__cxzBlockDone = true;
                     if (typeof window.__cxzStartLoadingScreen === 'function') window.__cxzStartLoadingScreen();
                     return;
@@ -946,14 +1401,27 @@ html:-webkit-full-screen body {
                 var theme = localStorage.getItem('cxz_block_theme');
                 if (THEMES.indexOf(theme) === -1) theme = 'lightspeed';
                 clearTimeout(timer); clearTimeout(hideTimer);
-                frame.src = './blockscreens/' + theme + '.html';
+                var token = ++loadToken;
                 overlay.style.display = 'block';
                 overlay.style.opacity = '1';
                 overlay.style.pointerEvents = 'auto';
             } catch (e) { return; }
             window.removeEventListener('message', onMessage);
             window.addEventListener('message', onMessage);
-            timer = setTimeout(dismiss, BLOCK_SCREEN_MS);
+            fetch('./blockscreens/' + theme + '.html', { cache: 'no-store' })
+                .then(function (response) {
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    return response.text();
+                })
+                .then(function (html) {
+                    if (!html.trim()) throw new Error('The mirror returned an empty page.');
+                    renderBlockScreen(html, token);
+                })
+                .catch(function (error) {
+                    var detail = escapeHtml(error && error.message ? error.message : 'Network error');
+                    var fallback = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#090d18;color:#e8edf8;font:16px system-ui,sans-serif}.message{max-width:34rem;padding:2rem;text-align:center}.detail{color:#9aa8c1;font-size:13px}</style></head><body><main class="message"><h1>Block screen unavailable</h1><p>Could not load the selected ' + escapeHtml(theme) + ' screen.</p><p class="detail">' + detail + '</p></main></body></html>';
+                    renderBlockScreen(fallback, token);
+                });
         }
         window.cxzShowBlockScreen = function () { show(true); };
         show(false);
@@ -961,7 +1429,7 @@ html:-webkit-full-screen body {
     </script>
 
 
-    <!-- Background Canvas (Matrix / Starfield / Particles) -->
+    <!-- Background Canvas (Starfield, Weather, and Ambient Effects) -->
     <canvas id="bg-canvas"></canvas>
 
     <!-- Crosshair Target -->
@@ -982,16 +1450,58 @@ html:-webkit-full-screen body {
 
         <!-- Header -->
         <div class="header">
-            <h1 id="site-title">CLASSROOM-X-ZONE</h1>
+            <div class="brand-mark" aria-hidden="true">
+                <img src="./g/assets/favicon.ico" alt="">
+            </div>
+            <div class="brand-copy">
+                <div class="header-eyebrow">YOUR POCKET ARCADE</div>
+                <h1 id="site-title">CLASSROOM-X-ZONE</h1>
+                <p class="header-tagline">Good games. Zero setup.</p>
+            </div>
+            <div class="header-status"><span class="status-dot"></span><span>READY WHEN YOU ARE</span></div>
         </div>
 
         <!-- Search Bar -->
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Search games, tools..." onkeyup="filterItems()">
+            <label class="search-icon" for="searchInput" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+            </label>
+            <input type="text" id="searchInput" aria-label="Search games and tools" placeholder="Search games, tools..." onkeyup="filterItems()">
         </div>
 
         <!-- TAB: HOME -->
         <div id="home" class="tab-content active">
+            <section class="home-hero" aria-labelledby="home-hero-title">
+                <div class="home-hero-copy">
+                    <div class="hero-kicker">A LITTLE BREAK GOES A LONG WAY</div>
+                    <h2 id="home-hero-title">Make the next<br><span>break count.</span></h2>
+                    <p>Jump into a quick favorite, explore something new, and get straight to the good part.</p>
+                    <button class="hero-cta" type="button" onclick="switchTab('games')">
+                        Explore all games
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                    <div class="hero-note">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                        No installs. Just hit play.
+                    </div>
+                </div>
+                <div class="hero-art" aria-hidden="true">
+                    <div class="hero-art-glow"></div>
+                    <div class="hero-orbit"></div>
+                    <div class="hero-game-card">
+                        <img src="./g/assets/slope.png" alt="">
+                        <div class="hero-game-meta"><span>Slope</span><span>Fan favorite</span></div>
+                    </div>
+                    <div class="hero-floating-chip top">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-2-5.8L4 11l6-2.2L12 3Z"/><path d="m19 15 1 2.5 2.5 1-2.5 1L19 22l-1-2.5-2.5-1 2.5-1L19 15Z"/></svg>
+                        Something for every mood
+                    </div>
+                    <div class="hero-floating-chip bottom">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3M16 3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v13H4V6a1 1 0 0 1 1-1Z"/><path d="m9 15 2 2 4-4"/></svg>
+                        Pick up and play
+                    </div>
+                </div>
+            </section>
             <h2 class="section-title">Featured Games</h2>
             <div class="grid" id="featured-grid"></div>
         </div>
@@ -999,6 +1509,7 @@ html:-webkit-full-screen body {
         <!-- TAB: GAMES -->
         <div id="games" class="tab-content">
             <h2 class="section-title">All Games</h2>
+            <p class="page-description">Browse the full arcade or switch to GamePix for an even bigger library. Search by title, pick a card, and the game opens right here.</p>
 
             <div class="game-provider-buttons">
                 <button class="game-provider-button active" type="button" aria-selected="true" onclick="window.switchGameProvider('cxz', this)">
@@ -1026,6 +1537,7 @@ html:-webkit-full-screen body {
         <!-- TAB: TOOLS -->
         <div id="tools" class="tab-content">
             <h2 class="section-title">Tools &amp; Utilities</h2>
+            <p class="page-description">Quick extras for your browser and your next session, all collected in one place.</p>
             <div class="grid" id="tools-grid">
                 
             </div>
@@ -1034,12 +1546,14 @@ html:-webkit-full-screen body {
         <!-- TAB: PARTNERS -->
         <div id="partners" class="tab-content">
             <h2 class="section-title">Partners</h2>
+            <p class="page-description">Projects and people that help make the arcade more fun.</p>
             <div class="grid" id="partners-grid"></div>
         </div>
 
         <!-- TAB: SUGGEST -->
         <div id="suggest" class="tab-content">
             <h2 class="section-title">Suggest a Game</h2>
+            <p class="page-description">Tell us what you want to play next. Suggestions are saved here and sent when the service is available.</p>
             <div class="suggest-panel">
                 <p class="setup-sub">Want a game added to the site? Tell us which one.</p>
                 <div class="setting-subhead" style="text-align:left;">Game name *</div>
@@ -1057,6 +1571,10 @@ html:-webkit-full-screen body {
 
         <!-- TAB: SETTINGS - Exact 4-Column Layout from Image 2 -->
         <div id="settings" class="tab-content">
+            <div class="settings-heading">
+                <h2 class="section-title">Make it yours</h2>
+                <p class="page-description">Set up the arcade to match your style. Your preferences are saved in this browser.</p>
+            </div>
             <div class="version-tag">Version 2026.09.30</div>
             <div class="settings-grid">
 
@@ -1085,11 +1603,12 @@ html:-webkit-full-screen body {
                     <button class="btn-action" onclick="downloadHTML()">Download HTML</button>
                     <button class="btn-action" onclick="downloadSVG()">Download SVG</button>
 
-                    <div class="setting-subhead">Open g4mes In</div>
+                    <div class="setting-subhead">Open games in</div>
                     <label class="checkbox-label">
                         <input type="checkbox" id="open-games-blob" onchange="toggleGamesInBlob(this.checked)">
-                        Open g4mes in blob
+                        Open games in blob
                     </label>
+                    <div class="setting-help">Runs the game from a local blob document inside the player when the host allows source access. Otherwise it falls back to the original game URL.</div>
                 </div>
 
                 <!-- COLUMN 2: CLOAKING -->
@@ -1123,7 +1642,7 @@ html:-webkit-full-screen body {
                     <div class="setting-subhead" style="text-align:left;">Tab Name:</div>
                     <input type="text" id="cloak-name-input" placeholder="Home - Classroom">
 
-                    <div class="setting-subhead" style="text-align:left;">Favicon Data URL:</div>
+                    <div class="setting-subhead" style="text-align:left;">Favicon URL or Data URL:</div>
                     <input type="text" id="cloak-icon-input" placeholder="https://ssl.gstatic.com/classroom/favicon.png">
 
                     <div class="btn-row">
@@ -1139,12 +1658,13 @@ html:-webkit-full-screen body {
 
                     <div class="setting-subhead" style="text-align:left; margin-top:8px;">Hidden Page Cover</div>
                     <select id="hidden-cover-select" onchange="saveHiddenCover()">
+                        <option value="none" selected>None — use panic URL</option>
                         <option value="classroom">Google Classroom</option>
                         <option value="drive">Google Drive</option>
                         <option value="google">Google</option>
                         <option value="canvas">Canvas</option>
-                        <option value="none">None</option>
                     </select>
+                    <div class="setting-help">When the panic key is pressed, open this cover. Choose None to use the URL below.</div>
 
                     <div class="setting-subhead" style="text-align:left; margin-top:8px;">Panic Key</div>
                     <label class="checkbox-label">
@@ -1193,10 +1713,15 @@ html:-webkit-full-screen body {
                     <div class="setting-subhead" style="text-align:left; margin-top:8px;">Background</div>
                     <select id="bg-select" onchange="changeBackground(this.value)">
                         <option value="starfield">Starfield</option>
+                        <option value="constellations">Constellations</option>
+                        <option value="rain">Rain</option>
+                        <option value="snow">Snowfall</option>
+                        <option value="aurora">Aurora</option>
                         <option value="matrix">Matrix</option>
                         <option value="embers">Embers</option>
                         <option value="none">None</option>
                     </select>
+                    <div style="font-size:0.55rem;color:var(--text-muted);line-height:1.6;">Animated effects pause in Performance Mode or when reduced motion is enabled.</div>
 
                     <div class="setting-subhead" style="text-align:left;">Sidebar</div>
                     <select id="sidebar-select" onchange="changeSidebar(this.value)">
@@ -1264,8 +1789,9 @@ html:-webkit-full-screen body {
                     <div class="setting-subhead" style="text-align:left; margin-top:8px;">Startup Options</div>
                     <label class="checkbox-label">
                         <input type="checkbox" id="music-startup-check" onchange="savePerfSettings()">
-                        Music on startup
+                        Arcade music on startup
                     </label>
+                    <div class="setting-help">A quiet, generated arcade loop starts after your first click. Browsers require that first interaction.</div>
                     <label class="checkbox-label">
                         <input type="checkbox" id="loadscreen-startup-check" checked onchange="savePerfSettings()">
                         Loading screen on startup
@@ -1359,6 +1885,8 @@ html:-webkit-full-screen body {
                 min="0"
                 max="100"
                 value="100"
+                aria-label="Game volume"
+                title="Game volume"
             >
 
             <span id="cxz-volume-text">
@@ -1464,7 +1992,7 @@ html:-webkit-full-screen body {
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
         <!-- Lucide volume-x -->
-        <button class="dock-item" onclick="toggleMuteSound()" id="dock-mute-btn" title="Mute">
+        <button class="dock-item" onclick="toggleMuteSound()" id="dock-mute-btn" title="Mute audio" aria-label="Mute audio" aria-pressed="false">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-volume-x"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg>
         </button>
     </nav>
@@ -2165,15 +2693,22 @@ html:-webkit-full-screen body {
         }
 
         // 4. ACCENT THEME SYSTEM
-        function setThemeAccent(hex) {
-            if (!hex) hex = '#ff6600';
-            document.documentElement.style.setProperty('--accent-color', hex);
-            document.documentElement.style.setProperty('--accent-glow', `0 0 12px ${hex}`);
-            document.documentElement.style.setProperty('--border-color', hex);
-            document.documentElement.style.setProperty('--text-color', hex);
-            document.getElementById('accent-hex-input').value = hex;
-            localStorage.setItem(PRE + 'accent', hex);
-            showToast(`Accent set to ${hex}`);
+        function setThemeAccent(hex, silent = false) {
+            const color = String(hex || '').trim();
+            if (!/^#[\da-f]{6}$/i.test(color) || !CSS.supports('color', color)) {
+                if (!silent) showToast('Enter a valid 6-digit hex color, such as #ff6600');
+                return false;
+            }
+            const normalized = color.toLowerCase();
+            document.documentElement.style.setProperty('--accent-color', normalized);
+            document.documentElement.style.setProperty('--accent-glow', `0 10px 30px color-mix(in srgb, ${normalized} 22%, transparent)`);
+            document.documentElement.style.setProperty('--border-color', normalized);
+            document.documentElement.style.setProperty('--text-color', normalized);
+            const input = byId('accent-hex-input');
+            if (input) input.value = normalized;
+            localStorage.setItem(PRE + 'accent', normalized);
+            if (!silent) showToast(`Accent set to ${normalized}`);
+            return true;
         }
 
         // 5. TOAST NOTIFICATIONS
@@ -2209,26 +2744,39 @@ html:-webkit-full-screen body {
         }
 
         function saveCloak() {
-            const title = document.getElementById('cloak-name-input').value;
-            const icon = document.getElementById('cloak-icon-input').value;
+            const title = byId('cloak-name-input').value.trim().slice(0, 80);
+            const icon = byId('cloak-icon-input').value.trim();
+            if (icon && !/^(https?:\/\/|data:image\/)/i.test(icon)) {
+                showToast('Favicon must be an http(s) URL or image data URL');
+                return;
+            }
 
             if (title) {
                 document.title = title;
                 localStorage.setItem(PRE + 'cloak_title', title);
-                document.getElementById('preview-tab-text').innerText = title;
+            } else {
+                document.title = 'Classroom-x-zone';
+                localStorage.removeItem(PRE + 'cloak_title');
+            }
+            byId('preview-tab-text').innerText = title || 'Classroom-x-zone';
+
+            let link = byId('favicon');
+            if (!link) {
+                link = document.createElement('link');
+                link.id = 'favicon';
+                link.rel = 'icon';
+                document.head.appendChild(link);
             }
             if (icon) {
-                let link = document.getElementById('favicon');
-                if (!link) {
-                    link = document.createElement('link');
-                    link.id = 'favicon';
-                    link.rel = 'icon';
-                    document.head.appendChild(link);
-                }
                 link.href = icon;
                 localStorage.setItem(PRE + 'cloak_icon', icon);
-                document.getElementById('preview-favicon').src = icon;
-                document.getElementById('preview-favicon').style.display = 'inline-block';
+                byId('preview-favicon').src = icon;
+                byId('preview-favicon').style.display = 'inline-block';
+            } else {
+                link.href = './g/assets/favicon.ico';
+                localStorage.removeItem(PRE + 'cloak_icon');
+                byId('preview-favicon').src = './g/assets/favicon.ico';
+                byId('preview-favicon').style.display = 'inline-block';
             }
             showToast("Cloak Applied!");
         }
@@ -2248,19 +2796,37 @@ html:-webkit-full-screen body {
         function saveHiddenCover() {
             const v = document.getElementById('hidden-cover-select').value;
             localStorage.setItem(PRE + 'hidden_cover', v);
-            showToast(`Hidden Cover: ${v}`);
+            showToast(v === 'none' ? 'Panic key will use the custom URL' : 'Panic cover saved: ' + v);
         }
 
         // 7. PANIC KEY SYSTEM
+        const PANIC_COVER_URLS = {
+            classroom: 'https://classroom.google.com/',
+            drive: 'https://drive.google.com/',
+            google: 'https://www.google.com/',
+            canvas: 'https://canvas.instructure.com/'
+        };
+
         function savePanicSettings() {
             const en = document.getElementById('panic-enable').checked;
-            const key = document.getElementById('panic-key-input').value || '`';
-            const url = document.getElementById('panic-url-input').value || 'https://www.google.com';
+            const key = document.getElementById('panic-key-input').value.trim() || '`';
+            const url = document.getElementById('panic-url-input').value.trim() || 'https://www.google.com';
+            let parsedUrl;
+            try { parsedUrl = new URL(url); } catch (e) { parsedUrl = null; }
+            if (key.length !== 1) {
+                showToast('Choose a single panic key');
+                return false;
+            }
+            if (!parsedUrl || !['http:', 'https:'].includes(parsedUrl.protocol)) {
+                showToast('Panic URL must start with http:// or https://');
+                return false;
+            }
 
             localStorage.setItem(PRE + 'panic_enable', en);
             localStorage.setItem(PRE + 'panic_key', key);
-            localStorage.setItem(PRE + 'panic_url', url);
+            localStorage.setItem(PRE + 'panic_url', parsedUrl.href);
             showToast(`Panic Key '${key}' Saved`);
+            return true;
         }
 
         function resetPanic() {
@@ -2274,10 +2840,12 @@ html:-webkit-full-screen body {
         document.addEventListener('keydown', (e) => {
             const en = localStorage.getItem(PRE + 'panic_enable') === 'true';
             const key = localStorage.getItem(PRE + 'panic_key') || '`';
-            const url = localStorage.getItem(PRE + 'panic_url') || 'https://www.google.com';
-            if (en && e.key === key) {
-                window.location.replace(url);
-            }
+            const target = e.target;
+            if (!en || e.repeat || e.key.toLowerCase() !== key.toLowerCase()) return;
+            if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
+            const selectedCover = byId('hidden-cover-select')?.value || localStorage.getItem(PRE + 'hidden_cover') || 'none';
+            const url = PANIC_COVER_URLS[selectedCover] || localStorage.getItem(PRE + 'panic_url') || 'https://www.google.com/';
+            window.location.replace(url);
         });
 
         // 8. LAUNCHERS & OFFLINE TOOLS
@@ -2297,9 +2865,20 @@ html:-webkit-full-screen body {
 
         function openInBlob() {
             const html = document.documentElement.outerHTML;
-            const blob = new Blob([html], { type: 'text/html' });
+            const base = new URL('.', window.location.href).href;
+            const baseTag = `<base href="${base.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}">`;
+            const withBase = /<head\b[^>]*>/i.test(html)
+                ? html.replace(/<head\b[^>]*>/i, match => match + baseTag)
+                : html;
+            const blob = new Blob([withBase], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
+            const opened = window.open(url, '_blank');
+            if (!opened) {
+                URL.revokeObjectURL(url);
+                alert("Pop-ups are blocked. Please enable pop-ups for this site.");
+                return;
+            }
+            window.setTimeout(() => URL.revokeObjectURL(url), 60000);
         }
 
         function downloadHTML() {
@@ -2340,7 +2919,7 @@ setTimeout(function() {
             a.href = url;
             a.download = 'classroom-x-zone.html';
             a.click();
-            URL.revokeObjectURL(url);
+            window.setTimeout(() => URL.revokeObjectURL(url), 30000);
             showToast("Downloaded from Classroom-X-Zone");
         }
 
@@ -2352,7 +2931,7 @@ setTimeout(function() {
                 a.href = u;
                 a.download = 'classroom-x-zone.svg';
                 a.click();
-                URL.revokeObjectURL(u);
+                window.setTimeout(() => URL.revokeObjectURL(u), 30000);
                 showToast("Downloaded from Classroom-X-Zone");
             }
 
@@ -2433,15 +3012,14 @@ setTimeout(function() {
         }
 
         function toggleGamesInBlob(checked) {
-            localStorage.setItem(PRE + 'games_in_blob', checked);
-            showToast(`Open games in blob: ${checked ? 'ON' : 'OFF'}`);
+            localStorage.setItem(PRE + 'games_in_blob', String(checked));
+            showToast(checked ? 'Blob mode will be used for the next game' : 'Games will open from their original URLs');
             interceptGameLinks();
         }
 
-        // Kept for compatibility with the old settings checkbox.
-        // Games are now always handled by the integrated CXZPlayer.
+        // The delegated card launcher reads this saved preference when each game opens.
         function interceptGameLinks() {
-            return;
+            return localStorage.getItem(PRE + 'games_in_blob') === 'true';
         }
 
         // 9. BACKUP & RESTORE
@@ -2470,21 +3048,34 @@ setTimeout(function() {
             a.href = url;
             a.download = 'cxz_backup_settings.txt';
             a.click();
-            URL.revokeObjectURL(url);
+            window.setTimeout(() => URL.revokeObjectURL(url), 30000);
             showToast("Settings saved to cxz_backup_settings.txt");
         }
 
         function loadSettingsTxt(e) {
             const file = e.target.files[0];
             if (!file) return;
+            if (file.size > 1024 * 1024) {
+                e.target.value = '';
+                alert('That backup is too large to be a settings file.');
+                return;
+            }
             const reader = new FileReader();
             reader.onload = (ev) => {
                 try {
                     const parsed = JSON.parse(ev.target.result);
-                    Object.keys(parsed).forEach(k => localStorage.setItem(k, parsed[k]));
+                    if (!parsed || Array.isArray(parsed) || typeof parsed !== 'object') throw new Error('Expected a settings object');
+                    const entries = Object.entries(parsed).filter(([key, value]) =>
+                        key.startsWith(PRE) && /^[a-z0-9_]+$/i.test(key) &&
+                        ['string', 'number', 'boolean'].includes(typeof value)
+                    );
+                    if (!entries.length) throw new Error('No CXZ settings found');
+                    entries.forEach(([key, value]) => localStorage.setItem(key, String(value)));
+                    e.target.value = '';
                     showToast("Settings imported! Reloading...");
                     setTimeout(() => location.reload(), 600);
                 } catch (err) {
+                    e.target.value = '';
                     alert("Invalid JSON settings file!");
                 }
             };
@@ -2492,71 +3083,115 @@ setTimeout(function() {
         }
 
         // 10. APPEARANCE & CURSOR
-        function changeBackground(type) {
+        function changeBackground(type, silent = false) {
+            if (!['starfield', 'constellations', 'rain', 'snow', 'aurora', 'matrix', 'embers', 'none'].includes(type)) type = 'starfield';
             localStorage.setItem(PRE + 'bg_type', type);
             currentBgType = type;
-            showToast(`Background: ${type}`);
+            canvas.style.display = type === 'none' ? 'none' : '';
+            lastFrameTime = 0;
+            ctx.clearRect(0, 0, cw, ch);
+            refreshBackgroundRendering();
+            if (!silent) showToast(`Background: ${type}`);
         }
 
-        function changeSidebar(pos) {
+        function changeSidebar(pos, silent = false) {
+            if (!['bottom', 'top'].includes(pos)) pos = 'bottom';
             localStorage.setItem(PRE + 'sidebar_pos', pos);
             if (pos === 'top') {
                 document.body.classList.add('top-sidebar');
             } else {
                 document.body.classList.remove('top-sidebar');
             }
-            showToast(`Sidebar: ${pos}`);
+            if (!silent) showToast(`Sidebar: ${pos}`);
+        }
+
+        function applyCursorImage(source, hotspot = '4 4') {
+            const cssCursor = `url("${source.replace(/["\\]/g, '')}") ${hotspot}, auto`;
+            document.documentElement.style.setProperty('--custom-cursor', cssCursor);
+            document.body.classList.add('custom-cursor');
+        }
+
+        function loadCursorSetting(value, silent = true) {
+            if (!value) return;
+            if (value.startsWith('preset:')) {
+                setPresetCursor(value.slice(7), silent);
+            } else if (/^(https?:\/\/|data:image\/)/i.test(value)) {
+                applyCursorImage(value);
+                if (value.startsWith('https://') || value.startsWith('http://')) byId('cursor-url-input').value = value;
+            } else {
+                document.body.classList.remove('custom-cursor');
+                document.body.style.cursor = value;
+            }
         }
 
         function applyCursorUrl() {
-            const url = document.getElementById('cursor-url-input').value;
-            if (url) {
-                document.body.style.cursor = `url('${url}'), auto`;
-                localStorage.setItem(PRE + 'cursor', url);
-                showToast("Custom cursor applied");
+            const url = byId('cursor-url-input').value.trim();
+            if (!/^(https?:\/\/|data:image\/)/i.test(url)) {
+                showToast('Enter an http(s) image URL or upload an image');
+                return;
             }
+            const image = new Image();
+            image.onload = () => {
+                applyCursorImage(url);
+                localStorage.setItem(PRE + 'cursor', url);
+                showToast('Custom cursor applied');
+            };
+            image.onerror = () => showToast('Could not load that cursor image');
+            image.src = url;
         }
 
         function uploadCursorFile(e) {
             const f = e.target.files[0];
             if (!f) return;
+            if (!f.type.startsWith('image/') || f.size > 1024 * 1024) {
+                e.target.value = '';
+                showToast('Choose an image smaller than 1 MB');
+                return;
+            }
             const r = new FileReader();
             r.onload = (ev) => {
                 const u = ev.target.result;
-                document.body.style.cursor = `url('${u}'), auto`;
+                applyCursorImage(u);
                 localStorage.setItem(PRE + 'cursor', u);
+                byId('cursor-url-input').value = '';
+                e.target.value = '';
                 showToast("Uploaded custom cursor");
             };
             r.readAsDataURL(f);
         }
 
-        function setPresetCursor(name) {
-            let cur = 'auto';
-            if (name === 'wii') {
-                cur = 'crosshair';
-            } else if (name === 'teto') {
-                cur = 'cell';
+        function setPresetCursor(name, silent = false) {
+            const cursors = {
+                wii: './g/assets/cursor-wii.png',
+                teto: 'https://quantil.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/teto/normal2.png'
+            };
+            if (!cursors[name]) {
+                showToast('Cursor preset not found');
+                return;
             }
-            document.body.style.cursor = cur;
-            localStorage.setItem(PRE + 'cursor', cur);
-            showToast(`Cursor: ${name}`);
+            applyCursorImage(cursors[name], name === 'wii' ? '4 3' : '7 6');
+            localStorage.setItem(PRE + 'cursor', 'preset:' + name);
+            if (!silent) showToast(`Cursor: ${name === 'wii' ? 'Wii pointer' : 'Teto sparkle'}`);
         }
 
         function resetCursor() {
-            document.body.style.cursor = 'auto';
+            document.body.classList.remove('custom-cursor');
+            document.body.style.cursor = '';
+            document.documentElement.style.removeProperty('--custom-cursor');
             localStorage.removeItem(PRE + 'cursor');
             showToast("Cursor reset to default");
         }
 
         // 11. PERFORMANCE OPTIONS
-        function togglePerfMode(checked) {
+        function togglePerfMode(checked, silent = false) {
             localStorage.setItem(PRE + 'perf_mode', checked);
             if (checked) {
                 document.body.classList.add('performance-mode');
             } else {
                 document.body.classList.remove('performance-mode');
             }
-            showToast(`Performance Mode: ${checked ? 'ON (Optimized)' : 'OFF'}`);
+            refreshBackgroundRendering();
+            if (!silent) showToast(`Performance Mode: ${checked ? 'ON (Optimized)' : 'OFF'}`);
         }
 
         function toggleLiquidGlass(checked) {
@@ -2568,20 +3203,21 @@ setTimeout(function() {
             }
         }
 
-        function toggleStretchedRes(val) {
+        function toggleStretchedRes(val, silent = false) {
+            if (!['off', 'on'].includes(val)) val = 'off';
             localStorage.setItem(PRE + 'stretched_res', val);
             if (val === 'on') {
                 document.body.classList.add('stretched-res');
             } else {
                 document.body.classList.remove('stretched-res');
             }
-            showToast(`Stretched Res: ${val}`);
+            if (!silent) showToast(`Stretched Res: ${val}`);
         }
 
         function savePerfSettings() {
             localStorage.setItem(PRE + 'block_screen', document.getElementById('block-screen-check').checked);
             localStorage.setItem(PRE + 'block_theme', document.getElementById('block-theme-select').value);
-            localStorage.setItem(PRE + 'music_startup', document.getElementById('music-startup-check').checked);
+            syncArcadeMusic(document.getElementById('music-startup-check').checked);
             localStorage.setItem(PRE + 'loadscreen', document.getElementById('loadscreen-startup-check').checked);
             const bTitle = document.getElementById('block-title-input').value.trim();
             const bMsg = document.getElementById('block-msg-input').value.trim();
@@ -2597,6 +3233,11 @@ setTimeout(function() {
             const color = document.getElementById('crosshair-color').value;
             const size = document.getElementById('crosshair-size').value;
             const crosshair = document.getElementById('crosshair');
+
+            document.body.classList.toggle('crosshair-enabled', en);
+            document.documentElement.style.setProperty('--crosshair-content', JSON.stringify(style));
+            document.documentElement.style.setProperty('--crosshair-color', color);
+            document.documentElement.style.setProperty('--crosshair-size', size + 'px');
 
             localStorage.setItem(PRE + 'crosshair_en', en);
             localStorage.setItem(PRE + 'crosshair_style', style);
@@ -2622,17 +3263,141 @@ setTimeout(function() {
         });
 
         // 13. MUTE SOUND TOGGLE
-        let isMuted = false;
+        let isMuted = localStorage.getItem(PRE + 'muted') === 'true';
+        let musicContext = null;
+        let musicMasterGain = null;
+        let musicTimer = null;
+        let musicStep = 0;
+        let musicUnlockArmed = false;
+        let musicUnlockHandler = null;
+
+        function updateMuteButton() {
+            const button = byId('dock-mute-btn');
+            if (!button) return;
+            const label = isMuted ? 'Unmute audio' : 'Mute audio';
+            button.title = label;
+            button.setAttribute('aria-label', label);
+            button.setAttribute('aria-pressed', String(isMuted));
+            button.innerHTML = isMuted
+                ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="m22 9-6 6m0-6 6 6"/></svg>'
+                : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>';
+        }
+
+        function setAudioMuted(muted) {
+            if (musicMasterGain && musicContext) {
+                musicMasterGain.gain.cancelScheduledValues(musicContext.currentTime);
+                musicMasterGain.gain.setTargetAtTime(muted ? 0 : 0.085, musicContext.currentTime, 0.08);
+            }
+            if (typeof CXZPlayer !== 'undefined') CXZPlayer.setMuted(muted);
+        }
+
+        function playArcadeNote(frequency) {
+            if (!musicContext || !musicMasterGain || musicContext.state !== 'running') return;
+            const now = musicContext.currentTime;
+            const oscillator = musicContext.createOscillator();
+            const envelope = musicContext.createGain();
+            oscillator.type = 'triangle';
+            oscillator.frequency.setValueAtTime(frequency, now);
+            envelope.gain.setValueAtTime(0.0001, now);
+            envelope.gain.exponentialRampToValueAtTime(0.2, now + 0.025);
+            envelope.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
+            oscillator.connect(envelope);
+            envelope.connect(musicMasterGain);
+            oscillator.start(now);
+            oscillator.stop(now + 0.44);
+        }
+
+        async function startArcadeMusic() {
+            if (localStorage.getItem(PRE + 'music_startup') !== 'true') return;
+            const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContextCtor) {
+                showToast('This browser does not support arcade music');
+                return;
+            }
+            try {
+                if (!musicContext) {
+                    musicContext = new AudioContextCtor();
+                    musicMasterGain = musicContext.createGain();
+                    musicMasterGain.gain.value = isMuted ? 0 : 0.085;
+                    musicMasterGain.connect(musicContext.destination);
+                    const pad = musicContext.createOscillator();
+                    const padGain = musicContext.createGain();
+                    pad.type = 'sine';
+                    pad.frequency.value = 110;
+                    padGain.gain.value = 0.025;
+                    pad.connect(padGain);
+                    padGain.connect(musicMasterGain);
+                    pad.start();
+                }
+                if (musicContext.state === 'suspended') await musicContext.resume();
+                if (musicTimer) return;
+                const notes = [392, 523.25, 587.33, 523.25, 440, 587.33, 659.25, 587.33, 392, 523.25, 659.25, 587.33, 440, 523.25, 587.33, 440];
+                musicStep = 0;
+                playArcadeNote(notes[musicStep++]);
+                musicTimer = window.setInterval(() => {
+                    if (!document.hidden && localStorage.getItem(PRE + 'music_startup') === 'true') {
+                        playArcadeNote(notes[musicStep++ % notes.length]);
+                    }
+                }, 520);
+                setAudioMuted(isMuted);
+            } catch (error) {
+                console.warn('[CXZ] Arcade music could not start:', error);
+                showToast('Arcade music could not start in this browser');
+            }
+        }
+
+        function armArcadeMusic() {
+            if (musicContext || musicUnlockArmed || localStorage.getItem(PRE + 'music_startup') !== 'true') return;
+            musicUnlockArmed = true;
+            musicUnlockHandler = () => {
+                musicUnlockArmed = false;
+                document.removeEventListener('pointerdown', musicUnlockHandler, true);
+                document.removeEventListener('keydown', musicUnlockHandler, true);
+                musicUnlockHandler = null;
+                startArcadeMusic();
+            };
+            document.addEventListener('pointerdown', musicUnlockHandler, true);
+            document.addEventListener('keydown', musicUnlockHandler, true);
+        }
+
+        function syncArcadeMusic(enabled) {
+            localStorage.setItem(PRE + 'music_startup', String(Boolean(enabled)));
+            if (enabled) {
+                if (musicContext) startArcadeMusic();
+                else armArcadeMusic();
+            } else {
+                if (musicTimer) window.clearInterval(musicTimer);
+                musicTimer = null;
+                if (musicUnlockHandler) {
+                    document.removeEventListener('pointerdown', musicUnlockHandler, true);
+                    document.removeEventListener('keydown', musicUnlockHandler, true);
+                }
+                musicUnlockHandler = null;
+                musicUnlockArmed = false;
+                if (musicContext && musicContext.state === 'running') musicContext.suspend();
+            }
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (!musicContext || localStorage.getItem(PRE + 'music_startup') !== 'true') return;
+            if (document.hidden && musicContext.state === 'running') musicContext.suspend();
+            else if (!document.hidden && musicContext.state === 'suspended') musicContext.resume();
+        });
+
         function toggleMuteSound() {
             isMuted = !isMuted;
-            showToast(`Audio: ${isMuted ? 'MUTED' : 'UNMUTED'}`);
+            localStorage.setItem(PRE + 'muted', String(isMuted));
+            setAudioMuted(isMuted);
+            updateMuteButton();
+            showToast(`Audio ${isMuted ? 'muted' : 'unmuted'}`);
         }
 
         // 14. LOAD ALL SAVED SETTINGS
         function loadAllSettings() {
             // Accent
-            const accent = localStorage.getItem(PRE + 'accent') || '#ff6600';
-            setThemeAccent(accent);
+            let accent = localStorage.getItem(PRE + 'accent') || '#ff6600';
+            if (!/^#[\da-f]{6}$/i.test(accent)) accent = '#ff6600';
+            setThemeAccent(accent, true);
 
             // Cloak
             const ct = localStorage.getItem(PRE + 'cloak_title');
@@ -2650,49 +3415,51 @@ setTimeout(function() {
             }
 
             // Hidden Cover
-            const hc = localStorage.getItem(PRE + 'hidden_cover') || 'classroom';
+            let hc = localStorage.getItem(PRE + 'hidden_cover') || 'none';
+            if (!['classroom', 'drive', 'google', 'canvas', 'none'].includes(hc)) hc = 'none';
             document.getElementById('hidden-cover-select').value = hc;
 
             // Panic Key
             const pe = localStorage.getItem(PRE + 'panic_enable') === 'true';
-            const pk = localStorage.getItem(PRE + 'panic_key') || '`';
-            const pu = localStorage.getItem(PRE + 'panic_url') || 'https://www.google.com';
+            const savedPanicKey = localStorage.getItem(PRE + 'panic_key') || '`';
+            const pk = savedPanicKey.length === 1 ? savedPanicKey : '`';
+            let pu = localStorage.getItem(PRE + 'panic_url') || 'https://www.google.com';
+            try {
+                const parsedPanicUrl = new URL(pu);
+                if (!['http:', 'https:'].includes(parsedPanicUrl.protocol)) pu = 'https://www.google.com';
+            } catch (e) { pu = 'https://www.google.com'; }
             document.getElementById('panic-enable').checked = pe;
             document.getElementById('panic-key-input').value = pk;
             document.getElementById('panic-url-input').value = pu;
 
             // Appearance: Background & Sidebar
-            const bg = localStorage.getItem(PRE + 'bg_type') || 'starfield';
+            let bg = localStorage.getItem(PRE + 'bg_type') || 'starfield';
+            if (!['starfield', 'constellations', 'rain', 'snow', 'aurora', 'matrix', 'embers', 'none'].includes(bg)) bg = 'starfield';
             document.getElementById('bg-select').value = bg;
-            currentBgType = bg;
+            changeBackground(bg, true);
 
-            const sb = localStorage.getItem(PRE + 'sidebar_pos') || 'bottom';
+            let sb = localStorage.getItem(PRE + 'sidebar_pos') || 'bottom';
+            if (!['bottom', 'top'].includes(sb)) sb = 'bottom';
             document.getElementById('sidebar-select').value = sb;
-            changeSidebar(sb);
+            changeSidebar(sb, true);
 
             // Cursor
             const cur = localStorage.getItem(PRE + 'cursor');
-            if (cur) {
-                if (cur.startsWith('http') || cur.startsWith('data:')) {
-                    document.body.style.cursor = `url('${cur}'), auto`;
-                    document.getElementById('cursor-url-input').value = cur;
-                } else {
-                    document.body.style.cursor = cur;
-                }
-            }
+            loadCursorSetting(cur);
 
             // Performance
             const perf = localStorage.getItem(PRE + 'perf_mode') === 'true';
             document.getElementById('perf-mode-check').checked = perf;
-            togglePerfMode(perf);
+            togglePerfMode(perf, true);
 
             const lg = localStorage.getItem(PRE + 'liquid_glass') === 'true';
             document.getElementById('liquid-glass-check').checked = lg;
             toggleLiquidGlass(lg);
 
-            const str = localStorage.getItem(PRE + 'stretched_res') || 'off';
+            let str = localStorage.getItem(PRE + 'stretched_res') || 'off';
+            if (!['off', 'on'].includes(str)) str = 'off';
             document.getElementById('stretched-res-select').value = str;
-            toggleStretchedRes(str);
+            toggleStretchedRes(str, true);
 
             const bs = localStorage.getItem(PRE + 'block_screen') === 'true';
             document.getElementById('block-screen-check').checked = bs;
@@ -2705,15 +3472,19 @@ setTimeout(function() {
 
             const ms = localStorage.getItem(PRE + 'music_startup') === 'true';
             document.getElementById('music-startup-check').checked = ms;
+            syncArcadeMusic(ms);
 
             const ls = localStorage.getItem(PRE + 'loadscreen') !== 'false';
             document.getElementById('loadscreen-startup-check').checked = ls;
 
             // Crosshair
             const xen = localStorage.getItem(PRE + 'crosshair_en') === 'true';
-            const xst = localStorage.getItem(PRE + 'crosshair_style') || '+';
-            const xco = localStorage.getItem(PRE + 'crosshair_color') || '#ff6600';
-            const xsz = localStorage.getItem(PRE + 'crosshair_size') || '20';
+            let xst = localStorage.getItem(PRE + 'crosshair_style') || '+';
+            if (!['+', '●', '×', '◈'].includes(xst)) xst = '+';
+            let xco = localStorage.getItem(PRE + 'crosshair_color') || '#ff6600';
+            if (!/^#[\da-f]{6}$/i.test(xco)) xco = '#ff6600';
+            let xsz = Number(localStorage.getItem(PRE + 'crosshair_size')) || 20;
+            xsz = Math.max(10, Math.min(60, xsz));
             document.getElementById('crosshair-enable').checked = xen;
             document.getElementById('crosshair-style').value = xst;
             document.getElementById('crosshair-color').value = xco;
@@ -2724,14 +3495,17 @@ setTimeout(function() {
             const gib = localStorage.getItem(PRE + 'games_in_blob') === 'true';
             document.getElementById('open-games-blob').checked = gib;
             interceptGameLinks();
+            updateMuteButton();
+            setAudioMuted(isMuted);
         }
 
-        // 15. ULTRA-OPTIMIZED BACKGROUND CANVAS (Matrix, Starfield, Embers)
+        // 15. OPTIMIZED BACKGROUND CANVAS (Starfield, Weather, and Ambient Effects)
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let currentBgType = 'starfield';
         let cw, ch;
         let lastFrameTime = 0;
+        let bgFrameHandle = null;
 
         function resizeCanvas() {
             cw = canvas.width = window.innerWidth;
@@ -2755,6 +3529,14 @@ setTimeout(function() {
         const stars = [];
         const starCount = 50;
 
+        // Weather and ambient background structures
+        const constellationStars = [];
+        const rainDrops = [];
+        const snowflakes = [];
+        const constellationCount = 46;
+        const rainDropCount = 115;
+        const snowflakeCount = 85;
+
         // Ember structures
         const embers = [];
         const emberCount = 30;
@@ -2775,6 +3557,40 @@ setTimeout(function() {
                 });
             }
 
+            constellationStars.length = 0;
+            for (let i = 0; i < constellationCount; i++) {
+                constellationStars.push({
+                    x: Math.random() * cw,
+                    y: Math.random() * ch,
+                    size: Math.random() * 1.5 + 0.7,
+                    phase: Math.random() * Math.PI * 2,
+                    drift: (Math.random() - 0.5) * 0.08
+                });
+            }
+
+            rainDrops.length = 0;
+            for (let i = 0; i < rainDropCount; i++) {
+                rainDrops.push({
+                    x: Math.random() * cw,
+                    y: Math.random() * ch,
+                    length: Math.random() * 15 + 9,
+                    speed: Math.random() * 4 + 5,
+                    alpha: Math.random() * 0.28 + 0.12
+                });
+            }
+
+            snowflakes.length = 0;
+            for (let i = 0; i < snowflakeCount; i++) {
+                snowflakes.push({
+                    x: Math.random() * cw,
+                    y: Math.random() * ch,
+                    radius: Math.random() * 2.1 + 0.7,
+                    speed: Math.random() * 0.7 + 0.35,
+                    phase: Math.random() * Math.PI * 2,
+                    alpha: Math.random() * 0.55 + 0.25
+                });
+            }
+
             embers.length = 0;
             for (let i = 0; i < emberCount; i++) {
                 embers.push({
@@ -2790,19 +3606,33 @@ setTimeout(function() {
 
         resizeCanvas();
 
-        function renderBg(now) {
-            requestAnimationFrame(renderBg);
+        function shouldRenderBackground() {
+            return !document.hidden &&
+                currentBgType !== 'none' &&
+                !document.body.classList.contains('performance-mode') &&
+                !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        }
 
-            // If tab is hidden, or reduced motion, or performance mode, or bg disabled: STOP
-            if (document.hidden || 
-                currentBgType === 'none' || 
-                document.body.classList.contains('performance-mode') || 
-                window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                return;
+        function refreshBackgroundRendering() {
+            if (shouldRenderBackground()) {
+                if (bgFrameHandle === null) bgFrameHandle = requestAnimationFrame(renderBg);
+            } else if (bgFrameHandle !== null) {
+                cancelAnimationFrame(bgFrameHandle);
+                bgFrameHandle = null;
             }
+        }
+
+        function renderBg(now) {
+            bgFrameHandle = null;
+
+            // Stop scheduling frames entirely while the effect is disabled.
+            if (!shouldRenderBackground()) return;
 
             // Cap at ~20fps (50ms interval) to save CPU & battery on low-end devices
-            if (now - lastFrameTime < 50) return;
+            if (now - lastFrameTime < 50) {
+                bgFrameHandle = requestAnimationFrame(renderBg);
+                return;
+            }
             lastFrameTime = now;
 
             const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#ff6600';
@@ -2849,10 +3679,99 @@ setTimeout(function() {
                     ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
                     ctx.fill();
                 }
+            } else if (currentBgType === 'rain') {
+                ctx.clearRect(0, 0, cw, ch);
+                ctx.lineWidth = 1.15;
+                for (const drop of rainDrops) {
+                    drop.y += drop.speed;
+                    drop.x -= drop.speed * 0.12;
+                    if (drop.y - drop.length > ch) {
+                        drop.y = -drop.length;
+                        drop.x = Math.random() * cw;
+                    }
+                    ctx.strokeStyle = `rgba(157, 194, 232, ${drop.alpha})`;
+                    ctx.beginPath();
+                    ctx.moveTo(drop.x, drop.y);
+                    ctx.lineTo(drop.x - drop.length * 0.12, drop.y - drop.length);
+                    ctx.stroke();
+                }
+            } else if (currentBgType === 'snow') {
+                ctx.clearRect(0, 0, cw, ch);
+                for (const flake of snowflakes) {
+                    flake.y += flake.speed;
+                    flake.x += Math.sin(now / 1100 + flake.phase) * 0.5;
+                    if (flake.y - flake.radius > ch) {
+                        flake.y = -flake.radius;
+                        flake.x = Math.random() * cw;
+                    }
+                    ctx.fillStyle = `rgba(224, 238, 255, ${flake.alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            } else if (currentBgType === 'constellations') {
+                ctx.clearRect(0, 0, cw, ch);
+                for (const star of constellationStars) {
+                    star.x += star.drift;
+                    if (star.x < -2) star.x = cw + 2;
+                    if (star.x > cw + 2) star.x = -2;
+                }
+                for (let i = 0; i < constellationStars.length; i++) {
+                    const a = constellationStars[i];
+                    for (let j = i + 1; j < constellationStars.length; j++) {
+                        const b = constellationStars[j];
+                        const dx = a.x - b.x;
+                        const dy = a.y - b.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < 118) {
+                            ctx.strokeStyle = `rgba(142, 179, 232, ${(1 - distance / 118) * 0.24})`;
+                            ctx.lineWidth = 0.7;
+                            ctx.beginPath();
+                            ctx.moveTo(a.x, a.y);
+                            ctx.lineTo(b.x, b.y);
+                            ctx.stroke();
+                        }
+                    }
+                    const twinkle = 0.38 + (Math.sin(now / 850 + a.phase) + 1) * 0.24;
+                    ctx.fillStyle = `rgba(225, 237, 255, ${twinkle})`;
+                    ctx.beginPath();
+                    ctx.arc(a.x, a.y, a.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            } else if (currentBgType === 'aurora') {
+                ctx.clearRect(0, 0, cw, ch);
+                ctx.globalCompositeOperation = 'screen';
+                ctx.lineCap = 'round';
+                ctx.shadowBlur = 32;
+                for (let i = 0; i < 4; i++) {
+                    const wave = Math.sin(now / (1800 + i * 350) + i * 1.7);
+                    const y = ch * (0.16 + i * 0.065) + wave * 27;
+                    const gradient = ctx.createLinearGradient(0, y - 45, cw, y + 55);
+                    gradient.addColorStop(0, 'rgba(26, 191, 163, 0)');
+                    gradient.addColorStop(0.32, 'rgba(26, 191, 163, 0.48)');
+                    gradient.addColorStop(0.64, 'rgba(101, 113, 244, 0.42)');
+                    gradient.addColorStop(1, 'rgba(101, 113, 244, 0)');
+                    ctx.strokeStyle = gradient;
+                    ctx.shadowColor = i % 2 ? '#7076ff' : '#24d4ae';
+                    ctx.globalAlpha = 0.3;
+                    ctx.lineWidth = 58 - i * 7;
+                    ctx.beginPath();
+                    ctx.moveTo(-cw * 0.08, y + wave * 16);
+                    ctx.bezierCurveTo(cw * 0.22, y - 62 - wave * 14, cw * 0.34, y + 72 + wave * 18, cw * 0.56, y + 2);
+                    ctx.bezierCurveTo(cw * 0.75, y - 52 + wave * 15, cw * 0.86, y + 48 - wave * 10, cw * 1.08, y - 18);
+                    ctx.stroke();
+                }
+                ctx.globalAlpha = 1;
+                ctx.shadowBlur = 0;
+                ctx.globalCompositeOperation = 'source-over';
             }
+            bgFrameHandle = requestAnimationFrame(renderBg);
         }
 
-        requestAnimationFrame(renderBg);
+        document.addEventListener('visibilitychange', refreshBackgroundRendering);
+        const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        if (reducedMotionQuery.addEventListener) reducedMotionQuery.addEventListener('change', refreshBackgroundRendering);
+        refreshBackgroundRendering();
     
 
 /* =========================================================
@@ -2868,6 +3787,9 @@ const CXZPlayer = (() => {
     let currentGame = '';
     let currentTitle = '';
     let currentHTML = '';
+    let currentBlobURL = '';
+    const savedVolume = Number(localStorage.getItem('cxz_game_volume'));
+    let volumeLevel = Number.isFinite(savedVolume) ? Math.max(0, Math.min(100, savedVolume)) : 100;
     let progressTimer = null;
     let loaderFailsafe = null;
     let progress = 0;
@@ -2946,7 +3868,10 @@ const CXZPlayer = (() => {
         if (!frame) throw new Error('Game iframe was not found.');
 
         frame.onload = () => {
-            if (token === launchToken) finishLoader(token);
+            if (token === launchToken) {
+                applyFrameAudioSettings();
+                finishLoader(token);
+            }
         };
         frame.onerror = () => {
             if (token === launchToken) {
@@ -2958,7 +3883,7 @@ const CXZPlayer = (() => {
         // Navigating directly lets the browser resolve relative scripts/assets
         // against the game's own URL instead of an about:srcdoc document.
         frame.removeAttribute('srcdoc');
-        frame.src = cacheBust(url);
+        frame.src = url.startsWith('blob:') ? url : cacheBust(url);
     }
 
     async function fetchGameHTML(url) {
@@ -2970,6 +3895,41 @@ const CXZPlayer = (() => {
         const html = await response.text();
         if (!html || !html.trim()) throw new Error('The game returned an empty HTML document.');
         return html;
+    }
+
+    function frameBlobURL(html, gameURL) {
+        const baseHref = new URL('.', gameURL).href.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+        const baseTag = `<base href="${baseHref}">`;
+        if (/<base\b[^>]*>/i.test(html)) {
+            html = html.replace(/<base\b[^>]*>/i, baseTag);
+        } else if (/<head\b[^>]*>/i.test(html)) {
+            html = html.replace(/<head\b[^>]*>/i, match => match + baseTag);
+        } else {
+            html = '<head>' + baseTag + '</head>' + html;
+        }
+        return URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+    }
+
+    async function loadBlobFrame(url, token) {
+        try {
+            const html = await fetchGameHTML(url);
+            if (token !== launchToken) return;
+            currentHTML = html;
+            const nextBlobURL = frameBlobURL(html, url);
+            const previousBlobURL = currentBlobURL;
+            currentBlobURL = nextBlobURL;
+            setFrameURL(nextBlobURL, token);
+            if (previousBlobURL) window.setTimeout(() => URL.revokeObjectURL(previousBlobURL), 1000);
+            log('[Blob] Game loaded from a local blob document.');
+        } catch (error) {
+            if (token !== launchToken) return;
+            log('[Blob fallback] Source access was blocked; loading the original game URL. ' + error.message);
+            showToast('Blob mode is blocked by this host; opening the game normally');
+            setFrameURL(url, token);
+            fetchGameHTML(url).then(html => {
+                if (token === launchToken) currentHTML = html;
+            }).catch(() => {});
+        }
     }
 
     async function open(url, title) {
@@ -2989,12 +3949,32 @@ const CXZPlayer = (() => {
         frame.onerror = null;
         frame.removeAttribute('srcdoc');
         frame.removeAttribute('src');
+        if (currentBlobURL) {
+            URL.revokeObjectURL(currentBlobURL);
+            currentBlobURL = '';
+        }
 
         startLoader();
         log('[Open] ' + currentGame);
 
         try {
-            setFrameURL(currentGame, token);
+            if (localStorage.getItem('cxz_games_in_blob') === 'true') {
+                loadBlobFrame(currentGame, token);
+            } else {
+                setFrameURL(currentGame, token);
+                // Source fetching is optional and only supports the Download button.
+                // A CORS/fetch failure must never prevent the game itself from launching.
+                fetchGameHTML(currentGame)
+                    .then(html => {
+                        if (token === launchToken) {
+                            currentHTML = html;
+                            log('[Source] Download copy is ready (' + html.length.toLocaleString() + ' characters).');
+                        }
+                    })
+                    .catch(error => {
+                        if (token === launchToken) log('[Source Note] Download source unavailable: ' + error.message);
+                    });
+            }
         } catch (error) {
             clearTimeout(loaderFailsafe);
             clearInterval(progressTimer);
@@ -3003,19 +3983,6 @@ const CXZPlayer = (() => {
             finishLoader(token);
             return;
         }
-
-        // Source fetching is optional and only supports the Download button.
-        // A CORS/fetch failure must never prevent the game itself from launching.
-        fetchGameHTML(currentGame)
-            .then(html => {
-                if (token === launchToken) {
-                    currentHTML = html;
-                    log('[Source] Download copy is ready (' + html.length.toLocaleString() + ' characters).');
-                }
-            })
-            .catch(error => {
-                if (token === launchToken) log('[Source Note] Download source unavailable: ' + error.message);
-            });
     }
 
     function close() {
@@ -3029,6 +3996,11 @@ const CXZPlayer = (() => {
             frame.onerror = null;
             frame.removeAttribute('srcdoc');
             frame.src = 'about:blank';
+        }
+        if (currentBlobURL) {
+            const oldBlobURL = currentBlobURL;
+            currentBlobURL = '';
+            window.setTimeout(() => URL.revokeObjectURL(oldBlobURL), 1000);
         }
 
         currentGame = '';
@@ -3051,13 +4023,17 @@ const CXZPlayer = (() => {
         frame.removeAttribute('srcdoc');
         frame.removeAttribute('src');
 
-        // Re-navigate directly to the real game URL, with a fresh cache key.
+        // Re-open using the current blob preference, falling back to the original URL if needed.
         setTimeout(() => {
             if (token !== launchToken || !currentGame) return;
-            setFrameURL(currentGame, token);
-            fetchGameHTML(currentGame)
-                .then(html => { if (token === launchToken) currentHTML = html; })
-                .catch(error => log('[Source Note] ' + error.message));
+            if (localStorage.getItem('cxz_games_in_blob') === 'true') {
+                loadBlobFrame(currentGame, token);
+            } else {
+                setFrameURL(currentGame, token);
+                fetchGameHTML(currentGame)
+                    .then(html => { if (token === launchToken) currentHTML = html; })
+                    .catch(error => log('[Source Note] ' + error.message));
+            }
         }, 30);
         showToast(currentTitle + ' reloading');
     }
@@ -3156,10 +4132,43 @@ const CXZPlayer = (() => {
         $('cxz-console').classList.toggle('open');
     }
 
+    function applyFrameAudioSettings() {
+        const frame = $('cxz-game-frame');
+        try {
+            const media = frame.contentDocument.querySelectorAll('audio, video');
+            media.forEach(element => {
+                element.volume = volumeLevel / 100;
+                element.muted = isMuted;
+            });
+        } catch (error) {
+            // Cross-origin game audio remains controlled by the game itself.
+        }
+    }
+
+    function setMuted(muted) {
+        const frame = $('cxz-game-frame');
+        try {
+            frame.contentDocument.querySelectorAll('audio, video').forEach(element => { element.muted = Boolean(muted); });
+        } catch (error) {
+            // Cross-origin game audio remains controlled by the game itself.
+        }
+    }
+
+    function setVolume(value) {
+        volumeLevel = Math.max(0, Math.min(100, Number(value) || 0));
+        localStorage.setItem('cxz_game_volume', String(volumeLevel));
+        const slider = $('cxz-volume-slider');
+        if (slider) slider.value = String(volumeLevel);
+        $('cxz-volume-text').textContent = volumeLevel + '%';
+        applyFrameAudioSettings();
+    }
+
     const volume = $('cxz-volume-slider');
     if (volume) {
+        volume.value = volumeLevel;
+        $('cxz-volume-text').textContent = volumeLevel + '%';
         volume.addEventListener('input', event => {
-            $('cxz-volume-text').textContent = event.target.value + '%';
+            setVolume(event.target.value);
         });
     }
 
@@ -3171,8 +4180,10 @@ const CXZPlayer = (() => {
         ) close();
     });
 
-    return { open, close, reload, fullscreen, openBlank, download, toggleConsole };
+    return { open, close, reload, fullscreen, openBlank, download, toggleConsole, setMuted, setVolume };
 })();
+
+window.CXZPlayer = CXZPlayer;
 
 
 /* =========================================================
