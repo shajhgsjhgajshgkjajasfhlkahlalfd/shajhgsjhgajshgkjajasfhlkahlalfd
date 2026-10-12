@@ -1,279 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Home - Classroom</title><link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEACABoBQAAFgAAACgAAAAQAAAAIAAAAAEACAAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAAAAAAAAYqMdAAC8/wBanhIAAbT0AGSkIQBfoRkAWZ4RAP///wAJt/QAZKQgAF+hGAATuvUAFLr1AFyfFQAVuvUAY6QfAGGiHABbnxQAZqUjAAa29AAHtvQACLb0AGGiGwAQufUAErn1AFufEwBlpSIAYKIaAF2gFwBeoBcA9/f3AAK19AADtfQABLX0AAW19AAMuPUAYqMeAA249QAOuPUAXaAWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICCSMjFhUVIyMjIyMgAgICIyMjIyMjIyMjIyMjIwQCAiQGBwgICAgICAgIBwMgAiYCFwcICAgICAgICAcaIQInAhEHBwgfHx8fCAcHEiECAgIBBwcHBwcHBwcHBxIiAgIYJSUBBwcICAcHBygOIwICGRAQBwcICAgIBwcHDiMCAgwKChAlCB8fCAYeHSgUAgINGwUKEAcICAcGCx4oFAICDxMbBwcHBwcHHAseHRQCAiMjIyMjIyMjIyMjIyMUAgIjIyMjIyMjIyMjIyMjIwIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//8AAP//AAA="><style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:sans-serif}#_0x1{position:fixed;top:10px;right:10px;z-index:9999;background:rgba(0,0,0,.7);padding:8px;border-radius:6px;color:#fff}select{background:#333;color:#fff;border:1px solid #555;padding:5px;border-radius:4px;font-size:14px;outline:none;cursor:pointer}._0x3{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#444;font-size:18px;text-align:center}</style></head><body><div id="_0x1"><label for="_0x2" style="margin-right:5px;font-size:14px;">Mirror:</label><select id="_0x2"><option value="" disabled="" selected="">Select a mirror...</option><option value="https://quantil.jsdelivr.net">quantil.jsdelivr.net (Main)</option><option value="https://cdn.jsdelivr.net">cdn.jsdelivr.net</option><option value="https://fastly.jsdelivr.net">fastly.jsdelivr.net</option><option value="https://testingcf.jsdelivr.net">testingcf.jsdelivr.net</option><option value="https://gcore.jsdelivr.net">gcore.jsdelivr.net</option><option value="https://originfastly.jsdelivr.net">originfastly.jsdelivr.net</option><option value="https://jsd.onmicrosoft.cn">jsd.onmicrosoft.cn</option><option value="https://cdn.staticdelivr.com">cdn.staticdelivr.com</option></select></div><div class="_0x3">Select a CDN mirror from the top right to launch in a new tab.</div><script>
+const path = "/gh/shajhgsjhgajshgkjajasfhlkahlalfd/shajhgsjhgajshgkjajasfhlkahlalfd/index.html";
+const mirrorSelect = document.getElementById("_0x2");
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+mirrorSelect.addEventListener("change", async (event) => {
+    const mirror = event.target.value;
+    if (!mirror) return;
 
-    <title>Loading...</title>
+    // Open synchronously from the user's change event so popup blockers allow it.
+    const tab = window.open("about:blank", "_blank");
+    if (!tab) {
+        document.querySelector("._0x3").textContent =
+            "Please allow pop-ups, then select a mirror again.";
+        event.target.value = "";
+        return;
+    }
 
-    <style>
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background: transparent;
+    try {
+        const response = await fetch(mirror + path + "?t=" + Date.now(), {
+            cache: "no-store"
+        });
+        if (!response.ok) throw new Error("HTTP " + response.status);
+
+        let html = await response.text();
+        if (!html.trim()) throw new Error("The mirror returned an empty page.");
+
+        // Make relative site assets resolve against the selected repository mirror.
+        const assetBase = mirror + path.slice(0, path.lastIndexOf("/") + 1);
+        const baseTag = "<base href=\"" + assetBase + "\">";
+        if (/<head(?:\s[^>]*)?>/i.test(html)) {
+            html = html.replace(/<head(?:\s[^>]*)?>/i, function (head) {
+                return head + baseTag;
+            });
         }
 
-        #hk {
-            position: fixed;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
+        tab.document.open();
+        tab.document.write(html);
+        tab.document.close();
+    } catch (error) {
+        console.error("Mirror launch failed:", error);
+        tab.document.open();
+        tab.document.write("<!doctype html><meta charset=\"utf-8\"><title>Mirror error</title><div id=\"message\"></div>");
+        tab.document.close();
 
-            width: 100%;
-            height: 100%;
-
-            z-index: 999999;
-
-            background: transparent;
-        }
-
-        #hk:hover {
-            background: rgba(0, 0, 0, 0.01);
-        }
-
-        #loading {
-            position: fixed;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-
-            z-index: 1000000;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            background: #000;
-            color: #fff;
-
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
-        }
-
-        #loading.hidden {
-            display: none;
-        }
-
-        .loading-box {
-            text-align: center;
-        }
-
-        .spinner {
-            width: 32px;
-            height: 32px;
-
-            margin: 0 auto 14px;
-
-            border: 3px solid rgba(255, 255, 255, 0.15);
-            border-top-color: #fff;
-            border-radius: 50%;
-
-            animation: spin 0.7s linear infinite;
-        }
-
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        #status {
-            color: #aaa;
-            font-size: 14px;
-        }
-    </style>
-</head>
-
-<body>
-
-    <div id="loading">
-        <div class="loading-box">
-            <div class="spinner"></div>
-
-            <div id="status">
-                Loading...
-            </div>
-        </div>
-    </div>
-
-    <div id="hk"></div>
-
-    <script>
-        (() => {
-            const SITE_URL =
-                "https://raw.githubusercontent.com/shajhgsjhgajshgkjajasfhlkahlalfd/shajhgsjhgajshgkjajasfhlkahlalfd/refs/heads/main/index.html";
-
-            const hk =
-                document.getElementById("hk");
-
-            const loading =
-                document.getElementById("loading");
-
-            const status =
-                document.getElementById("status");
-
-
-            /*
-             * Keep the launcher focused.
-             */
-            hk.addEventListener(
-                "mousedown",
-                (event) => {
-                    event.preventDefault();
-                    window.focus();
-                }
-            );
-
-
-            /*
-             * Open the fetched site in an
-             * about:blank tab.
-             */
-            function openSiteInBlankTab(html) {
-                const newWindow =
-                    window.open(
-                        "about:blank",
-                        "_blank"
-                    );
-
-                if (!newWindow) {
-                    status.textContent =
-                        "Please allow pop-ups and try again.";
-
-                    loading.classList.remove(
-                        "hidden"
-                    );
-
-                    return false;
-                }
-
-                const doc =
-                    newWindow.document;
-
-                doc.open();
-
-                doc.write(html);
-
-                doc.close();
-
-                return true;
-            }
-
-
-            /*
-             * Fetch the site's index.html.
-             */
-            async function launch() {
-                try {
-                    status.textContent =
-                        "Fetching site...";
-
-                    const response =
-                        await fetch(
-                            SITE_URL,
-                            {
-                                cache: "no-store"
-                            }
-                        );
-
-                    if (!response.ok) {
-                        throw new Error(
-                            `HTTP ${response.status}`
-                        );
-                    }
-
-                    status.textContent =
-                        "Starting site...";
-
-                    const html =
-                        await response.text();
-
-                    if (!html.trim()) {
-                        throw new Error(
-                            "The site returned empty HTML."
-                        );
-                    }
-
-
-                    /*
-                     * Open the fetched HTML
-                     * inside about:blank.
-                     */
-                    const opened =
-                        openSiteInBlankTab(
-                            html
-                        );
-
-                    if (!opened) {
-                        return;
-                    }
-
-
-                    /*
-                     * Clear the launcher page after
-                     * the new tab has been created.
-                     */
-                    setTimeout(
-                        () => {
-                            document.open();
-
-                            document.write(`
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Loading...</title>
-</head>
-
-<body>
-</body>
-</html>
-                            `);
-
-                            document.close();
-                        },
-                        100
-                    );
-
-                } catch (error) {
-                    console.error(
-                        "Launcher error:",
-                        error
-                    );
-
-                    status.textContent =
-                        "Failed to load. Retrying...";
-
-                    setTimeout(
-                        launch,
-                        1500
-                    );
-                }
-            }
-
-
-            /*
-             * Start the launcher.
-             */
-            launch();
-        })();
-    </script>
-
-</body>
-</html>
+        const message = tab.document.getElementById("message");
+        message.textContent = "Failed to load from " + mirror + ". Try another mirror.";
+        message.style.cssText =
+            "color:black;font-family:sans-serif;padding:20px";
+    } finally {
+        event.target.value = "";
+    }
+});
+</script></body></html>
