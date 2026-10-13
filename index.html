@@ -871,59 +871,6 @@ html:-webkit-full-screen body {
         .suggest-item { font-size: 0.6rem; color: var(--text-white); line-height: 1.6; padding: 6px 8px; border: 1px dashed rgba(255,102,0,0.4); border-radius: 4px; word-break: break-word; }
         .suggest-item small { color: var(--text-muted); }
 
-        /* Provider tabs live inside the Games page; the original dock stays untouched. */
-        .game-provider-buttons {
-            display: flex;
-            align-items: stretch;
-            gap: 12px;
-            margin: 0 0 24px;
-            flex-wrap: wrap;
-        }
-        .game-provider-button {
-            appearance: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            min-height: 66px;
-            min-width: 190px;
-            padding: 10px 16px;
-            border: 2px solid var(--accent-color);
-            border-radius: 8px;
-            background: rgba(255,102,0,.05);
-            color: var(--text-white);
-            cursor: pointer;
-            font: inherit;
-            font-size: .62rem;
-            box-shadow: 0 0 0 rgba(255,102,0,0);
-            transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
-        }
-        .game-provider-button:hover,
-        .game-provider-button.active {
-            background: rgba(255,102,0,.16);
-            box-shadow: 0 0 14px rgba(255,102,0,.45), inset 0 0 10px rgba(255,102,0,.08);
-            transform: translateY(-1px);
-        }
-        .game-provider-logo {
-            width: 30px;
-            height: 30px;
-            object-fit: contain;
-            flex: 0 0 30px;
-            image-rendering: auto;
-        }
-        .game-provider-name { line-height: 1.5; }
-        .game-provider-button span:not(.game-provider-name) {
-            opacity: .72;
-            font-size: .8em;
-        }
-        .game-provider-content { display: none; }
-        .game-provider-content.active { display: block; }
-        #gamepix-load-more { display: block; }
-        @media (max-width: 520px) {
-            .game-provider-button { min-width: 0; flex: 1 1 145px; padding: 10px; gap: 7px; }
-            .game-provider-logo { width: 25px; height: 25px; flex-basis: 25px; }
-        }
-
         /* =========================================================
            CXZ REDESIGN — presentation only; existing controls stay wired
         ========================================================= */
@@ -1344,6 +1291,33 @@ html:-webkit-full-screen body {
         @media (prefers-reduced-motion: reduce) {
             .card, .card img, .hero-cta { transition: none; }
         }
+        /* Lightweight rendering defaults for older laptops and Chromebooks. */
+        .card, .tool-card, .settings-col { content-visibility: auto; contain-intrinsic-size: auto 230px; }
+        .card img, .tool-card img { content-visibility: auto; }
+        @media (max-width: 800px) {
+            .home-hero { box-shadow: none; }
+            .hero-art-glow, .hero-orbit, .hero-floating-chip { display: none; }
+            .home-hero { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+            .hero-art { display: none; }
+            .bottom-dock { backdrop-filter: none !important; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+        }
+        body.auto-lite * {
+            animation: none !important;
+            transition: none !important;
+            text-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            box-shadow: none !important;
+        }
+        body.auto-lite canvas#bg-canvas { display: none !important; }
+        body.auto-lite .hero-art-glow, body.auto-lite .hero-orbit,
+        body.auto-lite .hero-floating-chip { display: none !important; }
+        body.auto-lite .home-hero { box-shadow: none !important; background: #151a24 !important; }
+        body.auto-lite .card, body.auto-lite .tool-card, body.auto-lite .settings-col { background: #151a24 !important; }
+
     </style>
 </head>
 <body>
@@ -1523,29 +1497,8 @@ html:-webkit-full-screen body {
         <!-- TAB: GAMES -->
         <div id="games" class="tab-content">
             <h2 class="section-title">All Games</h2>
-            <p class="page-description">Browse the full arcade or switch to GamePix for an even bigger library. Search by title, pick a card, and the game opens right here.</p>
-
-            <div class="game-provider-buttons">
-                <button class="game-provider-button active" type="button" aria-selected="true" onclick="window.switchGameProvider('cxz', this)">
-                    <img class="game-provider-logo" src="./g/assets/favicon-96x96.png" alt="" />
-                    <span class="game-provider-name">Classroom-X-Zone</span> <span id="cxz-game-count">0</span>
-                </button>
-                <button class="game-provider-button" type="button" aria-selected="false" onclick="window.switchGameProvider('gamepix', this)">
-                    <img class="game-provider-logo" src="https://gamepix.com/favicon.png" alt="" />
-                    <span class="game-provider-name">GamePix</span> <span id="gamepix-game-count">Loading...</span>
-                </button>
-            </div>
-
-            <div id="game-provider-cxz" class="game-provider-content active">
-                <div class="grid" id="all-games-grid"></div>
-            </div>
-
-            <div id="game-provider-gamepix" class="game-provider-content">
-                <div class="grid" id="gamepix-grid"></div>
-                <button id="gamepix-load-more" class="btn-action" type="button" onclick="loadMoreGamePix()" style="display:none;margin:24px auto;">
-                    Load More GamePix Games
-                </button>
-            </div>
+            <p class="page-description">Browse the Classroom-X-Zone arcade. Search by title, pick a card, and the game opens right here.</p>
+            <div class="grid" id="all-games-grid"></div>
         </div>
 
         <!-- TAB: TOOLS -->
@@ -2045,6 +1998,22 @@ html:-webkit-full-screen body {
     <div class="toast-container" id="toast-container"></div>
 
     <script>
+        // Automatically use a simpler visual mode on devices with limited resources.
+        (() => {
+            const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            const lowMemory = typeof navigator.deviceMemory === 'number' && navigator.deviceMemory <= 4;
+            const fewCores = typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency <= 4;
+            const dataSaver = !!(connection && connection.saveData);
+            const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (lowMemory || fewCores || dataSaver || reducedMotion) document.body.classList.add('auto-lite');
+        })();
+
+        // Defer off-screen artwork and decode images without blocking the UI.
+        document.querySelectorAll('img:not([loading])').forEach(img => {
+            if (!img.closest('.home-hero')) img.loading = 'lazy';
+            img.decoding = 'async';
+        });
+
         const PRE = 'cxz_';
 
         // Games on the site. Add a game here and it appears in the Games tab and the home-page pick.
@@ -2476,147 +2445,6 @@ html:-webkit-full-screen body {
             }
 
 
-        const GAMEPIX_PAGE_SIZE = 48;
-        const GAMEPIX_FEED = 'https://feeds.gamepix.com/v2/json?order=quality&page=1&pagination=' + GAMEPIX_PAGE_SIZE + '&sid=1';
-        let gamePixNextUrl = GAMEPIX_FEED;
-        let gamePixTotal = 0;
-        let gamePixLoading = false;
-        let gamePixLoaded = false;
-
-        function switchGameProvider(provider, button) {
-            const cxz = document.getElementById('game-provider-cxz');
-            const gamepix = document.getElementById('game-provider-gamepix');
-
-            cxz.classList.toggle('active', provider === 'cxz');
-            gamepix.classList.toggle('active', provider === 'gamepix');
-
-            document.querySelectorAll('.game-provider-button').forEach(btn => {
-                btn.classList.remove('active');
-                btn.setAttribute('aria-selected', 'false');
-            });
-
-            if (button) {
-                button.classList.add('active');
-                button.setAttribute('aria-selected', 'true');
-            }
-
-            if (provider === 'gamepix' && !gamePixLoaded) {
-                loadGamePixPage(gamePixNextUrl);
-            }
-        }
-
-        // Expose handlers used by inline buttons (the surrounding initialization code is closure-scoped).
-        window.switchGameProvider = switchGameProvider;
-
-        function createGamePixCard(game) {
-            const card = document.createElement('a');
-            card.className = 'card item-card';
-            card.href = '#';
-            card.setAttribute('role', 'button');
-            card.setAttribute('aria-label', 'Play ' + (game.title || 'GamePix Game'));
-            card.dataset.gameUrl = game.url || (game.namespace ? 'https://play.gamepix.com/' + game.namespace + '/embed?sid=1' : '');
-            card.dataset.title = game.title || 'GamePix Game';
-
-            const image = game.banner_image || game.image || game.thumbnailUrl || game.thumbnailUrl100 || '';
-            card.innerHTML = `
-                <div class="item-image">
-                    ${image ? `<img src="${image}" alt="${escapeHtml(game.title || 'Game')}" loading="lazy">` : ''}
-                </div>
-                <div class="item-info">
-                    <h3>${escapeHtml(game.title || 'GamePix Game')}</h3>
-                    <p>${escapeHtml(game.category || game.description || 'GamePix Game')}</p>
-                </div>
-            `;
-            return card;
-        }
-
-        function escapeHtml(value) {
-            return String(value)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
-        async function loadGamePixPage(url) {
-            if (!url || gamePixLoading) return;
-
-            gamePixLoading = true;
-            const button = document.getElementById('gamepix-load-more');
-            if (button) {
-                button.disabled = true;
-                button.textContent = 'Loading...';
-            }
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('GamePix feed returned ' + response.status);
-
-                const data = await response.json();
-                const items = Array.isArray(data.items) ? data.items : [];
-                const grid = document.getElementById('gamepix-grid');
-
-                if (!Array.isArray(items)) throw new Error('Unexpected GamePix feed response format');
-                items.forEach(game => {
-                    const card = createGamePixCard(game);
-                    if (card.dataset.gameUrl) grid.appendChild(card);
-                });
-
-                if (!items.length && !grid.children.length) {
-                    throw new Error('GamePix feed returned no games. Check the network response and browser CORS policy.');
-                }
-                gamePixLoaded = true;
-                gamePixNextUrl = data.next_url || '';
-                const lastPageUrl = data.last_page_url || '';
-                if (lastPageUrl) {
-                    try {
-                        const lastUrl = new URL(lastPageUrl);
-                        const lastPage = Number(lastUrl.searchParams.get('page')) || 1;
-                        const pagination = Number(lastUrl.searchParams.get('pagination')) || GAMEPIX_PAGE_SIZE;
-                        gamePixTotal = Math.max(items.length, lastPage * pagination);
-                    } catch (_) { gamePixTotal = items.length; }
-                } else {
-                    gamePixTotal = items.length;
-                }
-
-                updateGamePixCount();
-
-                if (button) {
-                    button.style.display = gamePixNextUrl ? 'block' : 'none';
-                    button.disabled = false;
-                    button.textContent = 'Load More GamePix Games';
-                }
-            } catch (error) {
-                console.error('[CXZ] GamePix failed to load:', error);
-                const grid = document.getElementById('gamepix-grid');
-                if (grid && !grid.children.length) {
-                    grid.innerHTML = '<div class="empty-state">Unable to load GamePix games right now.</div>';
-                }
-                if (button) {
-                    button.disabled = false;
-                    button.textContent = 'Retry GamePix';
-                    button.style.display = 'block';
-                    gamePixLoaded = false;
-                    gamePixNextUrl = GAMEPIX_FEED;
-                }
-            } finally {
-                gamePixLoading = false;
-            }
-        }
-
-        function loadMoreGamePix() {
-            if (gamePixNextUrl) loadGamePixPage(gamePixNextUrl);
-            else if (!gamePixLoaded) loadGamePixPage(GAMEPIX_FEED);
-        }
-
-        window.loadMoreGamePix = loadMoreGamePix;
-
-        function updateGamePixCount() {
-            const count = document.getElementById('gamepix-game-count');
-            if (count) count.textContent = gamePixTotal ? gamePixTotal : '...';
-        }
-
         // Keep the Classroom-X-Zone provider badge in sync with its catalog.
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', updateClassroomXZoneCount, { once: true });
@@ -2655,11 +2483,9 @@ html:-webkit-full-screen body {
             }
             document.querySelectorAll('.dock-item').forEach(b => b.classList.remove('active'));
             if (button) button.classList.add('active');
-            const providerButton = document.querySelector('.game-provider-button[onclick*="' + provider + '"]');
-            if (typeof window.switchGameProvider === 'function') window.switchGameProvider(provider, providerButton);
             const search = document.getElementById('searchInput');
             if (search) search.value = '';
-            document.querySelectorAll('#gamepix-grid .item-card, #all-games-grid .item-card').forEach(card => card.style.display = '');
+            document.querySelectorAll('#all-games-grid .item-card').forEach(card => card.style.display = '');
         }
 
         function switchTab(tabId, btn) {
