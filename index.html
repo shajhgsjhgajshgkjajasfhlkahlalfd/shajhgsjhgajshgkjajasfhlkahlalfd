@@ -1304,19 +1304,34 @@ html:-webkit-full-screen body {
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
         }
+        /* Low-end mode keeps motion, but favors cheap opacity/transform effects.
+           Avoid globally disabling animations: that made the interface feel static. */
         body.auto-lite * {
-            animation: none !important;
-            transition: none !important;
             text-shadow: none !important;
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
             box-shadow: none !important;
+            animation-duration: 0.7s !important;
+            transition-duration: 0.16s !important;
         }
-        body.auto-lite canvas#bg-canvas { display: none !important; }
+        body.auto-lite .card, body.auto-lite .tool-card,
+        body.auto-lite .dock-item, body.auto-lite .hero-cta,
+        body.auto-lite .tab-content {
+            will-change: auto !important;
+        }
+        /* Keep subtle UI motion but remove the most expensive decorative layers. */
         body.auto-lite .hero-art-glow, body.auto-lite .hero-orbit,
         body.auto-lite .hero-floating-chip { display: none !important; }
-        body.auto-lite .home-hero { box-shadow: none !important; background: #151a24 !important; }
+        body.auto-lite .home-hero { background: #151a24 !important; }
         body.auto-lite .card, body.auto-lite .tool-card, body.auto-lite .settings-col { background: #151a24 !important; }
+        body.auto-lite canvas#bg-canvas { opacity: 0.55; }
+        @media (prefers-reduced-motion: reduce) {
+            body.auto-lite *, body.auto-lite *::before, body.auto-lite *::after {
+                animation: none !important;
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+        }
 
     </style>
 </head>
@@ -3464,8 +3479,10 @@ setTimeout(function() {
             // Stop scheduling frames entirely while the effect is disabled.
             if (!shouldRenderBackground()) return;
 
-            // Cap at ~20fps (50ms interval) to save CPU & battery on low-end devices
-            if (now - lastFrameTime < 50) {
+            // Limit canvas work: ~12fps on lower-end devices, ~20fps otherwise.
+            // CSS UI animations remain active independently of this decorative canvas.
+            const frameInterval = document.body.classList.contains('auto-lite') ? 83 : 50;
+            if (now - lastFrameTime < frameInterval) {
                 bgFrameHandle = requestAnimationFrame(renderBg);
                 return;
             }
