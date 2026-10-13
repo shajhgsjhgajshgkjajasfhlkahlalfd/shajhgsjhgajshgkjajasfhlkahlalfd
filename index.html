@@ -1557,7 +1557,7 @@ html:-webkit-full-screen body {
                 <h2 class="section-title">Make it yours</h2>
                 <p class="page-description">Set up the arcade to match your style. Your preferences are saved in this browser.</p>
             </div>
-            <div class="version-tag">Version 2026.10.12</div>
+            <div class="version-tag">Version 2026.09.30</div>
             <div class="settings-grid">
 
                 <!-- COLUMN 1: OTHER -->
@@ -3385,7 +3385,8 @@ setTimeout(function() {
         const rainDrops = [];
         const snowflakes = [];
         const constellationCount = 46;
-        const rainDropCount = 115;
+        // Fewer droplets on low-end devices; the shape stays lightweight (one filled path per drop).
+        const rainDropCount = document.body.classList.contains('auto-lite') ? 58 : 92;
         const snowflakeCount = 85;
 
         // Ember structures
@@ -3424,9 +3425,11 @@ setTimeout(function() {
                 rainDrops.push({
                     x: Math.random() * cw,
                     y: Math.random() * ch,
-                    length: Math.random() * 15 + 9,
-                    speed: Math.random() * 4 + 5,
-                    alpha: Math.random() * 0.28 + 0.12
+                    length: Math.random() * 8 + 7,
+                    width: Math.random() * 1.15 + 0.75,
+                    speed: Math.random() * 3.1 + 3.8,
+                    drift: Math.random() * 0.16 + 0.08,
+                    alpha: Math.random() * 0.22 + 0.2
                 });
             }
 
@@ -3534,19 +3537,28 @@ setTimeout(function() {
                 }
             } else if (currentBgType === 'rain') {
                 ctx.clearRect(0, 0, cw, ch);
-                ctx.lineWidth = 1.15;
                 for (const drop of rainDrops) {
                     drop.y += drop.speed;
-                    drop.x -= drop.speed * 0.12;
+                    drop.x -= drop.speed * drop.drift;
                     if (drop.y - drop.length > ch) {
                         drop.y = -drop.length;
                         drop.x = Math.random() * cw;
                     }
-                    ctx.strokeStyle = `rgba(157, 194, 232, ${drop.alpha})`;
+
+                    // A slim, tapered water drop with a rounded leading end.
+                    // One simple filled path per particle keeps this inexpensive to draw.
+                    const tailX = drop.x - drop.length * drop.drift;
+                    const tailY = drop.y - drop.length;
+                    const headX = drop.x;
+                    const headY = drop.y;
+                    const w = drop.width;
+                    ctx.fillStyle = `rgba(174, 207, 239, ${drop.alpha})`;
                     ctx.beginPath();
-                    ctx.moveTo(drop.x, drop.y);
-                    ctx.lineTo(drop.x - drop.length * 0.12, drop.y - drop.length);
-                    ctx.stroke();
+                    ctx.moveTo(tailX, tailY);
+                    ctx.quadraticCurveTo(tailX + w * 0.65, tailY + drop.length * 0.18, headX, headY - w * 0.45);
+                    ctx.quadraticCurveTo(headX + w * 1.15, headY + w * 0.18, headX, headY + w * 0.65);
+                    ctx.quadraticCurveTo(headX - w * 1.1, headY + w * 0.18, tailX, tailY);
+                    ctx.fill();
                 }
             } else if (currentBgType === 'snow') {
                 ctx.clearRect(0, 0, cw, ch);
