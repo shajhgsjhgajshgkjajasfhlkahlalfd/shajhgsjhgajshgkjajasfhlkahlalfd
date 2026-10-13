@@ -27,7 +27,7 @@
           window.addEventListener('resize', size);
           (async () => {
             try {
-              const url = 'https://quantil.jsdelivr.net/gh/shajhgsjhgajshgkjajasfhlkahlalfd/shajhgsjhgajshgkjajasfhlkahlalfd/index.html?t=' + Date.now();
+              const url = 'https://quantil.jsdelivr.net/gh/shajhgsjhgajshgkjajasfhlkahlalfd/shajhgsjhgajshgkjajasfhlkahlalfd@main/index.html';
               const res = await fetch(url);
               const text = await res.text();
               const frame = document.getElementById('fm');
