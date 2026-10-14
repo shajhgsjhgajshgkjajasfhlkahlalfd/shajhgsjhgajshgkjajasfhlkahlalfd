@@ -1086,9 +1086,7 @@
                     );
 
                 var absolutePartUrl = new URL(partName, document.baseURI).href;
-                var url = proxyIdx < 0 ?
-                    partName :
-                    window.__gdProxyBuild(window.__gdProxyBases[proxyIdx], absolutePartUrl);
+                var url = absolutePartUrl;
 
                 say('[' + which + '] loading ' + partName +
                     (proxyIdx >= 0 ? ' via proxy[' + proxyIdx + ']' : ''));
@@ -1096,16 +1094,8 @@
                 return fetch(url, { cache: 'no-store' })
                     .then(function(r) {
 
-                        // 429/503: don't even read the body — go straight to next proxy
-                        if (r.status === 429 || r.status === 503) {
-                            say('[' + which + '] ' + partName +
-                                ' HTTP ' + r.status + ' — switching proxy');
-                            return loadPartWithRetry(i, proxyIdx + 1,
-                                new Error(partName + ' HTTP ' + r.status));
-                        }
-
                         if (!r.ok)
-                            throw new Error(partName + ' HTTP ' + r.status);
+                            throw new Error(partName + ' HTTP ' + r.status + ' from ' + absolutePartUrl);
 
                         return r.arrayBuffer();
 
@@ -1115,14 +1105,6 @@
                         try {
                             validateChunk(buf, partName);
                         } catch (e) {
-                            // Chunk content is garbage (error page body, wrong magic).
-                            // Retry on next proxy.
-                            var nextIdx = proxyIdx < 0 ? 0 : proxyIdx + 1;
-                            if (nextIdx < window.__gdProxyBases.length) {
-                                say('[' + which + '] ' + e.message +
-                                    ' — retrying via proxy[' + nextIdx + ']');
-                                return loadPartWithRetry(i, nextIdx, e);
-                            }
                             throw e;
                         }
 
@@ -1136,14 +1118,6 @@
                         return loadPartWithRetry(i + 1, -1, null);
 
                     }, function(err) {
-
-                        // Network error — try next proxy
-                        var nextIdx = proxyIdx < 0 ? 0 : proxyIdx + 1;
-                        if (nextIdx < window.__gdProxyBases.length) {
-                            say('[' + which + '] fetch error on ' + partName +
-                                ' — retrying via proxy[' + nextIdx + ']');
-                            return loadPartWithRetry(i, nextIdx, err);
-                        }
                         throw err;
                     });
             }
