@@ -721,6 +721,19 @@
             bottom: 40px;
             z-index: 6;
         }
+
+        /* ===== No start screen / no extra buttons ===== */
+        #start,
+        #fsBtn,
+        #clearBtn,
+        #credit {
+            display: none !important;
+        }
+
+        #stage {
+            transform: none !important;
+            transition: none !important;
+        }
     </style>
 </head>
 
@@ -2239,12 +2252,11 @@
             loadModule();
         }
 
-        document.getElementById(
-            'loadFly'
-        ).addEventListener(
-            'click',
-            gdStart
-        );
+        // Auto-start: skip the load screen and boot the game right away
+        if (document.readyState === 'loading')
+            document.addEventListener('DOMContentLoaded', gdStart);
+        else
+            setTimeout(gdStart, 0);
 
         document.getElementById(
             'clearBtn'
