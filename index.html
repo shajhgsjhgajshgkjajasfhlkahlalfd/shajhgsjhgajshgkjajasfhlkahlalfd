@@ -1348,7 +1348,7 @@ html:-webkit-full-screen body {
         var THEMES = ['securly', 'lightspeed', 'goguardian', 'classlink'];
         var overlay = document.getElementById('block-overlay');
         var frame = document.getElementById('block-frame');
-        var timer = null, hideTimer = null, loadToken = 0;
+        var timer = null, hideTimer = null, fetchTimer = null, loadToken = 0;
         window.__cxzBlockDone = false;
 
         function onMessage(ev) {
@@ -1356,6 +1356,7 @@ html:-webkit-full-screen body {
         }
         function dismiss() {
             clearTimeout(timer);
+            clearTimeout(fetchTimer);
             loadToken++;
             window.removeEventListener('message', onMessage);
             overlay.style.opacity = '0';
@@ -1403,12 +1404,22 @@ html:-webkit-full-screen body {
                 }
                 var theme = localStorage.getItem('cxz_block_theme');
                 if (THEMES.indexOf(theme) === -1) theme = 'lightspeed';
-                clearTimeout(timer); clearTimeout(hideTimer);
+                clearTimeout(timer); clearTimeout(hideTimer); clearTimeout(fetchTimer);
                 var token = ++loadToken;
                 overlay.style.display = 'block';
                 overlay.style.opacity = '1';
                 overlay.style.pointerEvents = 'auto';
-            } catch (e) { return; }
+                // Never let a blocked fetch keep the whole site behind this overlay.
+                fetchTimer = setTimeout(function () {
+                    if (token !== loadToken) return;
+                    renderBlockScreen('<!doctype html><html><body style="margin:0;background:#090d18;color:#e8edf8;font:16px system-ui;display:grid;place-items:center;min-height:100vh"><main style="padding:2rem;text-align:center"><h2>Block screen timed out</h2><p>Continuing to Classroom-X-Zone…</p></main></body></html>', token);
+                }, 5000);
+            } catch (e) {
+                window.__cxzBlockDone = true;
+                if (overlay) overlay.style.display = 'none';
+                if (typeof window.__cxzStartLoadingScreen === 'function') window.__cxzStartLoadingScreen();
+                return;
+            }
             window.removeEventListener('message', onMessage);
             window.addEventListener('message', onMessage);
             fetch('./blockscreens/' + theme + '.html', { cache: 'no-store' })
@@ -1417,94 +1428,14 @@ html:-webkit-full-screen body {
                     return response.text();
                 })
                 .then(function (html) {
+                    clearTimeout(fetchTimer);
                     if (!html.trim()) throw new Error('The mirror returned an empty page.');
                     renderBlockScreen(html, token);
                 })
                 .catch(function (error) {
+                    clearTimeout(fetchTimer);
                     var detail = escapeHtml(error && error.message ? error.message : 'Network error');
-                    var fallback = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#090d18;color:#e8edf8;font:16px system-ui,sans-serif}.message{max-width:34rem;padding:2rem;text-align:center}.detail{color:#9aa8c1;font-size:13px}</style></head><body><main class="message"><h1>Block screen unavailable</h1><p>Could not load the selected ' + escapeHtml(theme) + ' screen.</p><p class="detail">' + detail + '</p></main>
-<!-- Independent startup-loader recovery: keeps startup working if another script fails. -->
-<script>
-(function () {
-  'use strict';
-  var recoveryStarted = false;
-  function safeSetting(key, fallback) {
-    try { var value = localStorage.getItem(key); return value === null ? fallback : value; }
-    catch (_) { return fallback; }
-  }
-  function beginRecovery() {
-    if (recoveryStarted) return;
-    var loader = document.getElementById('loading-screen');
-    var bar = document.getElementById('progressBar');
-    var status = document.getElementById('statusText');
-    if (!loader || !bar || !status) return;
-
-    // Do not cover an enabled block screen; wait until it has finished.
-    var overlay = document.getElementById('block-overlay');
-    var blockEnabled = safeSetting('cxz_block_screen', 'false') === 'true';
-    var blockStillVisible = overlay && overlay.style.display !== 'none' &&
-      getComputedStyle(overlay).display !== 'none' &&
-      (window.__cxzBlockDone === false || blockEnabled);
-    if (blockStillVisible) {
-      setTimeout(beginRecovery, 250);
-      return;
-    }
-
-    recoveryStarted = true;
-    if (safeSetting('cxz_loadscreen', 'true') === 'false' || safeSetting('classroom-x-zone_loadscreen', 'true') === 'false') {
-      loader.style.display = 'none';
-      var dock = document.querySelector('.bottom-dock');
-      if (dock) dock.classList.add('dock-ready');
-      return;
-    }
-
-    loader.style.display = 'flex';
-    loader.style.visibility = 'visible';
-    loader.style.opacity = '1';
-    loader.style.pointerEvents = 'auto';
-    var progress = 0;
-    bar.style.width = '0%';
-    status.textContent = 'INITIALIZING...';
-    var tick = setInterval(function () {
-      progress = Math.min(100, progress + 20);
-      bar.style.width = progress + '%';
-      status.textContent = progress >= 100 ? 'READY!' : 'LOADING ASSETS...';
-      if (progress >= 100) {
-        clearInterval(tick);
-        setTimeout(function () {
-          loader.style.opacity = '0';
-          setTimeout(function () {
-            loader.style.display = 'none';
-            loader.style.visibility = 'hidden';
-            loader.style.pointerEvents = 'none';
-            var dock = document.querySelector('.bottom-dock');
-            if (dock) dock.classList.add('dock-ready');
-          }, 350);
-        }, 200);
-      }
-    }, 90);
-  }
-  function scheduleRecovery() {
-    // Give the site's normal startup handler a chance first, then recover if it failed.
-    setTimeout(function () {
-      var loader = document.getElementById('loading-screen');
-      if (loader && getComputedStyle(loader).display !== 'none' &&
-          getComputedStyle(loader).opacity !== '0') beginRecovery();
-      else if (loader && !document.querySelector('.bottom-dock.dock-ready')) beginRecovery();
-    }, 1800);
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', scheduleRecovery, { once: true });
-  } else scheduleRecovery();
-  // Last-resort watchdog for a loader left on screen by a failed script.
-  setTimeout(function () {
-    var loader = document.getElementById('loading-screen');
-    if (loader && getComputedStyle(loader).display !== 'none' && getComputedStyle(loader).opacity !== '0') beginRecovery();
-  }, 8000);
-})();
-</script>
-
-</body></html>';
+                    var fallback = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#090d18;color:#e8edf8;font:16px system-ui,sans-serif}.message{max-width:34rem;padding:2rem;text-align:center}.detail{color:#9aa8c1;font-size:13px}</style></head><body><main class="message"><h1>Block screen unavailable</h1><p>Could not load the selected ' + escapeHtml(theme) + ' screen.</p><p class="detail">' + detail + '</p></main></body></html>';
                     renderBlockScreen(fallback, token);
                 });
         }
@@ -2481,6 +2412,8 @@ html:-webkit-full-screen body {
 
         // 1. STARTUP LOADER — runs AFTER the optional block screen
         window.addEventListener('DOMContentLoaded', () => {
+            // Apply persisted settings before starting the loader or showing the dock.
+            try { loadAllSettings(); } catch (settingsError) { console.error('Settings initialization failed:', settingsError); }
             const showLoader = localStorage.getItem(PRE + 'loadscreen') !== 'false';
             const progressBar = document.getElementById('progressBar');
             const statusText = document.getElementById('statusText');
@@ -2535,6 +2468,14 @@ html:-webkit-full-screen body {
 
             // The block-screen script calls this after its fade-out.
             window.__cxzStartLoadingScreen = startLoadingScreen;
+            // Final failsafe: never leave the page permanently covered by the loader.
+            setTimeout(() => {
+                if (loader && loader.style.display !== 'none' && !loaderStarted) startLoadingScreen();
+                if (loader && loader.style.display !== 'none' && statusText && statusText.innerText !== 'READY!') {
+                    loader.style.opacity = '0';
+                    setTimeout(() => { loader.style.display = 'none'; showDock(); }, 350);
+                }
+            }, 9000);
 
             // If no block screen is enabled, start the loader immediately.
             if (window.__cxzBlockDone !== false) {
@@ -2555,8 +2496,8 @@ html:-webkit-full-screen body {
                 switchTab(urlTab);
             }
 
-            // Init All Settings
-            loadAllSettings();
+            // Settings were initialized at the start of this callback so their effects
+            // are active before the homepage is revealed.
         });
 
         // 2. TAB SWITCHING
