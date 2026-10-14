@@ -1333,17 +1333,7 @@ html:-webkit-full-screen body {
             }
         }
 
-    
-        /* Lightweight ad hiding: CSS-only so it cannot interfere with startup. */
-        ins.adsbygoogle, [id^="google_ads"], [id*="google_ads"],
-        [class*="ad-container"], [class*="ad_container"],
-        [id*="ad-container"], [id*="ad_container"],
-        iframe[src*="doubleclick"], iframe[src*="googlesyndication"],
-        iframe[src*="adservice"], iframe[src*="adsterra"], iframe[src*="propellerads"] {
-            display: none !important;
-            visibility: hidden !important;
-        }
-</style>
+    </style>
 </head>
 <body>
     <!-- Startup block screen: shown in an iframe, then dismissed automatically -->
@@ -1353,22 +1343,6 @@ html:-webkit-full-screen body {
     </style>
     <div id="block-overlay" style="display:none"><iframe id="block-frame" title="Blocked"></iframe></div>
     <script>
-        // Lightweight popup protection. Keep the portal's original startup and game loader unchanged.
-        (() => {
-            const blockedHosts = /(^|\.)((doubleclick\.net)|(googlesyndication\.com)|(googleadservices\.com)|(adsterra\.com)|(propellerads\.com)|(popads\.net)|(exoclick\.com))$/i;
-            const originalOpen = window.open.bind(window);
-            window.open = function (url, target, features) {
-                try {
-                    if (url && blockedHosts.test(new URL(String(url), location.href).hostname)) return null;
-                } catch (_) {}
-                // Prevent unsolicited windows. Game navigation inside the existing frame remains available.
-                return null;
-            };
-            window.alert = function () {};
-            window.confirm = function () { return false; };
-            window.prompt = function () { return null; };
-        })();
-
     (function () {
         var BLOCK_SCREEN_MS = 4000;
         var THEMES = ['securly', 'lightspeed', 'goguardian', 'classlink'];
@@ -1448,7 +1422,89 @@ html:-webkit-full-screen body {
                 })
                 .catch(function (error) {
                     var detail = escapeHtml(error && error.message ? error.message : 'Network error');
-                    var fallback = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#090d18;color:#e8edf8;font:16px system-ui,sans-serif}.message{max-width:34rem;padding:2rem;text-align:center}.detail{color:#9aa8c1;font-size:13px}</style></head><body><main class="message"><h1>Block screen unavailable</h1><p>Could not load the selected ' + escapeHtml(theme) + ' screen.</p><p class="detail">' + detail + '</p></main></body></html>';
+                    var fallback = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#090d18;color:#e8edf8;font:16px system-ui,sans-serif}.message{max-width:34rem;padding:2rem;text-align:center}.detail{color:#9aa8c1;font-size:13px}</style></head><body><main class="message"><h1>Block screen unavailable</h1><p>Could not load the selected ' + escapeHtml(theme) + ' screen.</p><p class="detail">' + detail + '</p></main>
+<!-- Independent startup-loader recovery: keeps startup working if another script fails. -->
+<script>
+(function () {
+  'use strict';
+  var recoveryStarted = false;
+  function safeSetting(key, fallback) {
+    try { var value = localStorage.getItem(key); return value === null ? fallback : value; }
+    catch (_) { return fallback; }
+  }
+  function beginRecovery() {
+    if (recoveryStarted) return;
+    var loader = document.getElementById('loading-screen');
+    var bar = document.getElementById('progressBar');
+    var status = document.getElementById('statusText');
+    if (!loader || !bar || !status) return;
+
+    // Do not cover an enabled block screen; wait until it has finished.
+    var overlay = document.getElementById('block-overlay');
+    var blockEnabled = safeSetting('cxz_block_screen', 'false') === 'true';
+    var blockStillVisible = overlay && overlay.style.display !== 'none' &&
+      getComputedStyle(overlay).display !== 'none' &&
+      (window.__cxzBlockDone === false || blockEnabled);
+    if (blockStillVisible) {
+      setTimeout(beginRecovery, 250);
+      return;
+    }
+
+    recoveryStarted = true;
+    if (safeSetting('cxz_loadscreen', 'true') === 'false' || safeSetting('classroom-x-zone_loadscreen', 'true') === 'false') {
+      loader.style.display = 'none';
+      var dock = document.querySelector('.bottom-dock');
+      if (dock) dock.classList.add('dock-ready');
+      return;
+    }
+
+    loader.style.display = 'flex';
+    loader.style.visibility = 'visible';
+    loader.style.opacity = '1';
+    loader.style.pointerEvents = 'auto';
+    var progress = 0;
+    bar.style.width = '0%';
+    status.textContent = 'INITIALIZING...';
+    var tick = setInterval(function () {
+      progress = Math.min(100, progress + 20);
+      bar.style.width = progress + '%';
+      status.textContent = progress >= 100 ? 'READY!' : 'LOADING ASSETS...';
+      if (progress >= 100) {
+        clearInterval(tick);
+        setTimeout(function () {
+          loader.style.opacity = '0';
+          setTimeout(function () {
+            loader.style.display = 'none';
+            loader.style.visibility = 'hidden';
+            loader.style.pointerEvents = 'none';
+            var dock = document.querySelector('.bottom-dock');
+            if (dock) dock.classList.add('dock-ready');
+          }, 350);
+        }, 200);
+      }
+    }, 90);
+  }
+  function scheduleRecovery() {
+    // Give the site's normal startup handler a chance first, then recover if it failed.
+    setTimeout(function () {
+      var loader = document.getElementById('loading-screen');
+      if (loader && getComputedStyle(loader).display !== 'none' &&
+          getComputedStyle(loader).opacity !== '0') beginRecovery();
+      else if (loader && !document.querySelector('.bottom-dock.dock-ready')) beginRecovery();
+    }, 1800);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', scheduleRecovery, { once: true });
+  } else scheduleRecovery();
+  // Last-resort watchdog for a loader left on screen by a failed script.
+  setTimeout(function () {
+    var loader = document.getElementById('loading-screen');
+    if (loader && getComputedStyle(loader).display !== 'none' && getComputedStyle(loader).opacity !== '0') beginRecovery();
+  }, 8000);
+})();
+</script>
+
+</body></html>';
                     renderBlockScreen(fallback, token);
                 });
         }
