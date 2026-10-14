@@ -1085,9 +1085,10 @@
                         prevErr || new Error(partName + ': all proxies exhausted')
                     );
 
+                var absolutePartUrl = new URL(partName, document.baseURI).href;
                 var url = proxyIdx < 0 ?
                     partName :
-                    window.__gdProxyBuild(window.__gdProxyBases[proxyIdx], partName);
+                    window.__gdProxyBuild(window.__gdProxyBases[proxyIdx], absolutePartUrl);
 
                 say('[' + which + '] loading ' + partName +
                     (proxyIdx >= 0 ? ' via proxy[' + proxyIdx + ']' : ''));
