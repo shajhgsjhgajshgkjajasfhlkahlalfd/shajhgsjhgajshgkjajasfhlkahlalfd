@@ -232,8 +232,9 @@
 
         /* ===== TAB TRANSITION ANIMATIONS ===== */
         @keyframes tabIn {
-            from { opacity: 0; transform: translateY(18px) scale(0.985); filter: blur(3px); }
-            to   { opacity: 1; transform: none; filter: blur(0); }
+            /* Keep the tab entrance motion, but avoid blur while content renders. */
+            from { opacity: 0; transform: translateY(18px) scale(0.985); }
+            to   { opacity: 1; transform: none; }
         }
         @keyframes itemIn {
             from { opacity: 0; transform: translateY(22px) scale(0.94); }
