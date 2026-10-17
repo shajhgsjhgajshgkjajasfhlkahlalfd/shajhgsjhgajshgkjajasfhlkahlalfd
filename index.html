@@ -1527,17 +1527,17 @@
             <div class="vault-proxy-heading">
                 <div>
                     <h2 class="section-title">Web Proxy</h2>
-                    <p class="page-description">Browse through Lux without leaving The Vault.</p>
+                    <p class="page-description">Browse the web without leaving the site.</p>
                 </div>
                 <div class="vault-proxy-actions">
-                    <a class="vault-proxy-link primary" href="https://prox-pst6.onrender.com" target="_blank" rel="noopener noreferrer">Open Lux in new tab ↗</a>
+                    <a class="vault-proxy-link primary" id="vault-proxy-newtab" href="#" target="_blank" rel="noopener noreferrer">Open proxy in new tab ↗</a>
                     <button class="vault-proxy-link" type="button" onclick="reloadLuxProxy()">Reload</button>
                 </div>
             </div>
             <div class="vault-proxy-shell">
-                <iframe id="vault-lux-frame" title="Lux Web Proxy" src="about:blank" loading="lazy" allow="clipboard-read; clipboard-write; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>
+                <iframe id="vault-lux-frame" title="Web Proxy" src="about:blank" loading="lazy" allow="clipboard-read; clipboard-write; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>
             </div>
-            <p class="vault-proxy-note">If Lux does not load or a destination site refuses to open inside this panel, use “Open Lux in new tab.” Some websites restrict embedding.</p>
+            <p class="vault-proxy-note">If the proxy does not load or a destination site refuses to open inside this panel, use “Open proxy in new tab.” The first load can take up to a minute if the server was asleep.</p>
         </div>
 
         <!-- TAB: PARTNERS -->
@@ -2534,16 +2534,25 @@
             document.querySelectorAll('#all-games-grid .item-card').forEach(card => card.style.display = '');
         }
 
+        // ── Proxy backend ─────────────────────────────────────────
+        // Set this to your Render service URL (no trailing slash).
+        const PROXY_URL = 'https://YOUR-SERVICE.onrender.com';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const a = document.getElementById('vault-proxy-newtab');
+            if (a) a.href = PROXY_URL + '/';
+        });
+
         function reloadLuxProxy() {
             const frame = document.getElementById('vault-lux-frame');
-            if (frame) frame.src = 'https://prox-pst6.onrender.com/';
+            if (frame) frame.src = PROXY_URL + '/';
         }
 
         function switchTab(tabId, btn) {
             if (tabId === 'proxy') {
                 const proxyFrame = document.getElementById('vault-lux-frame');
                 if (proxyFrame && proxyFrame.getAttribute('src') === 'about:blank') {
-                    proxyFrame.src = 'https://prox-pst6.onrender.com/';
+                    proxyFrame.src = PROXY_URL + '/';
                 }
             }
             // If navigation is used while a game is open, dismiss the player
@@ -3705,8 +3714,9 @@ setTimeout(function() {
 //       to the same root level as this file.
 //
 //  BACKEND (Lux proxy):
-//    Already deployed at https://prox-pst6.onrender.com
-//    The Proxy tab iframes that URL directly. No changes needed.
+//    Ultraviolet + Wisp backend deployed on Render.
+//    Set PROXY_URL (search for it below) to your Render URL.
+//    The Proxy tab iframes that URL directly.
 //    Games load from CXZ_GAME_BASE below — fully automatic.
 //
 //  CXZ_GAME_BASE — auto-detects your GitHub Pages origin:
