@@ -1336,49 +1336,213 @@ html:-webkit-full-screen body {
 
         /* Integrated Lux proxy */
         #proxy.tab-content { min-width: 0; }
-        .vault-proxy-heading {
+        /* ===== CUSTOM PROXY BROWSER UI ===== */
+        .lux-browser {
             display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 18px;
-            margin-bottom: 22px;
+            flex-direction: column;
+            gap: 0;
+            border: 1.5px solid var(--accent-color);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--accent-glow), 0 20px 60px rgba(0,0,0,0.6);
+            background: #09090f;
         }
-        .vault-proxy-heading .page-description { margin: 0; }
-        .vault-proxy-actions { display: flex; gap: 10px; flex-shrink: 0; }
-        .vault-proxy-link {
-            display: inline-flex;
+
+        /* Chrome bar — toolbar + URL row stacked */
+        .lux-chrome {
+            background: #0d0d16;
+            border-bottom: 1.5px solid var(--accent-color);
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Top row: nav controls + engine toggle + external link */
+        .lux-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lux-nav-btn {
+            width: 30px;
+            height: 30px;
+            display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 40px;
-            padding: 0 14px;
-            border: 1px solid rgba(255,255,255,.13);
-            border-radius: 11px;
-            background: #202634;
-            color: #f2f3f7;
-            text-decoration: none;
-            font-size: 12px;
-            font-weight: 700;
+            background: #0a0a12;
+            border: 1.5px solid rgba(255,102,0,0.35);
+            border-radius: 5px;
+            color: var(--accent-color);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background 0.15s, border-color 0.15s;
         }
-        .vault-proxy-link.primary {
-            border-color: color-mix(in srgb, var(--accent-color) 55%, transparent);
-            background: color-mix(in srgb, var(--accent-color) 15%, #151a24);
+        .lux-nav-btn:hover { background: rgba(255,102,0,0.12); border-color: var(--accent-color); }
+        .lux-nav-btn:active { background: rgba(255,102,0,0.22); }
+        .lux-nav-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .lux-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(255,102,0,0.2);
+            flex-shrink: 0;
+            margin: 0 2px;
         }
-        .vault-proxy-link:hover { border-color: var(--accent-color); }
-        .vault-proxy-shell {
-            height: max(75vh, 650px);
-            min-height: 650px;
+
+        /* Engine toggle pill */
+        .lux-engine-group {
+            display: flex;
+            background: #08080e;
+            border: 1.5px solid rgba(255,102,0,0.3);
+            border-radius: 5px;
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,.12);
-            border-radius: 18px;
-            background: #0b0d13;
-            box-shadow: 0 18px 50px rgba(0,0,0,.25);
+            flex-shrink: 0;
         }
-        #vault-lux-frame { display: block; width: 100%; height: 100%; border: 0; background: #0b0d13; }
-        .vault-proxy-note { margin-top: 12px; color: #858d9d; font-size: 11px; line-height: 1.6; }
+        .lux-engine-btn {
+            padding: 5px 10px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.5rem;
+            color: rgba(255,102,0,0.5);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            line-height: 1;
+        }
+        .lux-engine-btn.active {
+            background: var(--accent-color);
+            color: #000;
+        }
+        .lux-engine-btn:not(.active):hover { color: var(--accent-color); background: rgba(255,102,0,0.08); }
+
+        .lux-spacer { flex: 1; }
+
+        .lux-ext-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.5rem;
+            color: var(--accent-color);
+            background: transparent;
+            border: 1.5px solid rgba(255,102,0,0.35);
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.15s, border-color 0.15s;
+            flex-shrink: 0;
+        }
+        .lux-ext-btn:hover { background: rgba(255,102,0,0.1); border-color: var(--accent-color); }
+        .lux-ext-btn svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* URL row */
+        .lux-url-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lux-lock {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            color: var(--accent-color);
+        }
+        .lux-lock svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .lux-url-input {
+            flex: 1;
+            background: #08080e;
+            border: 1.5px solid rgba(255,102,0,0.3);
+            border-radius: 5px;
+            color: #e8e8f0;
+            font-family: 'DM Sans', monospace;
+            font-size: 0.75rem;
+            padding: 7px 12px;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            min-width: 0;
+        }
+        .lux-url-input::placeholder { color: rgba(255,102,0,0.35); }
+        .lux-url-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(255,102,0,0.12);
+        }
+
+        .lux-go-btn {
+            flex-shrink: 0;
+            padding: 7px 14px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.5rem;
+            color: #000;
+            background: var(--accent-color);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: opacity 0.15s;
+            box-shadow: var(--accent-glow);
+        }
+        .lux-go-btn:hover { opacity: 0.85; }
+        .lux-go-btn:active { opacity: 0.7; }
+
+        /* iframe shell */
+        .lux-frame-shell {
+            position: relative;
+            height: max(72vh, 580px);
+            background: #08080c;
+        }
+
+        #vault-lux-frame {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: #08080c;
+        }
+
+        /* Status bar */
+        .lux-status {
+            background: #0a0a12;
+            border-top: 1px solid rgba(255,102,0,0.2);
+            padding: 5px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .lux-status-text {
+            font-size: 0.5rem;
+            color: rgba(255,102,0,0.5);
+            font-family: 'Press Start 2P', monospace;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+        .lux-status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            box-shadow: 0 0 5px var(--accent-color);
+            flex-shrink: 0;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .vault-proxy-note { margin-top: 10px; color: rgba(255,102,0,0.35); font-size: 0.5rem; line-height: 1.8; font-family: 'Press Start 2P', monospace; }
+
         @media (max-width: 700px) {
-            .vault-proxy-heading { flex-direction: column; }
-            .vault-proxy-actions { flex-wrap: wrap; }
-            .vault-proxy-shell { height: 75vh; min-height: 520px; }
+            .lux-toolbar { flex-wrap: wrap; }
+            .lux-engine-group { order: 3; }
+            .lux-spacer { display: none; }
+            .lux-frame-shell { height: 70vh; min-height: 420px; }
             .bottom-dock { max-width: calc(100vw - 16px); overflow-x: auto; }
             .dock-item { padding-left: 10px; padding-right: 10px; }
         }
@@ -1589,20 +1753,55 @@ html:-webkit-full-screen body {
 
         <!-- TAB: PROXY -->
         <div id="proxy" class="tab-content">
-            <div class="vault-proxy-heading">
-                <div>
-                    <h2 class="section-title">Web Proxy</h2>
-                    <p class="page-description">Browse through Lux without leaving The Vault.</p>
+            <div class="lux-browser" id="lux-browser">
+
+                <!-- CHROME -->
+                <div class="lux-chrome">
+                    <div class="lux-toolbar">
+                        <button class="lux-nav-btn" title="Back" onclick="luxNav('back')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                        </button>
+                        <button class="lux-nav-btn" title="Forward" onclick="luxNav('forward')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
+                        <button class="lux-nav-btn" title="Reload" onclick="luxNav('reload')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                        </button>
+                        <button class="lux-nav-btn" title="Lux home" onclick="luxNav('home')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                        </button>
+                        <div class="lux-divider"></div>
+                        <div class="lux-engine-group" title="Proxy engine">
+                            <button class="lux-engine-btn active" id="lux-engine-uv" onclick="luxSetEngine('uv')">UV</button>
+                            <button class="lux-engine-btn" id="lux-engine-scramjet" onclick="luxSetEngine('scramjet')">SJ</button>
+                        </div>
+                        <div class="lux-spacer"></div>
+                        <a class="lux-ext-btn" href="https://prox-pst6.onrender.com" target="_blank" rel="noopener noreferrer" title="Open in new tab">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                            New Tab
+                        </a>
+                    </div>
+                    <div class="lux-url-row">
+                        <span class="lux-lock" title="Routed through Lux">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </span>
+                        <input class="lux-url-input" id="lux-url-bar" type="text" placeholder="Search or enter a URL..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')luxGo()">
+                        <button class="lux-go-btn" onclick="luxGo()">GO</button>
+                    </div>
                 </div>
-                <div class="vault-proxy-actions">
-                    <a class="vault-proxy-link primary" href="https://prox-pst6.onrender.com" target="_blank" rel="noopener noreferrer">Open Lux in new tab ↗</a>
-                    <button class="vault-proxy-link" type="button" onclick="reloadLuxProxy()">Reload</button>
+
+                <!-- IFRAME -->
+                <div class="lux-frame-shell">
+                    <iframe id="vault-lux-frame" title="Lux Web Proxy" src="about:blank" loading="lazy" allow="clipboard-read; clipboard-write; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>
+                </div>
+
+                <!-- STATUS BAR -->
+                <div class="lux-status">
+                    <div class="lux-status-dot"></div>
+                    <div class="lux-status-text" id="lux-status-text">READY &#8212; POWERED BY LUX</div>
                 </div>
             </div>
-            <div class="vault-proxy-shell">
-                <iframe id="vault-lux-frame" title="Lux Web Proxy" src="about:blank" loading="lazy" allow="clipboard-read; clipboard-write; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>
-            </div>
-            <p class="vault-proxy-note">If Lux does not load or a destination site refuses to open inside this panel, use “Open Lux in new tab.” Some websites restrict embedding.</p>
+            <p class="vault-proxy-note">Routes traffic through prox-pst6.onrender.com &#8212; if a site won't load here, use New Tab.</p>
         </div>
 
         <!-- TAB: PARTNERS -->
@@ -2603,6 +2802,144 @@ html:-webkit-full-screen body {
             const frame = document.getElementById('vault-lux-frame');
             if (frame) frame.src = 'https://prox-pst6.onrender.com/';
         }
+
+        /* =========================================================
+           LUX BROWSER FRONTEND CONTROLS
+           Engine state, URL bar, nav buttons, status text.
+        ========================================================= */
+        (function () {
+            const LUX_BASE = 'https://prox-pst6.onrender.com';
+            // UV prefix used by Ultraviolet; Scramjet uses /scram/
+            const ENGINE_PATHS = { uv: '/service/', scramjet: '/scram/' };
+            let currentEngine = 'uv';
+
+            function getFrame() { return document.getElementById('vault-lux-frame'); }
+            function getBar()   { return document.getElementById('lux-url-bar'); }
+            function getStatus(){ return document.getElementById('lux-status-text'); }
+
+            function setStatus(msg) {
+                const el = getStatus();
+                if (el) el.textContent = msg;
+            }
+
+            function luxEncode(url) {
+                // Pass bare URL through to Lux — it handles encoding internally.
+                // We just navigate the iframe to LUX_BASE/?engine&dest=url
+                // Lux's own frontend takes it from there.
+                return LUX_BASE;
+            }
+
+            // Navigate the iframe to LUX_BASE and let Lux handle the destination.
+            // For a direct URL, we load Lux home first (it has its own URL bar).
+            // If a URL is passed, we attempt to deep-link via Lux's hash/query pattern.
+            function luxLoad(dest) {
+                const frame = getFrame();
+                if (!frame) return;
+
+                let target = LUX_BASE + '/';
+                if (dest && dest.trim()) {
+                    let url = dest.trim();
+                    // Prepend https if no scheme
+                    if (!/^https?:\/\//i.test(url) && !url.includes(' ')) {
+                        url = 'https://' + url;
+                    }
+                    // If it looks like a search query, use Google
+                    if (url.includes(' ') || !/\.[a-z]{2,}/i.test(url.replace(/^https?:\/\//, ''))) {
+                        url = 'https://www.google.com/search?q=' + encodeURIComponent(dest.trim());
+                    }
+                    // Lux encodes the destination into its service path.
+                    // We pass the raw URL as a ?url= param on the Lux home —
+                    // Lux will pick it up and navigate automatically.
+                    target = LUX_BASE + '/?url=' + encodeURIComponent(url);
+                    setStatus('LOADING ' + url.replace(/^https?:\/\//, '').split('/')[0].toUpperCase());
+                } else {
+                    setStatus('READY \u2014 POWERED BY LUX');
+                }
+
+                frame.src = target;
+            }
+
+            // Called by the GO button and Enter key
+            window.luxGo = function () {
+                const bar = getBar();
+                if (!bar) return;
+                luxLoad(bar.value);
+            };
+
+            // Called by nav buttons
+            window.luxNav = function (action) {
+                const frame = getFrame();
+                if (!frame) return;
+                switch (action) {
+                    case 'back':
+                        try { frame.contentWindow.history.back(); } catch (_) {
+                            setStatus('CANNOT NAVIGATE \u2014 CROSS-ORIGIN RESTRICTION');
+                        }
+                        break;
+                    case 'forward':
+                        try { frame.contentWindow.history.forward(); } catch (_) {
+                            setStatus('CANNOT NAVIGATE \u2014 CROSS-ORIGIN RESTRICTION');
+                        }
+                        break;
+                    case 'reload':
+                        if (frame.src && frame.src !== 'about:blank') {
+                            frame.src = frame.src;
+                            setStatus('RELOADING...');
+                        } else {
+                            luxLoad('');
+                        }
+                        break;
+                    case 'home':
+                        luxLoad('');
+                        const bar = getBar();
+                        if (bar) bar.value = '';
+                        break;
+                }
+            };
+
+            // Engine toggle — UV (Ultraviolet) or SJ (Scramjet)
+            window.luxSetEngine = function (engine) {
+                if (!ENGINE_PATHS[engine]) return;
+                currentEngine = engine;
+                ['uv', 'scramjet'].forEach(e => {
+                    const btn = document.getElementById('lux-engine-' + e);
+                    if (btn) btn.classList.toggle('active', e === engine);
+                });
+                setStatus('ENGINE: ' + (engine === 'uv' ? 'ULTRAVIOLET' : 'SCRAMJET'));
+                // Reload Lux home so the engine selection takes effect
+                // (Lux stores engine choice in localStorage on its own domain)
+                const frame = getFrame();
+                if (frame && frame.src !== 'about:blank') {
+                    frame.src = LUX_BASE + '/';
+                }
+            };
+
+            // Sync status bar on iframe load
+            function bindFrameEvents() {
+                const frame = getFrame();
+                if (!frame) return;
+                frame.addEventListener('load', function () {
+                    try {
+                        const loc = frame.contentWindow.location.href;
+                        if (loc && loc !== 'about:blank') {
+                            setStatus('CONNECTED \u2014 ' + loc.replace(/^https?:\/\//, '').split('/')[0].toUpperCase());
+                        } else {
+                            setStatus('READY \u2014 POWERED BY LUX');
+                        }
+                    } catch (_) {
+                        // Cross-origin — can't read location, that's fine
+                        setStatus('CONNECTED \u2014 LUX ACTIVE');
+                    }
+                });
+            }
+
+            // Wire up on DOM ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', bindFrameEvents);
+            } else {
+                bindFrameEvents();
+            }
+        })();
 
         function switchTab(tabId, btn) {
             if (tabId === 'proxy') {
@@ -3752,48 +4089,8 @@ setTimeout(function() {
    This preserves document location and relative asset paths.
    ========================================================= */
 
-// =========================================================
-//  GITHUB PAGES + LUX PROXY — DEPLOY GUIDE
-// =========================================================
-//
-//  FRONTEND (this file):
-//    1. Put this file at the root of your GitHub Pages repo.
-//       e.g. https://<you>.github.io/<repo>/index.html
-//    2. Mirror the /g/ folder from the original repo into yours:
-//         /g/assets/       (images, cursors, favicon)
-//         /g/games/html/   (game .html files)
-//         /g/games/other/  (tool .html files)
-//       Keep the folder structure exactly as-is — all asset
-//       paths in this file are relative (./g/...) and resolve
-//       against wherever you host this file.
-//    3. Mirror /blockscreens/ (lightspeed.html, securly.html…)
-//       to the same root level as this file.
-//
-//  BACKEND (Lux proxy):
-//    Already deployed at https://prox-pst6.onrender.com
-//    The Proxy tab iframes that URL directly. No changes needed.
-//    Games load from CXZ_GAME_BASE below — fully automatic.
-//
-//  CXZ_GAME_BASE — auto-detects your GitHub Pages origin:
-//    If you are at https://you.github.io/repo/index.html,
-//    game files load from https://you.github.io/repo/g/games/html/
-//    No hardcoded username or repo name required.
-// =========================================================
-
-const CXZ_GAME_BASE = (() => {
-    // Build the game base URL relative to this page's location.
-    // Works on any GitHub Pages host without editing this file.
-    try {
-        const base = new URL('./g/games/html/', document.currentScript
-            ? new URL(document.currentScript.src)
-            : window.location.href
-        );
-        return base.href;
-    } catch (_) {
-        // Absolute fallback — update this if auto-detection fails.
-        return window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/') + 'g/games/html/';
-    }
-})();
+const CXZ_GAME_BASE =
+    'https://shajhgsjhgajshgkjajasfhlkahlalfd.github.io/shajhgsjhgajshgkjajasfhlkahlalfd/g/games/html/';
 
 const CXZPlayer = (() => {
     let currentGame = '';
