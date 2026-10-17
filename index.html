@@ -3752,8 +3752,48 @@ setTimeout(function() {
    This preserves document location and relative asset paths.
    ========================================================= */
 
-const CXZ_GAME_BASE =
-    'https://shajhgsjhgajshgkjajasfhlkahlalfd.github.io/shajhgsjhgajshgkjajasfhlkahlalfd/g/games/html/';
+// =========================================================
+//  GITHUB PAGES + LUX PROXY — DEPLOY GUIDE
+// =========================================================
+//
+//  FRONTEND (this file):
+//    1. Put this file at the root of your GitHub Pages repo.
+//       e.g. https://<you>.github.io/<repo>/index.html
+//    2. Mirror the /g/ folder from the original repo into yours:
+//         /g/assets/       (images, cursors, favicon)
+//         /g/games/html/   (game .html files)
+//         /g/games/other/  (tool .html files)
+//       Keep the folder structure exactly as-is — all asset
+//       paths in this file are relative (./g/...) and resolve
+//       against wherever you host this file.
+//    3. Mirror /blockscreens/ (lightspeed.html, securly.html…)
+//       to the same root level as this file.
+//
+//  BACKEND (Lux proxy):
+//    Already deployed at https://prox-pst6.onrender.com
+//    The Proxy tab iframes that URL directly. No changes needed.
+//    Games load from CXZ_GAME_BASE below — fully automatic.
+//
+//  CXZ_GAME_BASE — auto-detects your GitHub Pages origin:
+//    If you are at https://you.github.io/repo/index.html,
+//    game files load from https://you.github.io/repo/g/games/html/
+//    No hardcoded username or repo name required.
+// =========================================================
+
+const CXZ_GAME_BASE = (() => {
+    // Build the game base URL relative to this page's location.
+    // Works on any GitHub Pages host without editing this file.
+    try {
+        const base = new URL('./g/games/html/', document.currentScript
+            ? new URL(document.currentScript.src)
+            : window.location.href
+        );
+        return base.href;
+    } catch (_) {
+        // Absolute fallback — update this if auto-detection fails.
+        return window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/') + 'g/games/html/';
+    }
+})();
 
 const CXZPlayer = (() => {
     let currentGame = '';
