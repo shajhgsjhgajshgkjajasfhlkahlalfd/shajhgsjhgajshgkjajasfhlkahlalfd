@@ -82,5 +82,17 @@
     "title": "Tomb of The Mask",
     "tagline": "Dash, dodge, and survive the arcade labyrinth",
     "img": "./g/assets/tomb-of-the-mask.png"
-  }
+  },
+  {
+    "file": "Cuphead.html",
+    "title": "Cuphead",
+    "tagline": "Good day for a swell battle!",
+    "img": "./g/assets/465.png"
+  },
+  {
+    "file": "Baseball_Bros.html",
+    "title": "Baseball Bros",
+    "tagline": "Baseball",
+    "img": "./g/assets/547.png"
+  },
 ]
