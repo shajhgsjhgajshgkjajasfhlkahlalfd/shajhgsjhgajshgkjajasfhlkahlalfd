@@ -1,0 +1,86 @@
+[
+  {
+    "file": "1v1.lol.html",
+    "title": "1v1.lol",
+    "tagline": "Multiplayer Shooter",
+    "img": "./g/assets/1v1-lol.png"
+  },
+  {
+    "file": "FNAF.html",
+    "title": "FNAF",
+    "tagline": "Five Nights at Freddy's",
+    "img": "./g/assets/FNAF1.png"
+  },
+  {
+    "file": "FNAF2.html",
+    "title": "FNAF 2",
+    "tagline": "Five Nights at Freddy's",
+    "img": "./g/assets/FNAF2.png"
+  },
+  {
+    "file": "FNAF3.html",
+    "title": "FNAF 3",
+    "tagline": "Five Nights at Freddy's",
+    "img": "./g/assets/FNAF3.png"
+  },
+  {
+    "file": "FNAF4.html",
+    "title": "FNAF 4",
+    "tagline": "Five Nights at Freddy's",
+    "img": "./g/assets/FNAF4.png"
+  },
+  {
+    "file": "Moto-X3M.html",
+    "title": "Moto X3M",
+    "tagline": "Bike Racing",
+    "img": "./g/assets/moto-x3m.png"
+  },
+  {
+    "file": "basket-bros.html",
+    "title": "Basket Bros",
+    "tagline": "Basketball",
+    "img": "./g/assets/basket-bros.png"
+  },
+  {
+    "file": "cookie-clicker.html",
+    "title": "Cookie Clicker",
+    "tagline": "Idle Clicker",
+    "img": "./g/assets/cookie-clicker.png"
+  },
+  {
+    "file": "escape-road.html",
+    "title": "Escape Road",
+    "tagline": "Driving Escape",
+    "img": "https://raw.githubusercontent.com/s0n-1m-cr1n3/sc13nc3/refs/heads/main/assets/img/main/escaperoad.png"
+  },
+  {
+    "file": "gd.html",
+    "title": "Geometry Dash",
+    "tagline": "Rhythm Platformer",
+    "img": "./g/assets/Geometry-Dash.png"
+  },
+  {
+    "file": "slope.html",
+    "title": "Slope",
+    "tagline": "Endless Runner",
+    "img": "./g/assets/slope.png"
+  },
+  {
+    "file": "basket-random.html",
+    "title": "Basket Random",
+    "tagline": "Basketball",
+    "img": "https://raw.githubusercontent.com/s0n-1m-cr1n3/sc13nc3/refs/heads/main/assets/img/main/basketrandom.png"
+  },
+  {
+    "file": "minecraft.html",
+    "title": "Minecraft",
+    "tagline": "Open-Word Sandbox",
+    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/181.png"
+  },
+  {
+    "file": "tomb-of-the-mask.html",
+    "title": "Tomb of The Mask",
+    "tagline": "Dash, dodge, and survive the arcade labyrinth",
+    "img": "./g/assets/tomb-of-the-mask.png"
+  }
+]
