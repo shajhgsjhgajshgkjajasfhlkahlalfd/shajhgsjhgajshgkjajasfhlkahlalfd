@@ -94,5 +94,11 @@
     "title": "Baseball Bros",
     "tagline": "Baseball",
     "img": "./g/assets/547.png"
+  },
+  {
+    "file": "fnae.html",
+    "title": "Five Nights at Epsteins",
+    "tagline": "Survive Five Nights on Epsteins island",
+    "img": "./g/assets/710.png"
   }
 ]
