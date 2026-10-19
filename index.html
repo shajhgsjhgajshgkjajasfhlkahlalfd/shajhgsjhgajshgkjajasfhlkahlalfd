@@ -1330,12 +1330,13 @@
     }
     :root {
         --mc-font: 'MinecraftUI', 'Press Start 2P', monospace;
-        --mc-purple: #8b5cf6;
-        --mc-purple-deep: #6d28d9;
-        --mc-purple-glow: rgba(139, 92, 246, 0.55);
+        /* All home colors derive from the user's accent setting */
+        --mc-purple: var(--accent-color);
+        --mc-purple-deep: color-mix(in srgb, var(--accent-color) 78%, #000);
+        --mc-purple-glow: color-mix(in srgb, var(--accent-color) 55%, transparent);
+        --mc-tint: color-mix(in srgb, var(--accent-color) 45%, #fff);
+        --mc-tint-soft: color-mix(in srgb, var(--accent-color) 30%, #fff);
     }
-    html { background: #07050d; }
-    canvas#bg-canvas { opacity: 0.55; }
 
     .visually-hidden {
         position: absolute !important;
@@ -1378,9 +1379,9 @@
         text-transform: uppercase;
         color: var(--mc-purple);
         text-shadow:
-            0 0 6px rgba(167, 139, 250, 0.55),
+            0 0 6px color-mix(in srgb, var(--accent-color) 55%, transparent),
             0 0 22px var(--mc-purple-glow),
-            0 0 48px rgba(109, 40, 217, 0.45);
+            0 0 48px color-mix(in srgb, var(--accent-color) 40%, transparent);
     }
     .datetime-detail-row {
         justify-content: center;
@@ -1394,7 +1395,7 @@
         text-shadow: 0 2px 0 rgba(0,0,0,0.6);
     }
     .datetime-detail-row > * { font-family: var(--mc-font); }
-    .datetime-detail-row time { color: #c4b5fd; }
+    .datetime-detail-row time { color: var(--mc-tint); }
     .live-datetime .datetime-separator {
         color: var(--mc-purple);
         font-size: 0.75em;
@@ -1410,24 +1411,24 @@
     .search-box input {
         min-height: 58px;
         padding: 0 54px 0 22px;
-        color: #ede9fe;
+        color: var(--mc-tint-soft);
         border: 2px solid var(--mc-purple-deep);
         border-radius: 6px;
         background: rgba(10, 8, 16, 0.92);
         font-family: var(--mc-font);
         font-size: 20px;
         letter-spacing: 0.04em;
-        box-shadow: 0 0 0 1px rgba(0,0,0,0.6), 0 0 18px rgba(109, 40, 217, 0.25);
+        box-shadow: 0 0 0 1px rgba(0,0,0,0.6), 0 0 18px color-mix(in srgb, var(--accent-color) 25%, transparent);
     }
-    .search-box input::placeholder { color: #6d4fa8; font-family: var(--mc-font); }
+    .search-box input::placeholder { color: color-mix(in srgb, var(--accent-color) 65%, #555); font-family: var(--mc-font); }
     .search-box input:focus {
         border-color: var(--mc-purple);
-        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.22), 0 0 26px rgba(139, 92, 246, 0.35);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 22%, transparent), 0 0 26px color-mix(in srgb, var(--accent-color) 35%, transparent);
     }
     .search-icon {
         left: auto;
         right: 20px;
-        color: #a78bfa;
+        color: var(--mc-tint);
     }
     .search-icon svg { width: 20px; height: 20px; }
 
@@ -1445,7 +1446,7 @@
         width: clamp(140px, 15.4vw, 196px);
         aspect-ratio: 1 / 1;
         padding: 0;
-        border: 3px solid #2e2150;
+        border: 3px solid color-mix(in srgb, var(--accent-color) 28%, #0d0d14);
         border-radius: 4px;
         background: #0d0a16;
         box-shadow: 0 10px 24px rgba(0,0,0,0.45);
@@ -1453,7 +1454,7 @@
     #featured-grid .card:hover {
         transform: translateY(-6px);
         border-color: var(--mc-purple);
-        box-shadow: 0 16px 32px rgba(0,0,0,0.5), 0 0 22px rgba(139, 92, 246, 0.45);
+        box-shadow: 0 16px 32px rgba(0,0,0,0.5), 0 0 22px color-mix(in srgb, var(--accent-color) 45%, transparent);
     }
     #featured-grid .card img {
         width: 100%;
@@ -1480,12 +1481,12 @@
     #featured-grid .card:hover h3,
     #featured-grid .card:focus-visible h3 { opacity: 1; transform: none; }
     #featured-grid .card p { display: none; }
-    #featured-grid .card:focus-visible { outline: 3px solid #c4b5fd; outline-offset: 3px; }
+    #featured-grid .card:focus-visible { outline: 3px solid var(--mc-tint); outline-offset: 3px; }
 
     .home-search-empty {
         margin-top: 8px;
         text-align: center;
-        color: #a78bfa;
+        color: var(--mc-tint);
         font-family: var(--mc-font);
         font-size: 16px;
         letter-spacing: 0.08em;
@@ -2201,10 +2202,11 @@
         // Generated card art for games without an image (or whose image fails to load)
         function placeholderImg(title) {
             const t = String(title).replace(/[<>&"']/g, '');
+            const ac = (getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#8a2be2');
             const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="420" height="240" viewBox="0 0 420 240">' +
                 '<rect width="420" height="240" fill="#0e0e16"/>' +
-                '<rect x="6" y="6" width="408" height="228" fill="none" stroke="#8b5cf6" stroke-opacity=".5" stroke-width="2" stroke-dasharray="8 6"/>' +
-                '<text x="210" y="130" text-anchor="middle" font-family="monospace" font-size="24" fill="#a78bfa">' + t + '</text></svg>';
+                '<rect x="6" y="6" width="408" height="228" fill="none" stroke="' + ac + '" stroke-opacity=".5" stroke-width="2" stroke-dasharray="8 6"/>' +
+                '<text x="210" y="130" text-anchor="middle" font-family="monospace" font-size="24" fill="' + ac + '">' + t + '</text></svg>';
             return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
         }
 
@@ -2466,7 +2468,7 @@
 
         // ===== FIRST-RUN SETUP MODAL =====
         let setupShown = false;
-        let setupAccent = '#ff6600';
+        let setupAccent = '#8a2be2';
 
         function buildSetupUI() {
             const sw = byId('setup-swatches');
@@ -2498,6 +2500,8 @@
 
         function selectSetupAccent(hex) {
             setupAccent = hex;
+            // Live preview so the page recolors immediately.
+            if (typeof setThemeAccent === 'function') setThemeAccent(hex, true);
             document.querySelectorAll('#setup-swatches .swatch-box').forEach(b => {
                 b.classList.toggle('selected', b.dataset.color.toLowerCase() === hex.toLowerCase());
             });
@@ -2507,7 +2511,7 @@
             const modal = byId('setup-modal');
             if (!modal) return;
             buildSetupUI();
-            selectSetupAccent(localStorage.getItem(PRE + 'accent') || '#ff6600');
+            selectSetupAccent(localStorage.getItem(PRE + 'accent') || '#8a2be2');
             byId('setup-cloak-name').value = localStorage.getItem(PRE + 'cloak_title') || '';
             byId('setup-cloak-icon').value = localStorage.getItem(PRE + 'cloak_icon') || '';
             byId('setup-preset').value = '';
@@ -2762,6 +2766,10 @@
             const input = byId('accent-hex-input');
             if (input) input.value = normalized;
             localStorage.setItem(PRE + 'accent', normalized);
+            if (!silent && typeof renderHomeSearch === 'function' && FEATURED_PICKS.length) {
+                const q = byId('searchInput');
+                renderHomeSearch(q && byId('home').classList.contains('active') ? q.value : '');
+            }
             if (!silent) showToast(`Accent set to ${normalized}`);
             return true;
         }
@@ -3431,8 +3439,8 @@ setTimeout(function() {
         // 14. LOAD ALL SAVED SETTINGS
         function loadAllSettings() {
             // Accent
-            let accent = localStorage.getItem(PRE + 'accent') || '#ff6600';
-            if (!/^#[\da-f]{6}$/i.test(accent)) accent = '#ff6600';
+            let accent = localStorage.getItem(PRE + 'accent') || '#8a2be2';
+            if (!/^#[\da-f]{6}$/i.test(accent)) accent = '#8a2be2';
             setThemeAccent(accent, true);
 
             // Cloak
@@ -3684,9 +3692,9 @@ setTimeout(function() {
             const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#ff6600';
 
             if (currentBgType === 'matrix') {
-                ctx.fillStyle = "rgba(6, 4, 12, 0.12)";
+                ctx.fillStyle = "rgba(8, 8, 14, 0.12)";
                 ctx.fillRect(0, 0, cw, ch);
-                ctx.fillStyle = "#8b5cf6";
+                ctx.fillStyle = accent;
                 ctx.font = fontSize + "px 'MinecraftUI', monospace";
 
                 for (let i = 0; i < drops.length; i++) {
