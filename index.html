@@ -1922,9 +1922,9 @@
                     <div class="setting-subhead" style="text-align:left; margin-top:8px;">Startup Options</div>
                     <label class="checkbox-label">
                         <input type="checkbox" id="music-startup-check" onchange="savePerfSettings()">
-                        Arcade music on startup
+                        Background music
                     </label>
-                    <div class="setting-help">A quiet, generated arcade loop starts after your first click. Browsers require that first interaction.</div>
+                    <div class="setting-help">Plays MF DOOM – "Doomsday" on loop after your first click (browsers require that first interaction). Pauses while a game is open. Use the speaker button to mute.</div>
                     <label class="checkbox-label">
                         <input type="checkbox" id="loadscreen-startup-check" checked onchange="savePerfSettings()">
                         Loading screen on startup
@@ -3319,12 +3319,30 @@ setTimeout(function() {
 
         // 13. MUTE SOUND TOGGLE
         let isMuted = localStorage.getItem(PRE + 'muted') === 'true';
-        let musicContext = null;
-        let musicMasterGain = null;
-        let musicTimer = null;
-        let musicStep = 0;
+        // Background music: looping MP3 that starts after the first click/keypress
+        // (browsers block autoplay), pauses while a game is open or the tab is hidden.
+        const BG_MUSIC_SRC = encodeURI('./g/assets/bg-music/MF Doom-Doomsday.mp3');
+        const BG_MUSIC_VOLUME = 0.35;
+        let bgMusic = null;
         let musicUnlockArmed = false;
         let musicUnlockHandler = null;
+        let musicPausedForGame = false;
+
+        function musicEnabled() {
+            return localStorage.getItem(PRE + 'music_startup') !== 'false';
+        }
+
+        function getBgMusic() {
+            if (!bgMusic) {
+                bgMusic = new Audio(BG_MUSIC_SRC);
+                bgMusic.loop = true;
+                bgMusic.preload = 'auto';
+                bgMusic.volume = BG_MUSIC_VOLUME;
+                bgMusic.muted = isMuted;
+                bgMusic.addEventListener('error', () => console.warn('[CXZ] Background music file not found:', BG_MUSIC_SRC));
+            }
+            return bgMusic;
+        }
 
         function updateMuteButton() {
             const button = byId('dock-mute-btn');
@@ -3339,76 +3357,36 @@ setTimeout(function() {
         }
 
         function setAudioMuted(muted) {
-            if (musicMasterGain && musicContext) {
-                musicMasterGain.gain.cancelScheduledValues(musicContext.currentTime);
-                musicMasterGain.gain.setTargetAtTime(muted ? 0 : 0.085, musicContext.currentTime, 0.08);
-            }
+            if (bgMusic) bgMusic.muted = Boolean(muted);
             if (typeof CXZPlayer !== 'undefined') CXZPlayer.setMuted(muted);
         }
 
-        function playArcadeNote(frequency) {
-            if (!musicContext || !musicMasterGain || musicContext.state !== 'running') return;
-            const now = musicContext.currentTime;
-            const oscillator = musicContext.createOscillator();
-            const envelope = musicContext.createGain();
-            oscillator.type = 'triangle';
-            oscillator.frequency.setValueAtTime(frequency, now);
-            envelope.gain.setValueAtTime(0.0001, now);
-            envelope.gain.exponentialRampToValueAtTime(0.2, now + 0.025);
-            envelope.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
-            oscillator.connect(envelope);
-            envelope.connect(musicMasterGain);
-            oscillator.start(now);
-            oscillator.stop(now + 0.44);
+        async function startArcadeMusic() {
+            if (!musicEnabled() || musicPausedForGame || document.hidden) return;
+            const audio = getBgMusic();
+            audio.muted = isMuted;
+            try {
+                await audio.play();
+            } catch (error) {
+                // Autoplay blocked: wait for the next interaction and try again.
+                armArcadeMusic();
+            }
         }
 
-        async function startArcadeMusic() {
-            if (localStorage.getItem(PRE + 'music_startup') !== 'true') return;
-            const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
-            if (!AudioContextCtor) {
-                showToast('This browser does not support arcade music');
-                return;
+        function disarmArcadeMusic() {
+            if (musicUnlockHandler) {
+                document.removeEventListener('pointerdown', musicUnlockHandler, true);
+                document.removeEventListener('keydown', musicUnlockHandler, true);
             }
-            try {
-                if (!musicContext) {
-                    musicContext = new AudioContextCtor();
-                    musicMasterGain = musicContext.createGain();
-                    musicMasterGain.gain.value = isMuted ? 0 : 0.085;
-                    musicMasterGain.connect(musicContext.destination);
-                    const pad = musicContext.createOscillator();
-                    const padGain = musicContext.createGain();
-                    pad.type = 'sine';
-                    pad.frequency.value = 110;
-                    padGain.gain.value = 0.025;
-                    pad.connect(padGain);
-                    padGain.connect(musicMasterGain);
-                    pad.start();
-                }
-                if (musicContext.state === 'suspended') await musicContext.resume();
-                if (musicTimer) return;
-                const notes = [392, 523.25, 587.33, 523.25, 440, 587.33, 659.25, 587.33, 392, 523.25, 659.25, 587.33, 440, 523.25, 587.33, 440];
-                musicStep = 0;
-                playArcadeNote(notes[musicStep++]);
-                musicTimer = window.setInterval(() => {
-                    if (!document.hidden && localStorage.getItem(PRE + 'music_startup') === 'true') {
-                        playArcadeNote(notes[musicStep++ % notes.length]);
-                    }
-                }, 520);
-                setAudioMuted(isMuted);
-            } catch (error) {
-                console.warn('[CXZ] Arcade music could not start:', error);
-                showToast('Arcade music could not start in this browser');
-            }
+            musicUnlockHandler = null;
+            musicUnlockArmed = false;
         }
 
         function armArcadeMusic() {
-            if (musicContext || musicUnlockArmed || localStorage.getItem(PRE + 'music_startup') !== 'true') return;
+            if (musicUnlockArmed || !musicEnabled()) return;
             musicUnlockArmed = true;
             musicUnlockHandler = () => {
-                musicUnlockArmed = false;
-                document.removeEventListener('pointerdown', musicUnlockHandler, true);
-                document.removeEventListener('keydown', musicUnlockHandler, true);
-                musicUnlockHandler = null;
+                disarmArcadeMusic();
                 startArcadeMusic();
             };
             document.addEventListener('pointerdown', musicUnlockHandler, true);
@@ -3418,25 +3396,28 @@ setTimeout(function() {
         function syncArcadeMusic(enabled) {
             localStorage.setItem(PRE + 'music_startup', String(Boolean(enabled)));
             if (enabled) {
-                if (musicContext) startArcadeMusic();
-                else armArcadeMusic();
+                if (bgMusic && !bgMusic.paused) return;
+                startArcadeMusic();
             } else {
-                if (musicTimer) window.clearInterval(musicTimer);
-                musicTimer = null;
-                if (musicUnlockHandler) {
-                    document.removeEventListener('pointerdown', musicUnlockHandler, true);
-                    document.removeEventListener('keydown', musicUnlockHandler, true);
-                }
-                musicUnlockHandler = null;
-                musicUnlockArmed = false;
-                if (musicContext && musicContext.state === 'running') musicContext.suspend();
+                disarmArcadeMusic();
+                if (bgMusic) bgMusic.pause();
             }
         }
 
+        // Called by the game player so the site music doesn't play over games.
+        window.cxzMusicPauseForGame = function () {
+            musicPausedForGame = true;
+            if (bgMusic) bgMusic.pause();
+        };
+        window.cxzMusicResumeAfterGame = function () {
+            musicPausedForGame = false;
+            if (bgMusic) startArcadeMusic();
+        };
+
         document.addEventListener('visibilitychange', () => {
-            if (!musicContext || localStorage.getItem(PRE + 'music_startup') !== 'true') return;
-            if (document.hidden && musicContext.state === 'running') musicContext.suspend();
-            else if (!document.hidden && musicContext.state === 'suspended') musicContext.resume();
+            if (!bgMusic || !musicEnabled()) return;
+            if (document.hidden) bgMusic.pause();
+            else startArcadeMusic();
         });
 
         function toggleMuteSound() {
@@ -3530,7 +3511,7 @@ setTimeout(function() {
             document.getElementById('block-title-input').value = localStorage.getItem(PRE + 'block_title') || '';
             document.getElementById('block-msg-input').value = localStorage.getItem(PRE + 'block_message') || '';
 
-            const ms = localStorage.getItem(PRE + 'music_startup') === 'true';
+            const ms = localStorage.getItem(PRE + 'music_startup') !== 'false';
             document.getElementById('music-startup-check').checked = ms;
             syncArcadeMusic(ms);
 
@@ -4044,6 +4025,7 @@ const CXZPlayer = (() => {
     }
 
     async function open(url, title) {
+        if (window.cxzMusicPauseForGame) window.cxzMusicPauseForGame();
         launchToken++;
         const token = launchToken;
         currentGame = absoluteGameURL(url);
@@ -4097,6 +4079,7 @@ const CXZPlayer = (() => {
     }
 
     function close() {
+        if (window.cxzMusicResumeAfterGame) window.cxzMusicResumeAfterGame();
         launchToken++;
         clearInterval(progressTimer);
         clearTimeout(loaderFailsafe);
