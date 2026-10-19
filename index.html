@@ -288,6 +288,44 @@
             font-size: 12px;
             font-weight: 500;
         }
+        .live-datetime {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            width: 100%;
+            margin-top: 16px;
+            color: #a855f7;
+            font-family: var(--font-mono), monospace;
+            font-weight: 400;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.10em;
+            line-height: 1.15;
+            text-shadow: 0 0 18px rgba(168, 85, 247, 0.38);
+        }
+        #current-weekday {
+            display: block;
+            font-size: clamp(38px, 7.2vw, 82px);
+            line-height: 1.15;
+            letter-spacing: 0.08em;
+            overflow-wrap: anywhere;
+        }
+        .datetime-detail-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px 24px;
+            color: #d8c5ed;
+            font-size: clamp(13px, 2.1vw, 23px);
+            letter-spacing: 0.22em;
+            line-height: 1.6;
+        }
+        .live-datetime .datetime-separator { color: #7e22ce; }
+        @media (max-width: 700px) {
+            .live-datetime { gap: 6px; margin-top: 12px; }
+            #current-weekday { font-size: clamp(29px, 8vw, 52px); letter-spacing: 0.04em; }
+            .datetime-detail-row { font-size: clamp(11px, 3vw, 16px); gap: 4px 12px; letter-spacing: 0.12em; }
+        }
         .header-status {
             display: inline-flex;
             align-items: center;
@@ -1418,6 +1456,14 @@
                 <div class="header-eyebrow">YOUR POCKET ARCADE</div>
                 <h1 id="site-title">CLASSROOM-X-ZONE</h1>
                 <p class="header-tagline">Good games. Zero setup.</p>
+                <div class="live-datetime" aria-label="Current date and time" role="timer">
+                    <span id="current-weekday">Loading day…</span>
+                    <div class="datetime-detail-row">
+                        <span id="current-date">--/--/--</span>
+                        <span class="datetime-separator" aria-hidden="true">•</span>
+                        <time id="current-time">--:--:-- --</time>
+                    </div>
+                </div>
             </div>
             <div class="header-status"><span class="status-dot"></span><span>READY WHEN YOU ARE</span></div>
         </div>
@@ -4133,6 +4179,33 @@ if (
     refreshCXZIcons();
 }
 
+
+    // Live local date and time, updated every second.
+    (function initLiveDateTime() {
+        const weekdayEl = document.getElementById('current-weekday');
+        const dateEl = document.getElementById('current-date');
+        const timeEl = document.getElementById('current-time');
+        if (!weekdayEl || !dateEl || !timeEl) return;
+
+        const weekdayFormatter = new Intl.DateTimeFormat('en-US', { weekday: 'long' });
+        const dateFormatter = new Intl.DateTimeFormat('en-US', {
+            month: '2-digit', day: '2-digit', year: '2-digit'
+        });
+        const timeFormatter = new Intl.DateTimeFormat('en-US', {
+            hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true
+        });
+
+        function updateDateTime() {
+            const now = new Date();
+            weekdayEl.textContent = weekdayFormatter.format(now);
+            dateEl.textContent = dateFormatter.format(now);
+            timeEl.textContent = timeFormatter.format(now);
+            timeEl.dateTime = now.toISOString();
+        }
+
+        updateDateTime();
+        window.setInterval(updateDateTime, 1000);
+    })();
 
 </script>
 </body>
