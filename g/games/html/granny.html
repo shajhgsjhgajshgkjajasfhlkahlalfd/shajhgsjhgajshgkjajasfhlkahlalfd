@@ -4,26 +4,225 @@
     <title>Granny Original</title>
     <meta charset="utf-8">
     <meta name="robots" content="noindex, nofollow">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gru6nny/ohd@main/TemplateData/style.css">
-    <script src="https://cdn.jsdelivr.net/gh/gru6nny/ohd@main/sdk.js"></script>
-    
-    <script type="text/javascript">window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a){switch(a.name){case"SDK_GAME_PAUSE":console.log("Oyun duraklatıldı, ses kapatılıyor...");if(typeof myGameInstance!=="undefined"&&myGameInstance){myGameInstance.SendMessage("AudioManager","MuteAudio")}break;case"SDK_GAME_START":console.log("Reklam bitti, oyun devam ediyor...");if(typeof myGameInstance!=="undefined"&&myGameInstance){myGameInstance.SendMessage("AudioManager","UnmuteAudio")}break;case"SDK_READY":console.log("SDK hazır.");break}}};(function(a,b,c){var d=a.getElementsByTagName(b)[0];a.getElementById(c)||(a=a.createElement(b),a.id=c,a.src="https://cdn.jsdelivr.net/gh/testamalame/sef@main/sedk.js",d.parentNode.insertBefore(a,d))})(document,"script","gamemonetize-sdk");</script>
-    <style>body{margin:0;padding:0;overflow:hidden;background:url('https://cdn.jsdelivr.net/gh/gru6nny/ohd@main/background.png') no-repeat center center fixed;background-size:cover}#unity-container{position:absolute;width:100%;height:100%;left:0;top:0}#unity-loading-bar{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:400px;height:20px;background:rgba(0,0,0,.5);border:2px solid #fff;border-radius:10px;display:block}#unity-logo{position:absolute;top:calc(50% - 100px);left:50%;transform:translateX(-50%);width:200px;height:auto}#unity-logo img{max-width:100%;height:auto}#unity-progress-bar-empty{width:100%;height:100%;position:relative}#unity-progress-bar-full{position:absolute;top:0;left:0;width:0%;height:100%;background:#4caf50;border-radius:8px;transition:width .3s ease}#unity-warning{position:absolute;left:50%;top:5%;transform:translate(-50%);background:#fff;padding:10px;display:none;border:1px solid #ccc;border-radius:5px}</style>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+        #unity-container { position: absolute; inset: 0; }
+        #unity-canvas { position: absolute; width: 100%; height: 100%; display: block; background: #000; }
+        #loader {
+            position: absolute; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 18px;
+            color: #ddd; font: 14px/1.5 system-ui, sans-serif; text-align: center;
+            background: radial-gradient(circle at center, #1a1a1a, #000 70%);
+        }
+        #loader img { width: 200px; height: auto; }
+        #bar { width: min(400px, 80vw); height: 20px; border: 2px solid #fff; border-radius: 10px; background: rgba(0,0,0,.5); overflow: hidden; }
+        #bar-fill { width: 0%; height: 100%; background: #4caf50; transition: width .3s ease; }
+        #status { min-height: 1.5em; color: #aaa; }
+        #error {
+            display: none; max-width: min(560px, 90vw); padding: 14px 18px;
+            border: 1px solid #ff5a5a; border-radius: 8px; background: rgba(120, 0, 0, .35);
+            color: #ffd6d6; text-align: left; white-space: pre-wrap;
+        }
+        #error button { margin-top: 10px; padding: 6px 14px; border: 0; border-radius: 6px; background: #fff; color: #000; cursor: pointer; }
+    </style>
 </head>
 <body>
     <div id="unity-container">
-        <canvas id="unity-canvas" style="position: absolute; width: 100%; height: 100%"></canvas>
-        <div id="unity-loading-bar">
-            <div id="unity-logo">
-                <img src="https://cdn.jsdelivr.net/gh/gru6nny/ohd@main/logo.png" alt="Granny Logo">
-            </div>
-            <div id="unity-progress-bar-empty">
-                <div id="unity-progress-bar-full"></div>
-            </div>
+        <canvas id="unity-canvas" tabindex="-1"></canvas>
+        <div id="loader">
+            <img id="logo" alt="Granny">
+            <div id="bar"><div id="bar-fill"></div></div>
+            <div id="status">Starting…</div>
+            <div id="error"></div>
         </div>
-        <div id="unity-warning"></div>
     </div>
-    <script>async function mergeUnityWebFiles(baseUrl,filePrefix,totalParts,extension){const partUrls=[];for(let i=1;i<=totalParts;i++){partUrls.push(`${baseUrl}/${filePrefix}_part${i}.${extension}`)}const buffers=[];for(let i=0;i<totalParts;i++){const response=await fetch(partUrls[i]);if(!response.ok){throw new Error(`Failed to load part: ${partUrls[i]}`)}const buffer=await response.arrayBuffer();buffers.push(buffer);const progress=(i+1)/totalParts*100;document.querySelector("#unity-progress-bar-full").style.width=`${progress}%`}const totalLength=buffers.reduce((acc,buffer)=>acc+buffer.byteLength,0);const combinedBuffer=new Uint8Array(totalLength);let offset=0;buffers.forEach(buffer=>{combinedBuffer.set(new Uint8Array(buffer),offset);offset+=buffer.byteLength});return combinedBuffer}var container=document.querySelector("#unity-container");var canvas=document.querySelector("#unity-canvas");var loadingBar=document.querySelector("#unity-loading-bar");var progressBarFull=document.querySelector("#unity-progress-bar-full");var warningBanner=document.querySelector("#unity-warning");let myGameInstance=null;let isAdShown=false;function unityShowBanner(msg,type){function updateBannerVisibility(){warningBanner.style.display=warningBanner.children.length?"block":"none"}var div=document.createElement("div");div.innerHTML=msg;warningBanner.appendChild(div);if(type=="error")div.style="background: red; padding: 10px;";else{if(type=="warning")div.style="background: yellow; padding: 10px;";setTimeout(function(){warningBanner.removeChild(div);updateBannerVisibility()},5e3)}updateBannerVisibility()}function showAdOnClick(){if(!isAdShown&&typeof sdk!=="undefined"&&typeof sdk.showBanner!=="undefined"){sdk.showBanner();isAdShown=true}}var buildUrl="https://cdn.jsdelivr.net/gh/gru6nny/ohd@main/Build";var loaderUrl=buildUrl+"/Granny.loader.js";async function initializeGame(){try{const dataBuffer=await mergeUnityWebFiles(buildUrl,"Granny",2,"data");const wasmBuffer=await mergeUnityWebFiles(buildUrl,"Granny",2,"wasm");const dataBlobUrl=URL.createObjectURL(new Blob([dataBuffer],{type:"application/octet-stream"}));const wasmBlobUrl=URL.createObjectURL(new Blob([wasmBuffer],{type:"application/octet-stream"}));var config={dataUrl:dataBlobUrl,frameworkUrl:buildUrl+"/Granny.framework.js",codeUrl:wasmBlobUrl,streamingAssetsUrl:"https://cdn.jsdelivr.net/gh/gru6nny/ohd@main/StreamingAssets",companyName:"Anastasia Kazantseva",productName:"Granny",productVersion:"1.0",showBanner:unityShowBanner};var script=document.createElement("script");script.src=loaderUrl;script.onload=()=>{createUnityInstance(canvas,config,progress=>{progressBarFull.style.width=100*progress+"%"}).then(unityInstance=>{myGameInstance=unityInstance;loadingBar.style.display="none";canvas.addEventListener("pointerdown",showAdOnClick);canvas.addEventListener("touchstart",showAdOnClick)}).catch(message=>{alert(message)})};document.body.appendChild(script)}catch(error){console.error("Game initialization failed:",error)}}initializeGame();</script>
+
+    <script>
+    /*
+     * Granny (Unity WebGL) — resilient loader.
+     *
+     * Why the original failed: every file came from cdn.jsdelivr.net/gh/gru6nny/ohd,
+     * but that GitHub repo is larger than jsDelivr's 50 MB package limit. jsDelivr
+     * then answers "403 Package size exceeded" for any file its nearby server
+     * hasn't cached, so the download silently failed and the bar never moved.
+     *
+     * This version tries each file from several sources in order:
+     *   1. ./granny/        — your own copy next to this file (most reliable; see README)
+     *   2. raw.githubusercontent.com — straight from GitHub, no 50 MB limit
+     *   3. several jsDelivr hostnames (each has its own cache)
+     */
+    const SOURCES = [
+        new URL('./granny/', location.href).href,
+        'https://raw.githubusercontent.com/gru6nny/ohd/main/',
+        'https://cdn.jsdelivr.net/gh/gru6nny/ohd@main/',
+        'https://quantil.jsdelivr.net/gh/gru6nny/ohd@main/',
+        'https://fastly.jsdelivr.net/gh/gru6nny/ohd@main/',
+        'https://gcore.jsdelivr.net/gh/gru6nny/ohd@main/',
+        'https://testingcf.jsdelivr.net/gh/gru6nny/ohd@main/'
+    ];
+
+    const $ = id => document.getElementById(id);
+    const canvas = $('unity-canvas');
+    const setStatus = t => { $('status').textContent = t; };
+    const setProgress = p => { $('bar-fill').style.width = Math.max(0, Math.min(100, p)) + '%'; };
+    function showError(msg) {
+        const box = $('error');
+        box.style.display = 'block';
+        box.textContent = msg;
+        const btn = document.createElement('button');
+        btn.textContent = 'Try again';
+        btn.onclick = () => location.reload();
+        box.appendChild(document.createElement('br'));
+        box.appendChild(btn);
+        setStatus('');
+    }
+    function sourceName(base) {
+        try { return base.startsWith(location.origin) ? 'this site' : new URL(base).hostname; }
+        catch (_) { return base; }
+    }
+
+    // Fetch one file, trying every source until one works. Remembers the
+    // source that worked so later files try it first.
+    let preferred = 0;
+    async function fetchFirst(path, onProgress) {
+        const order = [preferred, ...SOURCES.keys()].filter((v, i, a) => a.indexOf(v) === i);
+        const errors = [];
+        for (const i of order) {
+            const url = SOURCES[i] + path.split('/').map(encodeURIComponent).join('/');
+            try {
+                const res = await fetch(url, { cache: 'force-cache', credentials: 'omit' });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const total = Number(res.headers.get('content-length')) || 0;
+                let blob;
+                if (res.body && total && onProgress) {
+                    const reader = res.body.getReader();
+                    const chunks = []; let got = 0;
+                    for (;;) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+                        chunks.push(value); got += value.byteLength;
+                        onProgress(got / total);
+                    }
+                    blob = new Blob(chunks);
+                } else {
+                    blob = await res.blob();
+                }
+                // jsDelivr's size-limit error is a tiny text body; reject it.
+                if (blob.size < 1024 && /Package size exceeded/i.test(await blob.text())) throw new Error('jsDelivr size limit');
+                preferred = i;
+                return { blob, source: SOURCES[i] };
+            } catch (e) {
+                errors.push(sourceName(SOURCES[i]) + ': ' + e.message);
+            }
+        }
+        throw new Error('Could not download "' + path + '" from any source.\n  ' + errors.join('\n  '));
+    }
+
+    // Scripts are fetched and run from blob: URLs, so a CDN that serves
+    // them as text/plain (raw.githubusercontent.com) still works.
+    async function blobScriptURL(path) {
+        const { blob } = await fetchFirst(path);
+        return URL.createObjectURL(new Blob([blob], { type: 'text/javascript' }));
+    }
+    function runScript(src) {
+        return new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = src;
+            s.onload = resolve;
+            s.onerror = () => reject(new Error('Script failed to run: ' + src));
+            document.body.appendChild(s);
+        });
+    }
+
+    // Data/wasm are split into two ~20 MB parts. Joining them with a Blob
+    // (instead of copying into one big array) saves ~70 MB of RAM — helps
+    // Chromebooks with 4 GB of memory.
+    async function fetchParts(prefix, count, ext, from, to) {
+        const blobs = [];
+        for (let n = 1; n <= count; n++) {
+            const path = `Build/${prefix}_part${n}.${ext}`;
+            const span = (to - from) / count;
+            const base = from + span * (n - 1);
+            setStatus(`Downloading ${ext === 'wasm' ? 'game code' : 'game data'} (part ${n} of ${count})…`);
+            const { blob, source } = await fetchFirst(path, f => setProgress(base + span * f));
+            console.log('[Granny] ' + path + ' from ' + sourceName(source));
+            blobs.push(blob);
+            setProgress(base + span);
+        }
+        return URL.createObjectURL(new Blob(blobs, { type: 'application/octet-stream' }));
+    }
+
+    // Unity reads StreamingAssets (sounds) at runtime by URL, so pick the
+    // first source that actually serves them.
+    async function findStreamingAssets() {
+        const probe = 'StreamingAssets/Audio/Audio/_Done/ButtonClick_MP3.mp3';
+        for (const base of SOURCES) {
+            try {
+                const res = await fetch(base + probe, { method: 'GET', cache: 'force-cache', credentials: 'omit' });
+                if (res.ok && Number(res.headers.get('content-length') || 2000) > 1024) return base + 'StreamingAssets';
+            } catch (_) {}
+        }
+        return SOURCES[1] + 'StreamingAssets';
+    }
+
+    // Pause/mute hooks used by the Yandex SDK events.
+    let myGameInstance = null;
+    window.SDK_OPTIONS = {
+        gameId: 'jp112o3o4hzgrnc7zaewjkrfk282pul8',
+        onEvent(a) {
+            if (!myGameInstance) return;
+            if (a.name === 'SDK_GAME_PAUSE') myGameInstance.SendMessage('AudioManager', 'MuteAudio');
+            if (a.name === 'SDK_GAME_START') myGameInstance.SendMessage('AudioManager', 'UnmuteAudio');
+        }
+    };
+
+    async function start() {
+        try {
+            // Logo (optional, decorative)
+            fetchFirst('logo.png').then(r => { $('logo').src = URL.createObjectURL(r.blob); }).catch(() => {});
+
+            // The game was built with the Yandex Games plugin; load its SDK but
+            // never let it block the game if it fails.
+            setStatus('Preparing…');
+            try { await runScript(await blobScriptURL('sdk.js')); } catch (e) { console.warn('[Granny] SDK skipped:', e.message); }
+
+            const loaderURL = await blobScriptURL('Build/Granny.loader.js');
+            const frameworkURL = await blobScriptURL('Build/Granny.framework.js');
+            setProgress(2);
+            const dataURL = await fetchParts('Granny', 2, 'data', 2, 52);
+            const codeURL = await fetchParts('Granny', 2, 'wasm', 52, 90);
+            const streamingAssetsUrl = await findStreamingAssets();
+
+            setStatus('Starting game…');
+            await runScript(loaderURL);
+            if (typeof createUnityInstance !== 'function') throw new Error('The Unity loader did not start.');
+
+            myGameInstance = await createUnityInstance(canvas, {
+                dataUrl: dataURL,
+                frameworkUrl: frameworkURL,
+                codeUrl: codeURL,
+                streamingAssetsUrl,
+                companyName: 'Anastasia Kazantseva',
+                productName: 'Granny',
+                productVersion: '1.0',
+                showBanner(msg, type) { if (type === 'error') showError(msg); else console.warn('[Unity]', msg); }
+            }, p => setProgress(90 + p * 10));
+
+            $('loader').style.display = 'none';
+            canvas.focus();
+        } catch (error) {
+            console.error('[Granny] Load failed:', error);
+            let hint = '';
+            if (/memory|allocate|RangeError/i.test(error && error.message)) {
+                hint = '\n\nThis device ran out of memory. Close other tabs and try again.';
+            } else if (/any source/.test(error && error.message)) {
+                hint = '\n\nYour network may be blocking these download sites. Hosting the game files on your own site (the ./granny/ folder) fixes this.';
+            }
+            showError('Granny could not load.\n\n' + (error && error.message ? error.message : error) + hint);
+        }
+    }
+    start();
+    </script>
 </body>
 </html>
