@@ -1434,13 +1434,13 @@
 
     /* Cards */
     #home { padding-top: 0; }
-    #featured-grid {
+    .square-grid {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
         gap: clamp(12px, 1.6vw, 20px);
     }
-    #featured-grid .card {
+    .square-grid .card {
         position: relative;
         flex: 0 0 auto;
         width: clamp(140px, 15.4vw, 196px);
@@ -1451,19 +1451,19 @@
         background: #0d0a16;
         box-shadow: 0 10px 24px rgba(0,0,0,0.45);
     }
-    #featured-grid .card:hover {
+    .square-grid .card:hover {
         transform: translateY(-6px);
         border-color: var(--mc-purple);
         box-shadow: 0 16px 32px rgba(0,0,0,0.5), 0 0 22px color-mix(in srgb, var(--accent-color) 45%, transparent);
     }
-    #featured-grid .card img {
+    .square-grid .card img {
         width: 100%;
         height: 100%;
         margin: 0;
         border-radius: 0;
         object-fit: cover;
     }
-    #featured-grid .card h3 {
+    .square-grid .card h3 {
         position: absolute;
         left: 0; right: 0; bottom: 0;
         padding: 18px 8px 8px;
@@ -1478,10 +1478,10 @@
         transform: translateY(6px);
         transition: opacity 0.18s ease, transform 0.18s ease;
     }
-    #featured-grid .card:hover h3,
-    #featured-grid .card:focus-visible h3 { opacity: 1; transform: none; }
-    #featured-grid .card p { display: none; }
-    #featured-grid .card:focus-visible { outline: 3px solid var(--mc-tint); outline-offset: 3px; }
+    .square-grid .card:hover h3,
+    .square-grid .card:focus-visible h3 { opacity: 1; transform: none; }
+    .square-grid .card p { display: none; }
+    .square-grid .card:focus-visible { outline: 3px solid var(--mc-tint); outline-offset: 3px; }
 
     .home-search-empty {
         margin-top: 8px;
@@ -1500,15 +1500,25 @@
         justify-content: flex-start; text-align: left;
         pointer-events: none;
     }
+    .live-datetime { position: relative; isolation: isolate; will-change: transform; }
+    .live-datetime::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        border: 2px solid color-mix(in srgb, var(--accent-color) 45%, transparent);
+        border-radius: 6px;
+        background: rgba(8, 8, 14, 0.82);
+        box-shadow: 0 8px 22px rgba(0,0,0,0.4);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+    }
+    body:not([data-tab="home"]) .live-datetime::before { opacity: 1; transition-delay: 0.2s; }
     body:not([data-tab="home"]) .live-datetime {
         align-items: flex-start;
         gap: 4px;
         padding: 9px 13px 8px;
-        border: 2px solid color-mix(in srgb, var(--accent-color) 45%, transparent);
-        border-radius: 6px;
-        background: rgba(8, 8, 14, 0.82);
-        backdrop-filter: blur(6px);
-        box-shadow: 0 8px 22px rgba(0,0,0,0.4);
     }
     body:not([data-tab="home"]) #current-weekday {
         font-size: 20px; letter-spacing: 0.1em; margin-right: 0;
@@ -1526,8 +1536,51 @@
     }
     body:not([data-tab="home"]) .search-icon { right: 14px; }
     body:not([data-tab="home"]) .search-icon svg { width: 17px; height: 17px; }
+    .search-box {
+        max-height: 90px;
+        transition: width 0.7s cubic-bezier(0.65, 0, 0.35, 1),
+                    margin-bottom 0.7s cubic-bezier(0.65, 0, 0.35, 1),
+                    max-height 0.7s cubic-bezier(0.65, 0, 0.35, 1),
+                    opacity 0.45s ease, visibility 0s linear 0s;
+    }
+    .search-box input {
+        transition: min-height 0.7s cubic-bezier(0.65, 0, 0.35, 1),
+                    padding 0.7s cubic-bezier(0.65, 0, 0.35, 1),
+                    font-size 0.7s cubic-bezier(0.65, 0, 0.35, 1),
+                    border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .search-icon { transition: right 0.7s cubic-bezier(0.65, 0, 0.35, 1); }
+    .search-icon svg { transition: width 0.7s cubic-bezier(0.65, 0, 0.35, 1), height 0.7s cubic-bezier(0.65, 0, 0.35, 1); }
     body[data-tab="suggest"] .search-box,
-    body[data-tab="settings"] .search-box { display: none; }
+    body[data-tab="settings"] .search-box {
+        max-height: 0;
+        margin-bottom: 0;
+        opacity: 0;
+        visibility: hidden;
+        overflow: hidden;
+        pointer-events: none;
+        transition: width 0.7s cubic-bezier(0.65, 0, 0.35, 1),
+                    margin-bottom 0.7s cubic-bezier(0.65, 0, 0.35, 1),
+                    max-height 0.7s cubic-bezier(0.65, 0, 0.35, 1),
+                    opacity 0.3s ease, visibility 0s linear 0.7s;
+    }
+    /* The clock is animated by morphHeader() (transform only), so its own
+       layout properties must switch instantly — including in auto-lite mode,
+       which otherwise forces a 0.14s transition on every property. */
+    .header, .header *,
+    body.auto-lite .header, body.auto-lite .header * { transition: none !important; }
+    .live-datetime::before,
+    body.auto-lite .live-datetime::before { transition: opacity 0.5s ease !important; }
+    body:not([data-tab="home"]) .live-datetime::before,
+    body.auto-lite:not([data-tab="home"]) .live-datetime::before { transition: opacity 0.5s ease 0.2s !important; }
+    body.auto-lite .search-box,
+    body.auto-lite .search-box input,
+    body.auto-lite .search-icon,
+    body.auto-lite .search-icon svg { transition-duration: 0.7s !important; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .search-box, .search-box input, .search-icon, .search-icon svg, .live-datetime::before { transition: none !important; }
+    }
     body[data-tab="suggest"] #suggest,
     body[data-tab="settings"] #settings { margin-top: 40px; }
 
@@ -1544,9 +1597,9 @@
         #current-weekday { font-size: clamp(36px, 12vw, 60px); letter-spacing: 0.08em; margin-right: -0.08em; }
         .datetime-detail-row { font-size: clamp(12px, 3.6vw, 17px); letter-spacing: 0.18em; gap: 4px 12px; }
         .search-box input { min-height: 50px; font-size: 16px; }
-        #featured-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-        #featured-grid .card { width: 100%; }
-        #featured-grid .card h3 { opacity: 1; transform: none; font-size: 11px; }
+        .square-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+        .square-grid .card { width: 100%; }
+        .square-grid .card h3 { opacity: 1; transform: none; font-size: 11px; }
     }
 </style>
 </head>
@@ -1703,7 +1756,7 @@
         <!-- TAB: HOME -->
         <div id="home" class="tab-content active">
             <h2 class="visually-hidden" id="home-grid-label">Suggested games</h2>
-            <div class="grid" id="featured-grid" aria-labelledby="home-grid-label"></div>
+            <div class="grid square-grid" id="featured-grid" aria-labelledby="home-grid-label"></div>
             <p class="home-search-empty" id="home-search-empty" hidden>No games match that search.</p>
         </div>
 
@@ -1711,14 +1764,14 @@
         <div id="games" class="tab-content">
             <h2 class="section-title">All Games</h2>
             <p class="page-description">Browse the Classroom-X-Zone arcade. Search by title, pick a card, and the game opens right here.</p>
-            <div class="grid" id="all-games-grid"></div>
+            <div class="grid square-grid" id="all-games-grid"></div>
         </div>
 
         <!-- TAB: TOOLS -->
         <div id="tools" class="tab-content">
             <h2 class="section-title">Tools &amp; Utilities</h2>
             <p class="page-description">Quick extras for your browser and your next session, all collected in one place.</p>
-            <div class="grid" id="tools-grid">
+            <div class="grid square-grid" id="tools-grid">
                 
             </div>
         </div>
@@ -2249,10 +2302,10 @@
         function placeholderImg(title) {
             const t = String(title).replace(/[<>&"']/g, '');
             const ac = (getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#ff6600');
-            const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="420" height="240" viewBox="0 0 420 240">' +
-                '<rect width="420" height="240" fill="#0e0e16"/>' +
-                '<rect x="6" y="6" width="408" height="228" fill="none" stroke="' + ac + '" stroke-opacity=".5" stroke-width="2" stroke-dasharray="8 6"/>' +
-                '<text x="210" y="130" text-anchor="middle" font-family="monospace" font-size="24" fill="' + ac + '">' + t + '</text></svg>';
+            const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">' +
+                '<rect width="300" height="300" fill="#0e0e16"/>' +
+                '<rect x="8" y="8" width="284" height="284" fill="none" stroke="' + ac + '" stroke-opacity=".5" stroke-width="2" stroke-dasharray="8 6"/>' +
+                '<text x="150" y="158" text-anchor="middle" font-family="monospace" font-size="22" fill="' + ac + '">' + t + '</text></svg>';
             return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
         }
 
@@ -2350,38 +2403,11 @@
             const grid = document.getElementById('tools-grid');
             if (!grid) return;
             TOOLS.forEach(t => {
-                const card = document.createElement('div');
-                card.className = 'tool-card item-card';
-                card.dataset.title = t.title;
-
-                if (t.img) {
-                    const img = document.createElement('img');
-                    img.src = t.img;
-                    img.alt = t.title;
-                    img.loading = 'lazy';
-                    img.decoding = 'async';
-                    img.onerror = () => img.remove();
-                    card.appendChild(img);
-                }
-
-                const info = document.createElement('div');
-                const h3 = document.createElement('h3');
-                h3.textContent = t.title;
-                const p = document.createElement('p');
-                p.textContent = t.desc;
-                info.append(h3, p);
-
-                const a = document.createElement('a');
-                a.className = 'btn-action';
                 // Tools use the same integrated player, but load from /other/.
                 const toolUrl = CXZ_GAME_BASE.replace('/g/games/html/', '/g/games/other/') + encodeURIComponent(t.name) + '.html';
-                a.dataset.gameUrl = toolUrl;
-                a.dataset.title = t.title;
-                a.href = '#';
-                a.setAttribute('role', 'button');
-                a.textContent = t.label;
-
-                card.append(info, a);
+                const card = buildGameCard({ title: t.title, file: toolUrl, img: t.img, tagline: t.desc });
+                card.setAttribute('aria-label', 'Open ' + t.title);
+                card.title = t.desc;
                 grid.appendChild(card);
             });
         });
@@ -2725,6 +2751,67 @@
             document.querySelectorAll('#all-games-grid .item-card').forEach(card => card.style.display = '');
         }
 
+        // Smoothly morphs the date/time box and search bar between the large
+        // home layout and the compact corner layout (FLIP technique).
+        const MORPH_MS = 700;
+        const MORPH_EASE = 'cubic-bezier(0.65, 0, 0.35, 1)';
+        function morphHeader(apply, content) {
+            const clock = document.querySelector('.live-datetime');
+            const search = document.querySelector('.search-box');
+            const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (!clock || reduce) { apply(); return; }
+
+            const c0 = clock.getBoundingClientRect();
+            const s0 = search ? search.getBoundingClientRect() : null;
+            const flowEnd = () => {
+                if (!search) return 0;
+                const r = search.getBoundingClientRect();
+                return r.top + r.height + (parseFloat(getComputedStyle(search).marginBottom) || 0);
+            };
+            const e0 = flowEnd();
+            clock.getAnimations().forEach(a => a.cancel());
+            if (search) search.getAnimations().forEach(a => { if (a instanceof CSSTransition) return; a.cancel(); });
+
+            apply();
+
+            const c1 = clock.getBoundingClientRect();
+            const dx = c0.left - c1.left, dy = c0.top - c1.top;
+            const scale = c1.width ? c0.width / c1.width : 1;
+            if (Math.abs(dx) > 1 || Math.abs(dy) > 1 || Math.abs(scale - 1) > 0.01) {
+                clock.animate([
+                    { transformOrigin: 'top left', transform: `translate(${dx}px, ${dy}px) scale(${scale})` },
+                    { transformOrigin: 'top left', transform: 'translate(0, 0) scale(1)' }
+                ], {
+                    duration: MORPH_MS,
+                    easing: MORPH_EASE,
+                    // Growing back to the big home clock: let the search bar
+                    // move down first so the two never touch mid-animation.
+                    delay: scale < 1 ? 110 : 0,
+                    fill: 'backwards'
+                });
+            }
+            // Content under the search bar slides with it instead of jumping.
+            // Uses the independent `translate` property so it doesn't fight
+            // the tab's own fade-in transform animation.
+            const e1 = flowEnd();
+            if (content && Math.abs(e0 - e1) > 1) {
+                content.animate([
+                    { translate: `0 ${e0 - e1}px` },
+                    { translate: '0 0' }
+                ], { duration: MORPH_MS, easing: MORPH_EASE });
+            }
+            if (search && s0 && s0.height > 0) {
+                const s1 = search.getBoundingClientRect();
+                const sdy = s0.top - s1.top;
+                if (s1.height > 0 && Math.abs(sdy) > 1) {
+                    search.animate([
+                        { transform: `translateY(${sdy}px)` },
+                        { transform: 'translateY(0)' }
+                    ], { duration: MORPH_MS, easing: MORPH_EASE });
+                }
+            }
+        }
+
         function switchTab(tabId, btn) {
             // If navigation is used while a game is open, dismiss the player
             // overlay first so the selected tab and its cards are interactive.
@@ -2744,7 +2831,7 @@
 
             const targetTab = document.getElementById(tabId);
             if (targetTab) {
-                document.body.dataset.tab = tabId;
+                morphHeader(() => { document.body.dataset.tab = tabId; }, targetTab);
                 if (searchEl) {
                     const names = { home: 'Search...', games: 'Search games...', tools: 'Search tools...', partners: 'Search partners...' };
                     searchEl.placeholder = names[tabId] || 'Search...';
