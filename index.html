@@ -1085,21 +1085,8 @@
             background: #10141d;
             overflow: hidden;
         }
-
-        #cxz-exit-fullscreen[hidden] { display: none !important; }
-        #cxz-exit-fullscreen {
-            position: absolute; z-index: 2147483647;
-            top: max(12px, env(safe-area-inset-top));
-            right: max(12px, env(safe-area-inset-right));
-            padding: 10px 16px; border-radius: 10px;
-            border: 1px solid rgba(255,255,255,.4);
-            background: rgba(15,18,28,.92); color: #fff;
-            font: inherit; font-size: 13px; cursor: pointer;
-        }
-        #cxz-exit-fullscreen:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
         #cxz-game-window:fullscreen .cxz-close { display: none; }
         #cxz-game-window:-webkit-full-screen .cxz-close { display: none; }
-
         #cxz-game-window:fullscreen,
         #cxz-game-window:-webkit-full-screen {
             width: 100vw; height: 100vh;
@@ -2086,7 +2073,6 @@
 
     <div class="cxz-stage">
         <div class="cxz-window" id="cxz-game-window">
-            <button type="button" id="cxz-exit-fullscreen" hidden onclick="CXZPlayer.fullscreen()" aria-label="Exit fullscreen">Exit fullscreen</button>
             <button class="cxz-close left" onclick="CXZPlayer.close()" title="Close">✕</button>
             <button class="cxz-close right" onclick="CXZPlayer.close()" title="Close">✕</button>
 
@@ -2180,10 +2166,8 @@
 
         <button
             class="cxz-tool"
-            id="cxz-fullscreen-toggle"
-            aria-pressed="false"
             onclick="CXZPlayer.fullscreen()"
-            title="Fullscreen with keyboard lock">
+            title="Fullscreen">
 
             <i data-lucide="maximize"></i>
 
@@ -4308,12 +4292,7 @@ const CXZPlayer = (() => {
         }
     }
     function syncFullscreenControls() {
-        const active = fullscreenElement() === $('cxz-game-window');
-        const button = $('cxz-exit-fullscreen');
-        if (button) button.hidden = !active;
-        const toggle = $('cxz-fullscreen-toggle');
-        if (toggle) toggle.setAttribute('aria-pressed', String(active));
-        if (!active) releaseKeyboardLock();
+        if (fullscreenElement() !== $('cxz-game-window')) releaseKeyboardLock();
     }
     document.addEventListener('fullscreenchange', syncFullscreenControls);
     document.addEventListener('webkitfullscreenchange', syncFullscreenControls);
@@ -4344,7 +4323,7 @@ const CXZPlayer = (() => {
                         releaseKeyboardLock();
                         return;
                     }
-                    showToast('Fullscreen ready. Use Exit fullscreen, or hold Escape to exit.');
+                    showToast('Fullscreen ready. Hold Escape to exit.');
                 } catch (error) {
                     console.warn('[CXZ] Keyboard lock unavailable:', error);
                     showToast('Keyboard lock was not granted. Escape will exit fullscreen.');
@@ -4462,8 +4441,6 @@ const CXZPlayer = (() => {
         });
     }
 
-    // Escape belongs to the game; fullscreen exit is handled by the browser
-    // emergency gesture or the visible Exit fullscreen button.
 
 
     return { open, close, reload, fullscreen, openBlank, download, toggleConsole, setMuted, setVolume };
