@@ -1,133 +1,102 @@
-<!-- Downloaded from unblockedzone. join discord.gg/v66D3fn4kD for 100+ links -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-L7856P3VNT"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-L7856P3VNT');
-</script><!DOCTYPE html>
-<html lang="en-us">
+<!doctype html>
+<html lang="en">
 <head>
-  <base href="https://cdn.jsdelivr.net/gh/web-ports/granny@main/">
-
-  <link rel="shortcut icon" href="TemplateData/favicon.ico">
-  <script src="TemplateData/UnityProgress.js"></script>
-  <script src="Build/UnityLoader.js"></script>
-
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      height: 100%;
-      width: 100%;
-      background: black;
-    }
-
-    #unityContainer {
-      width: 100vw;
-      height: 100vh;
-    }
-
-  #loading-text {
-  font-weight: bold;
-  background: linear-gradient(
-    270deg,
-    #ff0000,
-    #ff7f00,
-    #ffff00,
-    #00ff00,
-    #0000ff,
-    #4b0082,
-    #8f00ff
-  );
-  background-size: 400% 400%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: rainbow 3s ease infinite;
-}
-
-@keyframes rainbow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-  </style>
-<div id="loading-text"
-    style="color: white; font-size: 48px; font-family: cursive; text-align: center; margin-top: 20px;"> LOADING...
-  </div>
-  <script>
-    var loadingText = document.querySelector("#loading-text");
-    let totalBytes = 0;
-    let loadedBytes = 0;
-
-    async function fetchWithProgress(url) {
-      const response = await fetch(url);
-      const reader = response.body.getReader();
-      let chunks = [];
-      let received = 0;
-      while (true) {
-        const {
-          done,
-          value
-        } = await reader.read();
-        if (done) break;
-        received += value.length;
-        loadedBytes += value.length;
-        chunks.push(value);
-        let mbDone = (loadedBytes / (1024 * 1024)).toFixed(2);
-        let mbTotal = '567.86';
-        loadingText.textContent = `LOADING... ${mbDone} MB / ${mbTotal} MB`;
-      }
-      let fullBuffer = new Uint8Array(received);
-      let offset = 0;
-      for (let chunk of chunks) {
-        fullBuffer.set(chunk, offset);
-        offset += chunk.length;
-      }
-      return fullBuffer.buffer;
-    }
-
-    async function mergeFiles(fileParts, cacheKey) {
-      const buffers = await Promise.all(
-        fileParts.map(part => fetchWithProgress(part))
-      );
-      const mergedBlob = new Blob(buffers);
-      return URL.createObjectURL(mergedBlob);
-    }
-
-    function getParts(file, start, end) {
-      let parts = [];
-      for (let i = start; i <= end; i++) {
-        parts.push(file + ".part" + i);
-      }
-      return parts;
-    }
-    (async () => {
-      const [dataUrl] = await Promise.all([
-        mergeFiles(getParts("Build/GrannyPortButBetter.data.unityweb", 1, 29), "GrannyPortButBetter.data.unityweb")
-      ]);
-            const originalOpen = XMLHttpRequest.prototype.open;
-      XMLHttpRequest.prototype.open = function (method, url, ...rest) {
-          if (url.includes("GrannyPortButBetter.data.unityweb")) {
-              url = dataUrl;
-          }
-          return originalOpen.call(this, method, url, ...rest);
-      };
-          var unityInstance = UnityLoader.instantiate(
-      "unityContainer",
-      "Build/GrannyPortButBetter.json",
-      { onProgress: UnityProgress }
-    );
-    loadingText.remove();
-    })();
-  </script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Granny</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#090909;color:#eee;font-family:system-ui,sans-serif}
+#unityContainer{width:100%;height:100%}
+#loading{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#111;z-index:10;padding:24px;box-sizing:border-box;text-align:center}
+h1{margin:0 0 16px}#status{max-width:720px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}progress{width:min(440px,90vw);margin:20px}button{padding:12px 24px;font:inherit;cursor:pointer}#note{color:#aaa;max-width:600px;font-size:14px}
+</style>
 </head>
-
 <body>
-
-  <div id="unityContainer"></div>
-
+<div id="unityContainer"></div>
+<div id="loading" role="status" aria-live="polite"><h1>Granny</h1><div id="status">Preparing game…</div><progress id="progress"></progress><p id="note">The game downloads a large set of files. Keep this tab open while it loads. Internet access is required.</p><button id="retry" hidden>Retry</button></div>
+<script>
+'use strict';
+const BASE='https://cdn.jsdelivr.net/gh/web-ports/granny@main/';
+const statusText=document.getElementById('status');
+const progress=document.getElementById('progress');
+const overlay=document.getElementById('loading');
+const retry=document.getElementById('retry');
+const urls=[];
+let failed=false;
+function fail(error){
+  if(failed)return;
+  failed=true;
+  overlay.style.display='flex';
+  statusText.textContent='The game could not start.\n'+(error.message||String(error))+'\n\nCheck your connection and whether the game CDN is blocked. If a file is missing on the host, the game owner must restore it.';
+  progress.hidden=true;retry.hidden=false;
+}
+retry.onclick=()=>location.reload();
+window.addEventListener('error',e=>{if(e.error)fail(e.error)});
+window.addEventListener('unhandledrejection',e=>fail(e.reason||new Error('Unknown loading error')));
+async function download(path,kind='blob'){
+  const url=new URL(path,BASE).href;
+  let last;
+  for(let attempt=0;attempt<3;attempt++){
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),180000);
+    try{
+      const response=await fetch(url,{signal:controller.signal});
+      if(!response.ok)throw new Error('HTTP '+response.status+' for '+url);
+      const value=kind==='json'?await response.json():await response.blob();
+      if(kind==='blob'&&!value.size)throw new Error('Empty file: '+url);
+      return value;
+    }catch(e){last=e;if(attempt<2)await new Promise(r=>setTimeout(r,1000*(attempt+1)));}
+    finally{clearTimeout(timeout);}
+  }
+  throw new Error('Download failed: '+url+'\n'+last.message);
+}
+function loadScript(url){return new Promise((resolve,reject)=>{
+  const script=document.createElement('script');
+  const timer=setTimeout(()=>{script.remove();reject(new Error('Loader timed out: '+url))},90000);
+  script.src=url;script.onload=()=>{clearTimeout(timer);resolve()};
+  script.onerror=()=>{clearTimeout(timer);reject(new Error('Could not load Unity loader: '+url))};
+  document.head.appendChild(script);
+})}
+function blobURL(blob){const url=URL.createObjectURL(blob);urls.push(url);return url}
+async function start(){
+  if(!window.WebAssembly)throw new Error('This browser does not support WebAssembly.');
+  statusText.textContent='Loading game configuration…';
+  const manifestURL=new URL('Build/GrannyPortButBetter.json',BASE);
+  const config=await download(manifestURL.href,'json');
+  await loadScript(new URL('Build/UnityLoader.js',BASE).href);
+  if(!window.UnityLoader)throw new Error('UnityLoader was not provided by the downloaded script.');
+  const parts=new Array(29);let next=0,done=0,bytes=0;
+  progress.max=29;progress.value=0;
+  async function worker(){
+    while(next<parts.length){
+      const index=next++;
+      parts[index]=await download('Build/GrannyPortButBetter.data.unityweb.part'+(index+1));
+      bytes+=parts[index].size;done++;
+      progress.value=done;
+      statusText.textContent='Downloading game: '+done+'/29 files ('+(bytes/1048576).toFixed(1)+' MiB)';
+    }
+  }
+  await Promise.all(Array.from({length:3},()=>worker()));
+  const dataURL=blobURL(new Blob(parts,{type:'application/octet-stream'}));
+  parts.fill(null);
+  for(const key of Object.keys(config)){
+    if(/url$/i.test(key)&&typeof config[key]==='string'&&config[key])config[key]=new URL(config[key],manifestURL).href;
+  }
+  config.dataUrl=dataURL;
+  const configURL=blobURL(new Blob([JSON.stringify(config)],{type:'application/json'}));
+  statusText.textContent='Starting Unity…';
+  progress.max=1;progress.value=0;
+  window.unityInstance=UnityLoader.instantiate('unityContainer',configURL,{
+    onProgress:(instance,value)=>{
+      if(failed)return;
+      progress.value=value;
+      statusText.textContent='Starting game: '+Math.round(value*100)+'%';
+      if(value>=1)overlay.style.display='none';
+    }
+  });
+}
+start().catch(fail);
+window.addEventListener('pagehide',()=>urls.forEach(url=>URL.revokeObjectURL(url)));
+</script>
 </body>
 </html>
