@@ -1058,10 +1058,7 @@
         }
         #cxz-player.open { display: flex; }
 
-        html:fullscreen, html:-webkit-full-screen {
-            width: 100%; height: 100%; background: var(--bg);
-        }
-        html:fullscreen body, html:-webkit-full-screen body { min-height: 100%; }
+
 
         #cxz-player .cxz-particles {
             position: absolute; inset: 0;
@@ -1085,17 +1082,29 @@
             background: #10141d;
             overflow: hidden;
         }
-        #cxz-game-window:fullscreen,
-        #cxz-game-window:-webkit-full-screen {
-            width: 100vw; height: 100vh;
-            max-width: none; max-height: none;
-            border: 0; border-radius: 0; box-shadow: none; background: #000;
+
+        /* Custom viewport fullscreen: never invokes the browser Fullscreen API. */
+        #cxz-player.cxz-expanded .cxz-stage {
+            width: 100%; max-width: none; height: 100%; min-height: 0;
         }
-        #cxz-game-window:fullscreen .cxz-frame-wrap,
-        #cxz-game-window:fullscreen .cxz-game-frame,
-        #cxz-game-window:-webkit-full-screen .cxz-frame-wrap,
-        #cxz-game-window:-webkit-full-screen .cxz-game-frame {
-            width: 100%; height: 100%;
+        #cxz-player.cxz-expanded .cxz-window {
+            border: 0; border-radius: 0; box-shadow: none;
+        }
+        #cxz-player.cxz-expanded .cxz-toolbar { display: none; }
+        #cxz-player.cxz-expanded .cxz-close { display: none; }
+        #cxz-player .cxz-exit-expanded { display: none; }
+        #cxz-player.cxz-expanded .cxz-exit-expanded {
+            display: block; position: absolute;
+            top: max(12px, env(safe-area-inset-top));
+            right: max(12px, env(safe-area-inset-right));
+            z-index: 100; padding: 10px 15px;
+            color: #fff; background: rgba(15,18,28,.92);
+            border: 1px solid rgba(255,255,255,.3); border-radius: 10px;
+            font: inherit; font-size: 13px; cursor: pointer;
+            box-shadow: 0 3px 18px rgba(0,0,0,.35);
+        }
+        #cxz-player .cxz-exit-expanded:focus-visible {
+            outline: 2px solid #fff; outline-offset: 3px;
         }
         #cxz-player .cxz-close {
             position: absolute; top: 10px;
@@ -2071,6 +2080,7 @@
 
     <div class="cxz-stage">
         <div class="cxz-window" id="cxz-game-window">
+            <button type="button" class="cxz-exit-expanded" onclick="CXZPlayer.fullscreen()" aria-label="Exit custom fullscreen">Exit fullscreen</button>
             <button class="cxz-close left" onclick="CXZPlayer.close()" title="Close">✕</button>
             <button class="cxz-close right" onclick="CXZPlayer.close()" title="Close">✕</button>
 
@@ -2164,8 +2174,11 @@
 
         <button
             class="cxz-tool"
+            id="cxz-fullscreen-toggle"
             onclick="CXZPlayer.fullscreen()"
-            title="Fullscreen">
+            aria-pressed="false"
+            aria-label="Enter custom fullscreen"
+            title="Custom fullscreen">
 
             <i data-lucide="maximize"></i>
 
@@ -4220,6 +4233,7 @@ const CXZPlayer = (() => {
     }
 
     function close() {
+        setExpanded(false);
         if (window.cxzMusicResumeAfterGame) window.cxzMusicResumeAfterGame();
         launchToken++;
         clearInterval(progressTimer);
@@ -4273,57 +4287,27 @@ const CXZPlayer = (() => {
         showToast(currentTitle + ' reloading');
     }
 
+    function setExpanded(expanded) {
+        const player = $('cxz-player');
+        if (!player) return;
+        player.classList.toggle('cxz-expanded', expanded);
+        const toggle = $('cxz-fullscreen-toggle');
+        if (toggle) {
+            toggle.setAttribute('aria-pressed', String(expanded));
+            toggle.setAttribute('aria-label', expanded ? 'Exit custom fullscreen' : 'Enter custom fullscreen');
+            toggle.title = expanded ? 'Exit custom fullscreen' : 'Custom fullscreen';
+        }
+        const focusTarget = expanded ? player.querySelector('.cxz-exit-expanded') : toggle;
+        if (focusTarget) focusTarget.focus({ preventScroll: true });
+        window.dispatchEvent(new Event('resize'));
+    }
+
     function fullscreen() {
-        // Fullscreen the actual game viewport. Fullscreening the document
-        // left the game at its normal 78vw/82vh size and looked broken.
-        const gameWindow = $('cxz-game-window');
-        const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
-        if (isFullscreen) {
-            const exit = document.exitFullscreen || document.webkitExitFullscreen;
-            if (exit) {
-                const result = exit.call(document);
-                if (result && typeof result.catch === 'function') result.catch(() => showToast('Could not exit fullscreen'));
-            }
-            return;
-        }
-        if (!gameWindow) {
-            showToast('Game window was not found');
-            return;
-        }
-        const request = gameWindow.requestFullscreen || gameWindow.webkitRequestFullscreen;
-        if (!request) {
-            showToast('Fullscreen is not supported by this browser');
-            return;
-        }
-        try {
-            const result = request.call(gameWindow);
-            if (result && typeof result.catch === 'function') {
-                result.catch(error => {
-                    console.warn('[CXZ] Fullscreen request failed:', error);
-                    showToast('Fullscreen was blocked by the browser');
-                });
-            }
-        } catch (error) {
-            console.warn('[CXZ] Fullscreen request failed:', error);
-            showToast('Fullscreen was blocked by the browser');
-        }
+        const player = $('cxz-player');
+        if (!player || !player.classList.contains('open')) return;
+        setExpanded(!player.classList.contains('cxz-expanded'));
     }
-document.addEventListener('keydown', function(event) {
-    if (
-        event.key.toLowerCase() === 'f' &&
-        (document.fullscreenElement || document.webkitFullscreenElement)
-    ) {
-        event.preventDefault();
 
-        const exit = document.exitFullscreen ||
-                     document.webkitExitFullscreen;
-
-        if (exit) {
-            exit.call(document);
-        }
-    }
-});
-    
     function openBlank() {
         if (!currentGame) {
             showToast('No game is open');
@@ -4425,11 +4409,18 @@ document.addEventListener('keydown', function(event) {
     }
 
     document.addEventListener('keydown', event => {
-        if (
-            event.key === 'Escape' &&
-            $('cxz-player').classList.contains('open') &&
-            !document.fullscreenElement
-        ) close();
+        const player = $('cxz-player');
+        if (!player || !player.classList.contains('open') || event.defaultPrevented) return;
+        const target = event.target;
+        const editing = target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            if (player.classList.contains('cxz-expanded')) setExpanded(false);
+            else close();
+        } else if (!editing && !event.repeat && !event.ctrlKey && !event.metaKey && !event.altKey && event.key.toLowerCase() === 'f') {
+            event.preventDefault();
+            fullscreen();
+        }
     });
 
     return { open, close, reload, fullscreen, openBlank, download, toggleConsole, setMuted, setVolume };
