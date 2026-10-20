@@ -1,142 +1,131 @@
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-L7856P3VNT"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-L7856P3VNT');
-</script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en-us">
 <head>
-  <base href="https://cdn.jsdelivr.net/gh/web-ports/granny@main/">
-
-  <link rel="shortcut icon" href="TemplateData/favicon.ico">
-  <script src="TemplateData/UnityProgress.js"></script>
-  <script src="Build/UnityLoader.js"></script>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Granny</title>
+  <link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/web-ports/granny@main/TemplateData/favicon.ico">
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      height: 100%;
-      width: 100%;
-      background: black;
-    }
-
-    #unityContainer {
-      width: 100vw;
-      height: 100vh;
-    }
-
-  #loading-text {
-  font-weight: bold;
-  background: linear-gradient(
-    270deg,
-    #ff0000,
-    #ff7f00,
-    #ffff00,
-    #00ff00,
-    #0000ff,
-    #4b0082,
-    #8f00ff
-  );
-  background-size: 400% 400%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: rainbow 3s ease infinite;
-}
-
-@keyframes rainbow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
+    html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
+    #unityContainer { width:100vw; height:100vh; }
+    #loading-text { position:fixed; z-index:10; top:18px; left:12px; right:12px; margin:0; text-align:center; font:700 clamp(20px,5vw,48px) cursive; color:#a000ff; overflow-wrap:anywhere; }
+    #loading-text.loading { background:linear-gradient(270deg,#ff0000,#ff7f00,#ffff00,#00ff00,#0000ff,#4b0082,#8f00ff); background-size:400% 400%; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; animation:rainbow 3s ease infinite; }
+    #loading-text.error { color:#ff7777; -webkit-text-fill-color:#ff7777; background:none; font:600 16px/1.5 system-ui,sans-serif; }
+    @keyframes rainbow { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    @media (prefers-reduced-motion:reduce) { #loading-text.loading { animation:none; } }
   </style>
 </head>
 <body>
-<div id="loading-text"
-    style="color: white; font-size: 48px; font-family: cursive; text-align: center; margin-top: 20px;"> LOADING...
-  </div>
+  <div id="loading-text" class="loading" role="status" aria-live="polite">LOADING... preparing game</div>
+  <div id="unityContainer"></div>
   <script>
-    const loadingText = document.getElementById("loading-text");
-    const PART_COUNT = 29;
-    const DATA_FILE = "Build/GrannyPortButBetter.data.unityweb";
-    let loadedBytes = 0;
+    (() => {
+      'use strict';
+      const CDN = 'https://cdn.jsdelivr.net/gh/web-ports/granny@main/';
+      const RAW = 'https://raw.githubusercontent.com/web-ports/granny/main/';
+      const DATA_FILE = 'Build/GrannyPortButBetter.data.unityweb';
+      const PART_COUNT = 29;
+      const loadingText = document.getElementById('loading-text');
+      let loadedBytes = 0;
 
-    function showLoading(message) {
-      if (loadingText) loadingText.textContent = message;
-    }
-
-    async function fetchPart(url, index) {
-      const response = await fetch(url, { cache: "force-cache" });
-      if (!response.ok) {
-        throw new Error(`Could not load data part ${index} (HTTP ${response.status}).`);
+      function status(message) {
+        if (loadingText) loadingText.textContent = message;
       }
-      // Keep each part as a Blob. Do not copy every part into one giant
-      // Uint8Array; that duplicate allocation was causing memory exceptions.
-      const blob = await response.blob();
-      loadedBytes += blob.size;
-      showLoading(`LOADING... ${(loadedBytes / 1048576).toFixed(1)} MB loaded`);
-      return blob;
-    }
+      function showError(message) {
+        console.error('[Granny loader]', message);
+        if (!loadingText) return;
+        loadingText.className = 'error';
+        loadingText.textContent = 'COULD NOT LOAD GAME: ' + message + ' Check your connection and refresh.';
+      }
+      const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-    async function loadGame() {
-      try {
-        const parts = [];
-        // Fetch one part at a time to avoid 29 simultaneous downloads and
-        // their temporary buffers overwhelming lower-memory devices.
-        for (let i = 1; i <= PART_COUNT; i++) {
-          showLoading(`LOADING... downloading data ${i}/${PART_COUNT}`);
-          parts.push(await fetchPart(`${DATA_FILE}.part${i}`, i));
-        }
-
-        showLoading("LOADING... preparing game");
-        // Blob composition avoids the extra full-size Uint8Array copy.
-        const dataBlob = new Blob(parts, { type: "application/octet-stream" });
-        parts.length = 0;
-        const dataUrl = URL.createObjectURL(dataBlob);
-
-        const originalOpen = XMLHttpRequest.prototype.open;
-        XMLHttpRequest.prototype.open = function (method, url, ...rest) {
-          if (String(url).includes("GrannyPortButBetter.data.unityweb")) {
-            url = dataUrl;
-          }
-          return originalOpen.call(this, method, url, ...rest);
-        };
-
-        showLoading("LOADING... starting Unity");
-        window.unityInstance = UnityLoader.instantiate(
-          "unityContainer",
-          "Build/GrannyPortButBetter.json",
-          {
-            onProgress: function (instance, progress) {
-              if (typeof window.UnityProgress === "function") {
-                window.UnityProgress(instance, progress);
+      async function fetchPart(partNumber) {
+        const path = DATA_FILE + '.part' + partNumber;
+        const urls = [CDN + path, RAW + path];
+        let lastError = 'Network request failed';
+        for (const url of urls) {
+          for (let attempt = 1; attempt <= 2; attempt++) {
+            try {
+              const controller = new AbortController();
+              const timeout = setTimeout(() => controller.abort(), 90000);
+              let response;
+              try {
+                response = await fetch(url, { signal: controller.signal, cache: 'no-cache' });
+              } finally {
+                clearTimeout(timeout);
               }
-              if (progress >= 1) {
-                showLoading("LOADING... finishing up");
-                // Let Unity finish its final frame before hiding the message.
-                setTimeout(() => loadingText && loadingText.remove(), 500);
+              if (!response.ok) {
+                lastError = 'HTTP ' + response.status + ' for part ' + partNumber;
+                // A 404 won't be fixed by retrying this same mirror.
+                if (response.status === 404) break;
+                continue;
               }
+              const blob = await response.blob();
+              if (!blob.size) {
+                lastError = 'Empty response for part ' + partNumber;
+                break;
+              }
+              loadedBytes += blob.size;
+              status('LOADING... ' + (loadedBytes / 1048576).toFixed(1) + ' MB downloaded (' + partNumber + '/' + PART_COUNT + ')');
+              return blob;
+            } catch (err) {
+              lastError = err && err.name === 'AbortError' ? 'Timed out downloading part ' + partNumber : (err && err.message ? err.message : 'Network request failed');
+              if (attempt < 2) await wait(800 * attempt);
             }
           }
-        );
-      } catch (error) {
-        console.error("Game failed to load:", error);
-        showLoading("COULDN'T LOAD GAME — " + (error && error.message ? error.message : "unknown error") + " Refresh to try again.");
-        if (loadingText) {
-          loadingText.style.background = "none";
-          loadingText.style.webkitTextFillColor = "#ff6666";
-          loadingText.style.color = "#ff6666";
-          loadingText.style.fontSize = "20px";
-          loadingText.style.padding = "24px";
+        }
+        throw new Error('data part ' + partNumber + ' failed on both download sources (' + lastError + ').');
+      }
+
+      async function loadScript(url) {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = url;
+          script.onload = resolve;
+          script.onerror = () => reject(new Error('Could not load Unity script: ' + url));
+          document.head.appendChild(script);
+        });
+      }
+
+      async function loadGame() {
+        let dataUrl = null;
+        try {
+          // Explicitly load dependencies so a failed script request gets a readable error.
+          status('LOADING... loading Unity engine');
+          await loadScript(CDN + 'TemplateData/UnityProgress.js');
+          await loadScript(CDN + 'Build/UnityLoader.js');
+
+          const parts = [];
+          for (let i = 1; i <= PART_COUNT; i++) {
+            status('LOADING... downloading data part ' + i + '/' + PART_COUNT);
+            parts.push(await fetchPart(i));
+          }
+          status('LOADING... assembling game data');
+          const dataBlob = new Blob(parts, { type: 'application/octet-stream' });
+          parts.length = 0;
+          dataUrl = URL.createObjectURL(dataBlob);
+
+          const originalOpen = XMLHttpRequest.prototype.open;
+          XMLHttpRequest.prototype.open = function(method, url, ...rest) {
+            const requested = String(url);
+            if (requested.includes('GrannyPortButBetter.data.unityweb')) url = dataUrl;
+            else if (requested.startsWith('Build/') || requested.startsWith('TemplateData/')) url = CDN + requested;
+            return originalOpen.call(this, method, url, ...rest);
+          };
+
+          status('LOADING... starting Granny');
+          window.unityInstance = UnityLoader.instantiate('unityContainer', CDN + 'Build/GrannyPortButBetter.json', {
+            onProgress: function(instance, progress) {
+              if (typeof window.UnityProgress === 'function') window.UnityProgress(instance, progress);
+              if (progress >= 1 && loadingText) setTimeout(() => loadingText && loadingText.remove(), 700);
+            }
+          });
+        } catch (err) {
+          showError(err && err.message ? err.message : 'Unknown network or memory error');
         }
       }
-    }
-
-    window.addEventListener("load", loadGame, { once: true });
+      window.addEventListener('load', loadGame, { once: true });
+    })();
   </script>
-  <div id="unityContainer"></div>
 </body>
 </html>
