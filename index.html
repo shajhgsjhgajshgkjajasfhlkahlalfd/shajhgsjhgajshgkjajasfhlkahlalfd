@@ -1492,6 +1492,52 @@
         letter-spacing: 0.08em;
     }
 
+    /* Non-home tabs: compact clock in the top-left corner */
+    body:not([data-tab="home"]) .container { position: static; }
+    body:not([data-tab="home"]) .header {
+        position: absolute; top: 14px; left: 14px; z-index: 50;
+        width: auto; margin: 0;
+        justify-content: flex-start; text-align: left;
+        pointer-events: none;
+    }
+    body:not([data-tab="home"]) .live-datetime {
+        align-items: flex-start;
+        gap: 4px;
+        padding: 9px 13px 8px;
+        border: 2px solid color-mix(in srgb, var(--accent-color) 45%, transparent);
+        border-radius: 6px;
+        background: rgba(8, 8, 14, 0.82);
+        backdrop-filter: blur(6px);
+        box-shadow: 0 8px 22px rgba(0,0,0,0.4);
+    }
+    body:not([data-tab="home"]) #current-weekday {
+        font-size: 20px; letter-spacing: 0.1em; margin-right: 0;
+        text-shadow: 0 0 10px var(--mc-purple-glow);
+    }
+    body:not([data-tab="home"]) .datetime-detail-row {
+        justify-content: flex-start; gap: 2px 8px;
+        font-size: 11px; letter-spacing: 0.14em;
+    }
+
+    /* Searchable tabs (games/tools/partners): smaller search bar */
+    body:not([data-tab="home"]) .search-box { width: min(100%, 380px); margin-bottom: 26px; }
+    body:not([data-tab="home"]) .search-box input {
+        min-height: 42px; padding: 0 42px 0 16px; font-size: 15px;
+    }
+    body:not([data-tab="home"]) .search-icon { right: 14px; }
+    body:not([data-tab="home"]) .search-icon svg { width: 17px; height: 17px; }
+    body[data-tab="suggest"] .search-box,
+    body[data-tab="settings"] .search-box { display: none; }
+    body[data-tab="suggest"] #suggest,
+    body[data-tab="settings"] #settings { margin-top: 40px; }
+
+    /* Narrower screens: compact clock stays top-left but in normal flow */
+    @media (max-width: 1060px) {
+        body:not([data-tab="home"]) .header { position: static; align-self: flex-start; margin: 0 0 14px; }
+        body[data-tab="suggest"] #suggest,
+        body[data-tab="settings"] #settings { margin-top: 0; }
+    }
+
     @media (max-width: 700px) {
         .container { display: flex; padding-top: 24px; }
         .header { margin-bottom: 16px; }
@@ -1503,78 +1549,8 @@
         #featured-grid .card h3 { opacity: 1; transform: none; font-size: 11px; }
     }
 </style>
-
-<style id="cxz-compact-widgets">
-    /* ── HOME: smaller clock + search ── */
-    .header { margin-bottom: clamp(12px, 1.8vh, 18px); }
-    .live-datetime { gap: clamp(4px, 0.8vh, 8px); }
-    #current-weekday { font-size: clamp(26px, 4.2vw, 50px); }
-    .datetime-detail-row { font-size: clamp(10px, 1.3vw, 15px); letter-spacing: 0.22em; gap: 4px 12px; }
-    .search-box { width: min(100%, 420px); margin-bottom: clamp(20px, 3.4vh, 30px); }
-    .search-box input { min-height: 42px; padding: 0 44px 0 16px; font-size: 14px; }
-    .search-icon { right: 14px; }
-    .search-icon svg { width: 16px; height: 16px; }
-
-    /* ── ALL OTHER TABS: tiny widgets pinned top-left ── */
-    body:has(#home:not(.active)) .header {
-        position: fixed;
-        top: 12px; left: 12px;
-        z-index: 60;
-        width: auto;
-        margin: 0;
-        padding: 8px 12px;
-        text-align: left;
-        justify-content: flex-start;
-        background: rgba(10, 8, 16, 0.82);
-        border: 1px solid var(--mc-purple-deep);
-        border-radius: 6px;
-        backdrop-filter: blur(6px);
-    }
-    body:has(#home:not(.active)) .live-datetime { align-items: flex-start; gap: 3px; }
-    body:has(#home:not(.active)) #current-weekday {
-        font-size: 13px;
-        letter-spacing: 0.1em;
-        margin-right: 0;
-        text-shadow: 0 0 8px var(--mc-purple-glow);
-    }
-    body:has(#home:not(.active)) .datetime-detail-row {
-        font-size: 9px;
-        letter-spacing: 0.12em;
-        gap: 2px 8px;
-        justify-content: flex-start;
-    }
-    body:has(#home:not(.active)) .search-box {
-        position: fixed;
-        top: 84px; left: 12px;
-        z-index: 60;
-        width: 190px;
-        margin: 0;
-    }
-    body:has(#home:not(.active)) .search-box input {
-        min-height: 30px;
-        padding: 0 30px 0 10px;
-        font-size: 11px;
-        border-width: 1px;
-    }
-    body:has(#home:not(.active)) .search-icon { right: 9px; }
-    body:has(#home:not(.active)) .search-icon svg { width: 12px; height: 12px; }
-    /* keep page content clear of the corner widgets */
-    body:has(#home:not(.active)) .tab-content:not(#home) { padding-top: 130px; }
-
-    @media (max-width: 700px) {
-        #current-weekday { font-size: clamp(24px, 8vw, 38px); }
-        .datetime-detail-row { font-size: clamp(10px, 2.8vw, 13px); }
-        .search-box input { min-height: 40px; font-size: 14px; }
-        body:has(#home:not(.active)) #current-weekday { font-size: 12px; }
-        body:has(#home:not(.active)) .datetime-detail-row { font-size: 8px; letter-spacing: 0.08em; }
-        body:has(#home:not(.active)) .search-box input { min-height: 28px; font-size: 11px; }
-        body:has(#home:not(.active)) .header { margin: 0; }
-        body:has(#home:not(.active)) .search-box { margin: 0; }
-        body:has(#home:not(.active)) .tab-content:not(#home) { padding-top: 120px; }
-    }
-</style>
 </head>
-<body>
+<body data-tab="home">
     <!-- Startup block screen: shown in an iframe, then dismissed automatically -->
     <style>
         #block-overlay { position: fixed; inset: 0; z-index: 2000000; background: #000; opacity: 1; transition: opacity 0.4s ease; }
@@ -2272,7 +2248,7 @@
         // Generated card art for games without an image (or whose image fails to load)
         function placeholderImg(title) {
             const t = String(title).replace(/[<>&"']/g, '');
-            const ac = (getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#8a2be2');
+            const ac = (getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#ff6600');
             const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="420" height="240" viewBox="0 0 420 240">' +
                 '<rect width="420" height="240" fill="#0e0e16"/>' +
                 '<rect x="6" y="6" width="408" height="228" fill="none" stroke="' + ac + '" stroke-opacity=".5" stroke-width="2" stroke-dasharray="8 6"/>' +
@@ -2538,7 +2514,7 @@
 
         // ===== FIRST-RUN SETUP MODAL =====
         let setupShown = false;
-        let setupAccent = '#8a2be2';
+        let setupAccent = '#ff6600';
 
         function buildSetupUI() {
             const sw = byId('setup-swatches');
@@ -2581,7 +2557,7 @@
             const modal = byId('setup-modal');
             if (!modal) return;
             buildSetupUI();
-            selectSetupAccent(localStorage.getItem(PRE + 'accent') || '#8a2be2');
+            selectSetupAccent(localStorage.getItem(PRE + 'accent') || '#ff6600');
             byId('setup-cloak-name').value = localStorage.getItem(PRE + 'cloak_title') || '';
             byId('setup-cloak-icon').value = localStorage.getItem(PRE + 'cloak_icon') || '';
             byId('setup-preset').value = '';
@@ -2768,6 +2744,11 @@
 
             const targetTab = document.getElementById(tabId);
             if (targetTab) {
+                document.body.dataset.tab = tabId;
+                if (searchEl) {
+                    const names = { home: 'Search...', games: 'Search games...', tools: 'Search tools...', partners: 'Search partners...' };
+                    searchEl.placeholder = names[tabId] || 'Search...';
+                }
                 targetTab.classList.add('active');
                 animateTab(targetTab);
             }
@@ -3509,8 +3490,8 @@ setTimeout(function() {
         // 14. LOAD ALL SAVED SETTINGS
         function loadAllSettings() {
             // Accent
-            let accent = localStorage.getItem(PRE + 'accent') || '#8a2be2';
-            if (!/^#[\da-f]{6}$/i.test(accent)) accent = '#8a2be2';
+            let accent = localStorage.getItem(PRE + 'accent') || '#ff6600';
+            if (!/^#[\da-f]{6}$/i.test(accent)) accent = '#ff6600';
             setThemeAccent(accent, true);
 
             // Cloak
@@ -3547,12 +3528,7 @@ setTimeout(function() {
             document.getElementById('panic-url-input').value = pu;
 
             // Appearance: Background & Sidebar
-            // One-time switch to the purple matrix look for the new home page.
-            if (!localStorage.getItem(PRE + 'home_v2')) {
-                localStorage.setItem(PRE + 'bg_type', 'matrix');
-                localStorage.setItem(PRE + 'home_v2', '1');
-            }
-            let bg = localStorage.getItem(PRE + 'bg_type') || 'matrix';
+            let bg = localStorage.getItem(PRE + 'bg_type') || 'starfield';
             if (!['starfield', 'constellations', 'rain', 'snow', 'aurora', 'matrix', 'embers', 'none'].includes(bg)) bg = 'starfield';
             document.getElementById('bg-select').value = bg;
             changeBackground(bg, true);
