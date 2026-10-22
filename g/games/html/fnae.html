@@ -164,20 +164,38 @@
             }
 
             const loader = document.createElement("script");
+            loader.crossOrigin = "anonymous";
             loader.src = loaderPaths[index];
             loader.onload = async () => {
               try {
                 if (typeof createUnityInstance !== "function") {
                   throw new Error("The Unity loader downloaded, but createUnityInstance was not defined.");
                 }
-                await createUnityInstance(canvas, config, progress => {
-                  progressBar.style.width = `${Math.round(progress * 100)}%`;
-                  loadingText.textContent = `LOADING... ${Math.round(progress * 100)}%`;
+
+                loadingText.textContent = "STARTING GAME... 90%";
+                let lastProgress = 0;
+                const instance = await createUnityInstance(canvas, config, progress => {
+                  lastProgress = progress;
+                  const percent = Math.round(progress * 100);
+                  progressBar.style.width = `${percent}%`;
+                  loadingText.textContent = `STARTING GAME... ${percent}%`;
                 });
+
+                // Some Unity builds reach the final progress stage but take a while
+                // to finish post-load initialization. Only hide the UI after the
+                // instance promise actually resolves.
+                if (!instance) {
+                  throw new Error("Unity finished loading assets but did not return a game instance.");
+                }
                 loadingBar.style.display = "none";
                 loadingText.remove();
               } catch (error) {
-                showError(error && error.message ? error.message : String(error));
+                showError(
+                  "Unity initialization failed after the download stage. " +
+                  "This can be caused by a WebAssembly compile error, insufficient memory, " +
+                  "or a failed Unity runtime/asset initialization.\n\n" +
+                  (error && error.message ? error.message : String(error))
+                );
               }
             };
             loader.onerror = () => {
@@ -188,6 +206,20 @@
           }
 
           loadUnityLoader();
+
+          // If Unity's promise never resolves, show a diagnostic instead of an
+          // indefinite 90% screen. This does not cancel loading or reload the game.
+          window.setTimeout(() => {
+            if (document.getElementById("loading-text") && !document.getElementById("load-error")) {
+              loadingText.textContent = "STILL STARTING... Unity is taking longer than expected.";
+              loadingText.style.fontSize = "24px";
+              const note = document.createElement("div");
+              note.id = "unity-timeout-note";
+              note.style.cssText = "color:#ddd;max-width:850px;margin:12px auto;text-align:center;font:14px sans-serif;";
+              note.textContent = "If this never changes, open the browser console (F12) and check for WebAssembly, memory, or asset errors. The game may be exceeding the browser's available memory.";
+              loadingText.insertAdjacentElement("afterend", note);
+            }
+          }, 45000);
         } catch (error) {
           showError(error && error.message ? error.message : String(error));
         }
