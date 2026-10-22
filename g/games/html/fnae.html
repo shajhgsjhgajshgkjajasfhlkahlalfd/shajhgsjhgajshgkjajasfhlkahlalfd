@@ -50,7 +50,7 @@
         panel.textContent = "DIAGNOSTICS\\n" + window.__fnaeDiagnostics.slice(-8).join("\\n");
       }
 
-      const ROOT = "https://cdn.jsdelivr.net/gh/web-ports/fnae@afd4e5071add297d6169665a4f999d62f312532e/";
+      const ROOT = new URL("./fnae-assets/", window.location.href).href;
       const PARTS = [
         { key: "data", path: "Build/fnae.data", count: 3 },
         { key: "wasm", path: "Build/fnae.wasm", count: 2 },
@@ -67,7 +67,7 @@
           details.style.cssText = "color:#fff;white-space:pre-wrap;overflow-wrap:anywhere;max-width:900px;margin:18px auto;padding:16px;font:14px monospace;text-align:left;background:#211;";
           loadingText.insertAdjacentElement("afterend", details);
         }
-        details.textContent = message + "\n\nThe page tried the CDN and GitHub raw host. If both fail with \"Failed to fetch\", the browser/network may be blocking the hosts or the files may not be publicly available. If the error shows HTTP 404, that specific file is missing.";
+        details.textContent = message + "\n\nThis build expects the game assets in a same-origin folder named fnae-assets beside this HTML file. Upload the required Build and StreamingAssets files there in your GitHub Pages repository. A 404 means a required asset is missing or its path is incorrect.";
         console.error(message);
       }
 
@@ -149,37 +149,10 @@
             document.head.appendChild(meta);
           }
 
-          // Try downloading the framework and serving it as a same-page Blob script.
-          // If the host's script response is blocked/malformed, this may give a clearer error.
-          try {
-            const frameworkResponse = await fetch(ROOT + "Build/fnae.framework.js", { cache: "no-store" });
-            if (!frameworkResponse.ok) {
-              throw new Error("Framework request returned HTTP " + frameworkResponse.status);
-            }
-            const frameworkText = await frameworkResponse.text();
-            if (!frameworkText || frameworkText.length < 1000) {
-              throw new Error("Framework response was unexpectedly short (" + frameworkText.length + " characters).");
-            }
-            if (frameworkText.trimStart().startsWith("<!DOCTYPE html") || frameworkText.trimStart().startsWith("<html")) {
-              throw new Error("Framework URL returned an HTML page instead of JavaScript.");
-            }
-            window.__fnaeFrameworkBlobUrl = URL.createObjectURL(
-              new Blob([frameworkText], { type: "text/javascript" })
-            );
-            addDiagnostic("Framework check", "Downloaded framework source (" + Math.round(frameworkText.length / 1024) + " KB); trying it as a JavaScript Blob.");
-          } catch (frameworkFetchError) {
-            addDiagnostic(
-              "Framework fetch failed",
-              (frameworkFetchError && frameworkFetchError.message ? frameworkFetchError.message : String(frameworkFetchError)) +
-              ". The browser may be blocking cross-origin fetch even though opening the URL in a tab works."
-            );
-            // Keep the normal URL so Unity can still attempt its usual loading path.
-          }
-
           const config = {
             arguments: [],
             dataUrl,
-            frameworkUrl: window.__fnaeFrameworkBlobUrl || ROOT + "Build/fnae.framework.js",
+            frameworkUrl: ROOT + "Build/fnae.framework.js",
             codeUrl: wasmUrl,
             streamingAssetsUrl: ROOT + "StreamingAssets",
             companyName: "DefaultCompany",
@@ -192,18 +165,14 @@
               if (typeof addDiagnostic === "function") {
                 addDiagnostic("Unity message", String(message));
                 if (String(message).includes("framework.js")) {
-                  addDiagnostic("Framework check", "Open the framework URL in a new tab. It should display/download JavaScript, not a 404 page or an HTML error page. If it does show JavaScript, this can still be a Chromebook network/content filter or script execution restriction.");
+                  addDiagnostic("Framework check", "This version loads the framework from the same-origin fnae-assets/Build/ folder in your GitHub Pages site.");
                 }
               }
             }
           };
 
           loadingBar.style.display = "block";
-          const loaderPaths = [
-            ROOT + "Build/fnae.loader.js",
-            "https://gcore.jsdelivr.net/gh/web-ports/fnae@afd4e5071add297d6169665a4f999d62f312532e/Build/fnae.loader.js",
-            "https://fastly.jsdelivr.net/gh/web-ports/fnae@afd4e5071add297d6169665a4f999d62f312532e/Build/fnae.loader.js"
-          ];
+          const loaderPaths = [ROOT + "Build/fnae.loader.js"];
 
           function loadUnityLoader(index = 0) {
             if (index >= loaderPaths.length) {
