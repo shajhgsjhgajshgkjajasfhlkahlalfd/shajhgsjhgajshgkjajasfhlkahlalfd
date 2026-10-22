@@ -51,16 +51,37 @@
           details.style.cssText = "color:#fff;white-space:pre-wrap;overflow-wrap:anywhere;max-width:900px;margin:18px auto;padding:16px;font:14px monospace;text-align:left;background:#211;";
           loadingText.insertAdjacentElement("afterend", details);
         }
-        details.textContent = message + "\n\nCheck that the game's .part files still exist at the CDN URL, then reload the page.";
+        details.textContent = message + "\n\nThe page tried the CDN and GitHub raw host. If both fail with \"Failed to fetch\", the browser/network may be blocking the hosts or the files may not be publicly available. If the error shows HTTP 404, that specific file is missing.";
         console.error(message);
       }
 
       async function fetchPart(url) {
-        const response = await fetch(url, { cache: "force-cache" });
-        if (!response.ok) {
-          throw new Error(`Failed to download ${url} (HTTP ${response.status})`);
+        // Try jsDelivr first, then GitHub's raw host in case the CDN is blocked.
+        const candidates = [url];
+        const prefix = "https://cdn.jsdelivr.net/gh/web-ports/fnae@afd4e5071add297d6169665a4f999d62f312532e/";
+        if (url.startsWith(prefix)) {
+          const relativePath = url.slice(prefix.length);
+          candidates.push(
+            "https://raw.githubusercontent.com/web-ports/fnae/afd4e5071add297d6169665a4f999d62f312532e/" + relativePath
+          );
         }
-        return await response.arrayBuffer();
+
+        let lastError;
+        for (const candidate of candidates) {
+          try {
+            const response = await fetch(candidate, { cache: "no-store" });
+            if (!response.ok) {
+              lastError = new Error(`HTTP ${response.status} while downloading ${candidate}`);
+              continue;
+            }
+            return await response.arrayBuffer();
+          } catch (error) {
+            lastError = new Error(
+              `Browser could not fetch: ${candidate}\nReason: ${error && error.message ? error.message : String(error)}`
+            );
+          }
+        }
+        throw lastError || new Error("Download failed for an unknown reason.");
       }
 
       async function mergeParts(path, count) {
