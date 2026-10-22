@@ -149,12 +149,13 @@
             document.head.appendChild(meta);
           }
 
+          let activeAssetRoot = ROOT;
           const config = {
             arguments: [],
             dataUrl,
-            frameworkUrl: ROOT + "Build/fnae.framework.js",
+            get frameworkUrl() { return activeAssetRoot + "Build/fnae.framework.js"; },
             codeUrl: wasmUrl,
-            streamingAssetsUrl: ROOT + "StreamingAssets",
+            get streamingAssetsUrl() { return activeAssetRoot + "StreamingAssets"; },
             companyName: "DefaultCompany",
             productName: "fnae",
             productVersion: "1.0",
@@ -172,18 +173,26 @@
           };
 
           loadingBar.style.display = "block";
-          const loaderPaths = [ROOT + "Build/fnae.loader.js"];
+          const assetRoots = [
+            ROOT,
+            "https://fastly.jsdelivr.net/gh/web-ports/fnae@afd4e5071add297d6169665a4f999d62f312532e/",
+            "https://gcore.jsdelivr.net/gh/web-ports/fnae@afd4e5071add297d6169665a4f999d62f312532e/",
+            "https://raw.githubusercontent.com/web-ports/fnae/afd4e5071add297d6169665a4f999d62f312532e/"
+          ];
+          const loaderPaths = assetRoots.map(root => root + "Build/fnae.loader.js");
 
           function loadUnityLoader(index = 0) {
             if (index >= loaderPaths.length) {
               showError(
-                "Could not load the Unity loader from the original CDN: " +
-                loaderPaths.join(", ") +
-                ". Check whether the CDN is reachable on this network."
+                "The Unity loader failed from all tested mirrors. This does not necessarily mean the CDN is down. Tried: " +
+                loaderPaths.join(" | ") +
+                ". If one opens in a tab, the next diagnostic should identify whether the script is blocked or the mirror response is invalid."
               );
               return;
             }
 
+            activeAssetRoot = assetRoots[index];
+            addDiagnostic("Loader attempt", activeAssetRoot);
             const loader = document.createElement("script");
             loader.src = loaderPaths[index];
             loader.onload = async () => {
@@ -219,6 +228,7 @@
               }
             };
             loader.onerror = () => {
+              addDiagnostic("Loader failed", loaderPaths[index]);
               loader.remove();
               loadUnityLoader(index + 1);
             };
