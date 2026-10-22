@@ -136,13 +136,18 @@
           const config = {
             arguments: [],
             dataUrl,
-            frameworkUrl: ROOT + "Build/fnae.framework.js",
+            frameworkUrl: "https://raw.githubusercontent.com/web-ports/fnae/afd4e5071add297d6169665a4f999d62f312532e/Build/fnae.framework.js",
             codeUrl: wasmUrl,
             streamingAssetsUrl: ROOT + "StreamingAssets",
             companyName: "DefaultCompany",
             productName: "fnae",
             productVersion: "1.0",
-            showBanner(message) { console.warn("Unity:", message); }
+            // Prefer stability on lower-memory Chromebooks.
+            matchWebGLToCanvasSize: true,
+            devicePixelRatio: 1,
+            showBanner(message) {
+              if (typeof addDiagnostic === "function") addDiagnostic("Unity message", String(message));
+            }
           };
 
           loadingBar.style.display = "block";
@@ -241,8 +246,14 @@
               loadingText.style.fontSize = "24px";
               addDiagnostic(
                 "Startup timeout",
-                "The Unity startup promise has not completed after 45 seconds. This can mean limited memory, WebAssembly startup failure, or an asset/runtime wait."
+                "Unity's progress callback stopped before startup completed. The HTML cannot safely skip this stage: Unity must finish creating its runtime. Common causes are memory pressure, a blocked framework file, or an incompatible WebAssembly/runtime asset."
               );
+              const reloadButton = document.createElement("button");
+              reloadButton.type = "button";
+              reloadButton.textContent = "Retry game";
+              reloadButton.style.cssText = "display:block;margin:12px auto;padding:10px 14px;font-size:14px;cursor:pointer;";
+              reloadButton.onclick = () => location.reload();
+              loadingText.insertAdjacentElement("afterend", reloadButton);
               const copyButton = document.createElement("button");
               copyButton.type = "button";
               copyButton.textContent = "Show / select diagnostic text";
