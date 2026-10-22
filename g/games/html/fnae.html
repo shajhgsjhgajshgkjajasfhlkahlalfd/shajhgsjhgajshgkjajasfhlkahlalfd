@@ -8,6 +8,12 @@
     <title>Unity Web Player | Five Night's at BIG E</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
+      <style>
+      html, body { margin: 0; min-height: 100%; background: #000; }
+      #unity-container { width: 100%; max-width: 960px; margin: 0 auto; }
+      #unity-canvas { display: block; width: 100%; height: auto; max-height: calc(100vh - 100px); object-fit: contain; background: #000; }
+      #unity-loading-bar { max-width: 80%; margin: 0 auto; }
+    </style>
   </head>
   <body>
   <div id="loading-text"
@@ -22,6 +28,126 @@
         </div>
       </div>
     </div>
-    <script>var loadingText=document.querySelector("#loading-text");let totalBytes=0;let loadedBytes=0;async function fetchWithProgress(url){const response=await fetch(url);const reader=response.body.getReader();let chunks=[];let received=0;while(true){const{done:done,value:value}=await reader.read();if(done)break;received+=value.length;loadedBytes+=value.length;chunks.push(value);let mbDone=(loadedBytes/(1024*1024)).toFixed(2);let mbTotal="139.53";loadingText.textContent=`LOADING... ${mbDone} MB / ${mbTotal} MB`}let fullBuffer=new Uint8Array(received);let offset=0;for(let chunk of chunks){fullBuffer.set(chunk,offset);offset+=chunk.length}return fullBuffer.buffer}async function mergeFiles(fileParts,cacheKey){const buffers=await Promise.all(fileParts.map(part=>fetchWithProgress(part)));const mergedBlob=new Blob(buffers);return URL.createObjectURL(mergedBlob)}function getParts(file,start,end){let parts=[];for(let i=start;i<=end;i++){parts.push(file+".part"+i)}return parts}(async()=>{const[dataUrl,wasmUrl,webm]=await Promise.all([mergeFiles(getParts("Build/fnae.data",1,3),"fnae.data"),mergeFiles(getParts("Build/fnae.wasm",1,2),"fnae.wasm"),mergeFiles(getParts("StreamingAssets/202512191935.webm",1,3),"202512191935.webm")]);window.randomwebm=webm;const realSrc=Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype,"src");Object.defineProperty(HTMLMediaElement.prototype,"src",{set(value){if(typeof value==="string"&&value.includes("202512191935.mp4")){value=window.randomwebm}return realSrc.set.call(this,value)},get(){return realSrc.get.call(this)}});var container=document.querySelector("#unity-container");var canvas=document.querySelector("#unity-canvas");var loadingBar=document.querySelector("#unity-loading-bar");var progressBarFull=document.querySelector("#unity-progress-bar-full");var warningBanner=document.querySelector("#unity-warning");function unityShowBanner(msg,type){}var buildUrl="Build";var loaderUrl=buildUrl+"/fnae.loader.js";var config={arguments:[],dataUrl:dataUrl,frameworkUrl:buildUrl+"/fnae.framework.js",codeUrl:wasmUrl,streamingAssetsUrl:"StreamingAssets",companyName:"DefaultCompany",productName:"fnae",productVersion:"1.0",showBanner:unityShowBanner};if(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)){var meta=document.createElement("meta");meta.name="viewport";meta.content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes";document.getElementsByTagName("head")[0].appendChild(meta)}loadingBar.style.display="block";var script=document.createElement("script");script.src=loaderUrl;script.onload=()=>{createUnityInstance(canvas,config,progress=>{progressBarFull.style.width=100*progress+"%"}).then(unityInstance=>{loadingBar.style.display="none";loadingText.remove()}).catch(message=>{alert(message)})};document.body.appendChild(script)})();</script>
+    <script>
+      const loadingText = document.getElementById("loading-text");
+      const loadingBar = document.getElementById("unity-loading-bar");
+      const progressBar = document.getElementById("unity-progress-bar-full");
+      const canvas = document.getElementById("unity-canvas");
+
+      const ROOT = "https://cdn.jsdelivr.net/gh/web-ports/fnae@afd4e5071add297d6169665a4f999d62f312532e/";
+      const PARTS = [
+        { key: "data", path: "Build/fnae.data", count: 3 },
+        { key: "wasm", path: "Build/fnae.wasm", count: 2 },
+        { key: "video", path: "StreamingAssets/202512191935.webm", count: 3 }
+      ];
+
+      function showError(message) {
+        loadingText.textContent = "GAME COULD NOT LOAD";
+        loadingText.style.color = "#ff7777";
+        let details = document.getElementById("load-error");
+        if (!details) {
+          details = document.createElement("pre");
+          details.id = "load-error";
+          details.style.cssText = "color:#fff;white-space:pre-wrap;overflow-wrap:anywhere;max-width:900px;margin:18px auto;padding:16px;font:14px monospace;text-align:left;background:#211;";
+          loadingText.insertAdjacentElement("afterend", details);
+        }
+        details.textContent = message + "\n\nCheck that the game's .part files still exist at the CDN URL, then reload the page.";
+        console.error(message);
+      }
+
+      async function fetchPart(url) {
+        const response = await fetch(url, { cache: "force-cache" });
+        if (!response.ok) {
+          throw new Error(`Failed to download ${url} (HTTP ${response.status})`);
+        }
+        return await response.arrayBuffer();
+      }
+
+      async function mergeParts(path, count) {
+        const buffers = [];
+        let total = 0;
+        for (let i = 1; i <= count; i++) {
+          loadingText.textContent = `LOADING... downloading ${path.split("/").pop()} (${i}/${count})`;
+          const buffer = await fetchPart(`${ROOT}${path}.part${i}`);
+          buffers.push(buffer);
+          total += buffer.byteLength;
+        }
+        const merged = new Uint8Array(total);
+        let offset = 0;
+        for (const buffer of buffers) {
+          merged.set(new Uint8Array(buffer), offset);
+          offset += buffer.byteLength;
+        }
+        return URL.createObjectURL(new Blob([merged]));
+      }
+
+      (async function startGame() {
+        try {
+          // Download sequentially to avoid multiple large allocations at once.
+          const dataUrl = await mergeParts("Build/fnae.data", 3);
+          const wasmUrl = await mergeParts("Build/fnae.wasm", 2);
+          const videoUrl = await mergeParts("StreamingAssets/202512191935.webm", 3);
+          window.randomwebm = videoUrl;
+
+          // The game requests an MP4, but the hosted asset is a WebM file.
+          const originalSrc = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, "src");
+          if (originalSrc && originalSrc.set && originalSrc.get) {
+            Object.defineProperty(HTMLMediaElement.prototype, "src", {
+              configurable: true,
+              get() { return originalSrc.get.call(this); },
+              set(value) {
+                if (typeof value === "string" && value.includes("202512191935.mp4")) {
+                  value = window.randomwebm;
+                }
+                originalSrc.set.call(this, value);
+              }
+            });
+          }
+
+          const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+          if (isMobile) {
+            const meta = document.createElement("meta");
+            meta.name = "viewport";
+            meta.content = "width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes";
+            document.head.appendChild(meta);
+          }
+
+          const config = {
+            arguments: [],
+            dataUrl,
+            frameworkUrl: ROOT + "Build/fnae.framework.js",
+            codeUrl: wasmUrl,
+            streamingAssetsUrl: ROOT + "StreamingAssets",
+            companyName: "DefaultCompany",
+            productName: "fnae",
+            productVersion: "1.0",
+            showBanner(message) { console.warn("Unity:", message); }
+          };
+
+          loadingBar.style.display = "block";
+          const loader = document.createElement("script");
+          loader.src = ROOT + "Build/fnae.loader.js";
+          loader.onload = async () => {
+            try {
+              if (typeof createUnityInstance !== "function") {
+                throw new Error("Unity loader loaded, but createUnityInstance was not found.");
+              }
+              await createUnityInstance(canvas, config, progress => {
+                progressBar.style.width = `${Math.round(progress * 100)}%`;
+                loadingText.textContent = `LOADING... ${Math.round(progress * 100)}%`;
+              });
+              loadingBar.style.display = "none";
+              loadingText.remove();
+            } catch (error) {
+              showError(error && error.message ? error.message : String(error));
+            }
+          };
+          loader.onerror = () => showError("Could not load the Unity loader: " + loader.src);
+          document.head.appendChild(loader);
+        } catch (error) {
+          showError(error && error.message ? error.message : String(error));
+        }
+      })();
+    </script>
 </body>
 </html>
