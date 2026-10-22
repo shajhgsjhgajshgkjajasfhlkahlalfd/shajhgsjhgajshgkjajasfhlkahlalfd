@@ -209,15 +209,53 @@
 
           // If Unity's promise never resolves, show a diagnostic instead of an
           // indefinite 90% screen. This does not cancel loading or reload the game.
+          // On-page diagnostics for devices where the developer console is unavailable.
+          window.__fnaeDiagnostics = [];
+          function addDiagnostic(label, detail) {
+            const message = `${label}: ${detail}`;
+            window.__fnaeDiagnostics.push(message);
+            let panel = document.getElementById("unity-diagnostics");
+            if (!panel) {
+              panel = document.createElement("div");
+              panel.id = "unity-diagnostics";
+              panel.style.cssText = "color:#fff;max-width:900px;margin:12px auto;padding:14px;background:#191919;border:1px solid #555;border-radius:8px;font:13px/1.45 monospace;white-space:pre-wrap;overflow-wrap:anywhere;text-align:left;";
+              loadingText.insertAdjacentElement("afterend", panel);
+            }
+            panel.textContent = "DIAGNOSTICS\\n" + window.__fnaeDiagnostics.slice(-8).join("\\n");
+          }
+
+          window.addEventListener("error", event => {
+            addDiagnostic("Browser error", event.message || "Unknown script/runtime error");
+          });
+          window.addEventListener("unhandledrejection", event => {
+            const reason = event.reason;
+            addDiagnostic("Startup rejection", reason && reason.message ? reason.message : String(reason || "Unknown rejection"));
+          });
+          window.addEventListener("unhandledrejection", () => {
+            // Avoid swallowing the error; this listener only records it.
+          });
+
           window.setTimeout(() => {
             if (document.getElementById("loading-text") && !document.getElementById("load-error")) {
-              loadingText.textContent = "STILL STARTING... Unity is taking longer than expected.";
+              loadingText.textContent = "STILL STARTING... (90% may be Unity initialization)";
               loadingText.style.fontSize = "24px";
-              const note = document.createElement("div");
-              note.id = "unity-timeout-note";
-              note.style.cssText = "color:#ddd;max-width:850px;margin:12px auto;text-align:center;font:14px sans-serif;";
-              note.textContent = "If this never changes, open the browser console (F12) and check for WebAssembly, memory, or asset errors. The game may be exceeding the browser's available memory.";
-              loadingText.insertAdjacentElement("afterend", note);
+              addDiagnostic(
+                "Startup timeout",
+                "The Unity startup promise has not completed after 45 seconds. This can mean limited memory, WebAssembly startup failure, or an asset/runtime wait."
+              );
+              const copyButton = document.createElement("button");
+              copyButton.type = "button";
+              copyButton.textContent = "Show / select diagnostic text";
+              copyButton.style.cssText = "display:block;margin:12px auto;padding:10px 14px;font-size:14px;cursor:pointer;";
+              copyButton.onclick = () => {
+                const panel = document.getElementById("unity-diagnostics");
+                if (panel) {
+                  panel.style.userSelect = "text";
+                  panel.style.background = "#000";
+                  panel.scrollIntoView({block:"center"});
+                }
+              };
+              loadingText.insertAdjacentElement("afterend", copyButton);
             }
           }, 45000);
         } catch (error) {
