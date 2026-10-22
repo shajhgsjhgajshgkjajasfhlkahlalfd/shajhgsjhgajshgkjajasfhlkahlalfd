@@ -50,7 +50,7 @@
         panel.textContent = "DIAGNOSTICS\\n" + window.__fnaeDiagnostics.slice(-8).join("\\n");
       }
 
-      const ROOT = new URL("./fnae-assets/", window.location.href).href;
+      const ROOT = "https://cdn.jsdelivr.net/gh/web-ports/fnae@afd4e5071add297d6169665a4f999d62f312532e/";
       const PARTS = [
         { key: "data", path: "Build/fnae.data", count: 3 },
         { key: "wasm", path: "Build/fnae.wasm", count: 2 },
@@ -67,7 +67,7 @@
           details.style.cssText = "color:#fff;white-space:pre-wrap;overflow-wrap:anywhere;max-width:900px;margin:18px auto;padding:16px;font:14px monospace;text-align:left;background:#211;";
           loadingText.insertAdjacentElement("afterend", details);
         }
-        details.textContent = message + "\n\nThis build expects the game assets in a same-origin folder named fnae-assets beside this HTML file. Upload the required Build and StreamingAssets files there in your GitHub Pages repository. A 404 means a required asset is missing or its path is incorrect.";
+        details.textContent = message + "\n\nThis standalone build loads assets from the original third-party CDN. If the URL opens in a tab but Unity cannot load it, the browser may be blocking cross-origin requests. The HTML cannot override the remote server CORS policy.";
         console.error(message);
       }
 
@@ -165,7 +165,7 @@
               if (typeof addDiagnostic === "function") {
                 addDiagnostic("Unity message", String(message));
                 if (String(message).includes("framework.js")) {
-                  addDiagnostic("Framework check", "This version loads the framework from the same-origin fnae-assets/Build/ folder in your GitHub Pages site.");
+                  addDiagnostic("Framework check", "The framework is hosted on a different origin from this GitHub Pages page. Opening it in a tab does not prove JavaScript fetch/XHR access is allowed.");
                 }
               }
             }
@@ -177,16 +177,14 @@
           function loadUnityLoader(index = 0) {
             if (index >= loaderPaths.length) {
               showError(
-                "The Unity loader failed on all CDN endpoints:\n" +
-                loaderPaths.join("\n") +
-                "\n\nThe loader exists in the source repository, so this may be a CDN/network issue. " +
-                "If these hosts are blocked on your network, host fnae.loader.js in your own game's repository and load it from there."
+                "Could not load the Unity loader from the original CDN: " +
+                loaderPaths.join(", ") +
+                ". Check whether the CDN is reachable on this network."
               );
               return;
             }
 
             const loader = document.createElement("script");
-            loader.crossOrigin = "anonymous";
             loader.src = loaderPaths[index];
             loader.onload = async () => {
               try {
