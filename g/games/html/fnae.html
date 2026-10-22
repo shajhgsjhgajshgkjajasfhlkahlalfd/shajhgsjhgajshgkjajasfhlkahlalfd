@@ -34,6 +34,22 @@
       const progressBar = document.getElementById("unity-progress-bar-full");
       const canvas = document.getElementById("unity-canvas");
 
+      // Initialize diagnostics before any async startup checks can use them.
+      window.__fnaeDiagnostics = [];
+      function addDiagnostic(label, detail) {
+        if (!Array.isArray(window.__fnaeDiagnostics)) window.__fnaeDiagnostics = [];
+        const message = `${label}: ${detail}`;
+        window.__fnaeDiagnostics.push(message);
+        let panel = document.getElementById("unity-diagnostics");
+        if (!panel) {
+          panel = document.createElement("div");
+          panel.id = "unity-diagnostics";
+          panel.style.cssText = "color:#fff;max-width:900px;margin:12px auto;padding:14px;background:#191919;border:1px solid #555;border-radius:8px;font:13px/1.45 monospace;white-space:pre-wrap;overflow-wrap:anywhere;text-align:left;";
+          loadingText.insertAdjacentElement("afterend", panel);
+        }
+        panel.textContent = "DIAGNOSTICS\\n" + window.__fnaeDiagnostics.slice(-8).join("\\n");
+      }
+
       const ROOT = "https://cdn.jsdelivr.net/gh/web-ports/fnae@afd4e5071add297d6169665a4f999d62f312532e/";
       const PARTS = [
         { key: "data", path: "Build/fnae.data", count: 3 },
@@ -133,10 +149,37 @@
             document.head.appendChild(meta);
           }
 
+          // Try downloading the framework and serving it as a same-page Blob script.
+          // If the host's script response is blocked/malformed, this may give a clearer error.
+          try {
+            const frameworkResponse = await fetch(ROOT + "Build/fnae.framework.js", { cache: "no-store" });
+            if (!frameworkResponse.ok) {
+              throw new Error("Framework request returned HTTP " + frameworkResponse.status);
+            }
+            const frameworkText = await frameworkResponse.text();
+            if (!frameworkText || frameworkText.length < 1000) {
+              throw new Error("Framework response was unexpectedly short (" + frameworkText.length + " characters).");
+            }
+            if (frameworkText.trimStart().startsWith("<!DOCTYPE html") || frameworkText.trimStart().startsWith("<html")) {
+              throw new Error("Framework URL returned an HTML page instead of JavaScript.");
+            }
+            window.__fnaeFrameworkBlobUrl = URL.createObjectURL(
+              new Blob([frameworkText], { type: "text/javascript" })
+            );
+            addDiagnostic("Framework check", "Downloaded framework source (" + Math.round(frameworkText.length / 1024) + " KB); trying it as a JavaScript Blob.");
+          } catch (frameworkFetchError) {
+            addDiagnostic(
+              "Framework fetch failed",
+              (frameworkFetchError && frameworkFetchError.message ? frameworkFetchError.message : String(frameworkFetchError)) +
+              ". The browser may be blocking cross-origin fetch even though opening the URL in a tab works."
+            );
+            // Keep the normal URL so Unity can still attempt its usual loading path.
+          }
+
           const config = {
             arguments: [],
             dataUrl,
-            frameworkUrl: "https://raw.githubusercontent.com/web-ports/fnae/afd4e5071add297d6169665a4f999d62f312532e/Build/fnae.framework.js",
+            frameworkUrl: window.__fnaeFrameworkBlobUrl || ROOT + "Build/fnae.framework.js",
             codeUrl: wasmUrl,
             streamingAssetsUrl: ROOT + "StreamingAssets",
             companyName: "DefaultCompany",
@@ -146,7 +189,12 @@
             matchWebGLToCanvasSize: true,
             devicePixelRatio: 1,
             showBanner(message) {
-              if (typeof addDiagnostic === "function") addDiagnostic("Unity message", String(message));
+              if (typeof addDiagnostic === "function") {
+                addDiagnostic("Unity message", String(message));
+                if (String(message).includes("framework.js")) {
+                  addDiagnostic("Framework check", "Open the framework URL in a new tab. It should display/download JavaScript, not a 404 page or an HTML error page. If it does show JavaScript, this can still be a Chromebook network/content filter or script execution restriction.");
+                }
+              }
             }
           };
 
@@ -214,21 +262,7 @@
 
           // If Unity's promise never resolves, show a diagnostic instead of an
           // indefinite 90% screen. This does not cancel loading or reload the game.
-          // On-page diagnostics for devices where the developer console is unavailable.
-          window.__fnaeDiagnostics = [];
-          function addDiagnostic(label, detail) {
-            const message = `${label}: ${detail}`;
-            window.__fnaeDiagnostics.push(message);
-            let panel = document.getElementById("unity-diagnostics");
-            if (!panel) {
-              panel = document.createElement("div");
-              panel.id = "unity-diagnostics";
-              panel.style.cssText = "color:#fff;max-width:900px;margin:12px auto;padding:14px;background:#191919;border:1px solid #555;border-radius:8px;font:13px/1.45 monospace;white-space:pre-wrap;overflow-wrap:anywhere;text-align:left;";
-              loadingText.insertAdjacentElement("afterend", panel);
-            }
-            panel.textContent = "DIAGNOSTICS\\n" + window.__fnaeDiagnostics.slice(-8).join("\\n");
-          }
-
+          // On-page diagnostic event capture for devices without a developer console.
           window.addEventListener("error", event => {
             addDiagnostic("Browser error", event.message || "Unknown script/runtime error");
           });
