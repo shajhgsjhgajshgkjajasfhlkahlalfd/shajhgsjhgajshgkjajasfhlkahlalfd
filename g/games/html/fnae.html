@@ -9,11 +9,18 @@
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
       <style>
-      html, body { margin: 0; min-height: 100%; background: #000; }
-      #unity-container { width: 100%; max-width: 960px; margin: 0 auto; }
-      #unity-canvas { display: block; width: 100%; height: auto; max-height: calc(100vh - 100px); object-fit: contain; background: #000; }
+      html, body { margin: 0 !important; padding: 0 !important; width: 100%; height: 100%; min-height: 100%; overflow: hidden; background: #000; }
+      #unity-container { position: relative; width: 100vw; height: 100vh; max-width: none; margin: 0; padding: 0; background: #000; }
+      #unity-canvas { display: block; width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; margin: 0; padding: 0; object-fit: fill; background: #000; }
       #unity-loading-bar { max-width: 80%; margin: 0 auto; }
-    </style>
+      body.game-loaded #loading-text,
+      body.game-loaded #unity-loading-bar,
+      body.game-loaded #unity-diagnostics,
+      body.game-loaded #load-error,
+      body.game-loaded button { display: none !important; }
+      body.game-loaded #unity-container { position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100vh !important; max-width: none !important; margin: 0 !important; z-index: 1; }
+      body.game-loaded #unity-canvas { position: absolute !important; inset: 0 !important; width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; }
+      </style>
   </head>
   <body>
   <div id="loading-text"
@@ -34,22 +41,6 @@
       const progressBar = document.getElementById("unity-progress-bar-full");
       const canvas = document.getElementById("unity-canvas");
 
-      // Initialize diagnostics before any async startup checks can use them.
-      window.__fnaeDiagnostics = [];
-      function addDiagnostic(label, detail) {
-        if (!Array.isArray(window.__fnaeDiagnostics)) window.__fnaeDiagnostics = [];
-        const message = `${label}: ${detail}`;
-        window.__fnaeDiagnostics.push(message);
-        let panel = document.getElementById("unity-diagnostics");
-        if (!panel) {
-          panel = document.createElement("div");
-          panel.id = "unity-diagnostics";
-          panel.style.cssText = "color:#fff;max-width:900px;margin:12px auto;padding:14px;background:#191919;border:1px solid #555;border-radius:8px;font:13px/1.45 monospace;white-space:pre-wrap;overflow-wrap:anywhere;text-align:left;";
-          loadingText.insertAdjacentElement("afterend", panel);
-        }
-        panel.textContent = "DIAGNOSTICS\\n" + window.__fnaeDiagnostics.slice(-8).join("\\n");
-      }
-
       const ROOT = "https://cdn.jsdelivr.net/gh/web-ports/fnae@afd4e5071add297d6169665a4f999d62f312532e/";
       const PARTS = [
         { key: "data", path: "Build/fnae.data", count: 3 },
@@ -67,7 +58,7 @@
           details.style.cssText = "color:#fff;white-space:pre-wrap;overflow-wrap:anywhere;max-width:900px;margin:18px auto;padding:16px;font:14px monospace;text-align:left;background:#211;";
           loadingText.insertAdjacentElement("afterend", details);
         }
-        details.textContent = message + "\n\nThis standalone build loads assets from the original third-party CDN. If the URL opens in a tab but Unity cannot load it, the browser may be blocking cross-origin requests. The HTML cannot override the remote server CORS policy.";
+        details.textContent = message;
         console.error(message);
       }
 
@@ -163,12 +154,7 @@
             matchWebGLToCanvasSize: true,
             devicePixelRatio: 1,
             showBanner(message) {
-              if (typeof addDiagnostic === "function") {
-                addDiagnostic("Unity message", String(message));
-                if (String(message).includes("framework.js")) {
-                  addDiagnostic("Framework check", "The framework is hosted on a different origin from this GitHub Pages page. Opening it in a tab does not prove JavaScript fetch/XHR access is allowed.");
-                }
-              }
+              console.warn("Unity:", message);
             }
           };
 
@@ -192,7 +178,6 @@
             }
 
             activeAssetRoot = assetRoots[index];
-            addDiagnostic("Loader attempt", activeAssetRoot);
             const loader = document.createElement("script");
             loader.src = loaderPaths[index];
             loader.onload = async () => {
@@ -216,6 +201,7 @@
                 if (!instance) {
                   throw new Error("Unity finished loading assets but did not return a game instance.");
                 }
+                document.body.classList.add("game-loaded");
                 loadingBar.style.display = "none";
                 loadingText.remove();
               } catch (error) {
@@ -228,7 +214,6 @@
               }
             };
             loader.onerror = () => {
-              addDiagnostic("Loader failed", loaderPaths[index]);
               loader.remove();
               loadUnityLoader(index + 1);
             };
@@ -237,49 +222,7 @@
 
           loadUnityLoader();
 
-          // If Unity's promise never resolves, show a diagnostic instead of an
-          // indefinite 90% screen. This does not cancel loading or reload the game.
-          // On-page diagnostic event capture for devices without a developer console.
-          window.addEventListener("error", event => {
-            addDiagnostic("Browser error", event.message || "Unknown script/runtime error");
-          });
-          window.addEventListener("unhandledrejection", event => {
-            const reason = event.reason;
-            addDiagnostic("Startup rejection", reason && reason.message ? reason.message : String(reason || "Unknown rejection"));
-          });
-          window.addEventListener("unhandledrejection", () => {
-            // Avoid swallowing the error; this listener only records it.
-          });
 
-          window.setTimeout(() => {
-            if (document.getElementById("loading-text") && !document.getElementById("load-error")) {
-              loadingText.textContent = "STILL STARTING... (90% may be Unity initialization)";
-              loadingText.style.fontSize = "24px";
-              addDiagnostic(
-                "Startup timeout",
-                "Unity's progress callback stopped before startup completed. The HTML cannot safely skip this stage: Unity must finish creating its runtime. Common causes are memory pressure, a blocked framework file, or an incompatible WebAssembly/runtime asset."
-              );
-              const reloadButton = document.createElement("button");
-              reloadButton.type = "button";
-              reloadButton.textContent = "Retry game";
-              reloadButton.style.cssText = "display:block;margin:12px auto;padding:10px 14px;font-size:14px;cursor:pointer;";
-              reloadButton.onclick = () => location.reload();
-              loadingText.insertAdjacentElement("afterend", reloadButton);
-              const copyButton = document.createElement("button");
-              copyButton.type = "button";
-              copyButton.textContent = "Show / select diagnostic text";
-              copyButton.style.cssText = "display:block;margin:12px auto;padding:10px 14px;font-size:14px;cursor:pointer;";
-              copyButton.onclick = () => {
-                const panel = document.getElementById("unity-diagnostics");
-                if (panel) {
-                  panel.style.userSelect = "text";
-                  panel.style.background = "#000";
-                  panel.scrollIntoView({block:"center"});
-                }
-              };
-              loadingText.insertAdjacentElement("afterend", copyButton);
-            }
-          }, 45000);
         } catch (error) {
           showError(error && error.message ? error.message : String(error));
         }
