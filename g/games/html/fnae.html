@@ -146,25 +146,48 @@
           };
 
           loadingBar.style.display = "block";
-          const loader = document.createElement("script");
-          loader.src = ROOT + "Build/fnae.loader.js";
-          loader.onload = async () => {
-            try {
-              if (typeof createUnityInstance !== "function") {
-                throw new Error("Unity loader loaded, but createUnityInstance was not found.");
-              }
-              await createUnityInstance(canvas, config, progress => {
-                progressBar.style.width = `${Math.round(progress * 100)}%`;
-                loadingText.textContent = `LOADING... ${Math.round(progress * 100)}%`;
-              });
-              loadingBar.style.display = "none";
-              loadingText.remove();
-            } catch (error) {
-              showError(error && error.message ? error.message : String(error));
+          const loaderPaths = [
+            ROOT + "Build/fnae.loader.js",
+            "https://gcore.jsdelivr.net/gh/web-ports/fnae@afd4e5071add297d6169665a4f999d62f312532e/Build/fnae.loader.js",
+            "https://fastly.jsdelivr.net/gh/web-ports/fnae@afd4e5071add297d6169665a4f999d62f312532e/Build/fnae.loader.js"
+          ];
+
+          function loadUnityLoader(index = 0) {
+            if (index >= loaderPaths.length) {
+              showError(
+                "The Unity loader failed on all CDN endpoints:\n" +
+                loaderPaths.join("\n") +
+                "\n\nThe loader exists in the source repository, so this may be a CDN/network issue. " +
+                "If these hosts are blocked on your network, host fnae.loader.js in your own game's repository and load it from there."
+              );
+              return;
             }
-          };
-          loader.onerror = () => showError("Could not load the Unity loader: " + loader.src);
-          document.head.appendChild(loader);
+
+            const loader = document.createElement("script");
+            loader.src = loaderPaths[index];
+            loader.onload = async () => {
+              try {
+                if (typeof createUnityInstance !== "function") {
+                  throw new Error("The Unity loader downloaded, but createUnityInstance was not defined.");
+                }
+                await createUnityInstance(canvas, config, progress => {
+                  progressBar.style.width = `${Math.round(progress * 100)}%`;
+                  loadingText.textContent = `LOADING... ${Math.round(progress * 100)}%`;
+                });
+                loadingBar.style.display = "none";
+                loadingText.remove();
+              } catch (error) {
+                showError(error && error.message ? error.message : String(error));
+              }
+            };
+            loader.onerror = () => {
+              loader.remove();
+              loadUnityLoader(index + 1);
+            };
+            document.head.appendChild(loader);
+          }
+
+          loadUnityLoader();
         } catch (error) {
           showError(error && error.message ? error.message : String(error));
         }
