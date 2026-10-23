@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classroom-x-zone</title>
@@ -23,11 +22,11 @@
     
     <!-- Non-blocking optimized font loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&amp;display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer=""></script>
 
 <style>
         /* ── Google Font add-on: Space Grotesk for headings ── */
@@ -1628,17 +1627,7 @@ input::placeholder, textarea::placeholder, button::before, button::after {
 
 </style>
 <!-- minecraft-site-font:end -->
-<!-- loading-logo-style:start -->
-<style>
-#loading-screen .loader-logo {
- display:block; width:min(360px,78vw); height:auto;
- max-height: min(240px,35vh); object-fit:contain;
- margin:0 auto 18px; flex-shrink:0;
-}
-
-</style>
-<!-- loading-logo-style:end -->
-</head>
+<style id="startup-logo-style">#loading-screen .loader-logo{display:block;width:min(360px,78vw);height:auto;max-height:min(240px,35vh);object-fit:contain;margin:0 auto 18px;flex-shrink:0}</style></head>
 <body data-tab="home">
     <!-- Startup block screen: shown in an iframe, then dismissed automatically -->
     <style>
@@ -1716,8 +1705,7 @@ input::placeholder, textarea::placeholder, button::before, button::after {
                 // Never let a blocked fetch keep the whole site behind this overlay.
                 fetchTimer = setTimeout(function () {
                     if (token !== loadToken) return;
-                    renderBlockScreen('<!doctype html><html><body style="margin:0;background:#090d18;color:#e8edf8;font:16px system-ui;display:grid;place-items:center;min-height:100vh"><main style="padding:2rem;text-align:center"><h2>Block screen timed out</h2><p>Continuing to Classroom-X-Zone…</p></main><!-- loading-logo-boot:start --><script>(function(){var img=document.getElementById("startup-loading-logo");function ready(){var title=document.querySelector("#loading-screen .loader-title");if(img&&img.naturalWidth&&title)title.style.display="none";}if(img){img.addEventListener("load",ready);if(img.complete)ready();}})();</script><!-- loading-logo-boot:end -->
-</body></html>', token);
+                    renderBlockScreen('<!doctype html><html><body style="margin:0;background:#090d18;color:#e8edf8;font:16px system-ui;display:grid;place-items:center;min-height:100vh"><main style="padding:2rem;text-align:center"><h2>Block screen timed out</h2><p>Continuing to Classroom-X-Zone…</p></main></body></html>', token);
                 }, 5000);
             } catch (e) {
                 window.__cxzBlockDone = true;
@@ -1757,8 +1745,7 @@ input::placeholder, textarea::placeholder, button::before, button::after {
     <div id="crosshair">+</div>
 
     <!-- Startup Loading Screen -->
-    <div id="loading-screen">
-<img class="loader-logo" id="startup-loading-logo" src="./g/assets/log-load.png" alt="Classroom-X-Zone" loading="eager" fetchpriority="high" decoding="async" onerror="this.hidden=true;this.style.display='none';var t=document.querySelector('#loading-screen .loader-title');if(t)t.style.removeProperty('display');">
+    <div id="loading-screen"><img id="startup-loading-logo" class="loader-logo" src="./g/assets/log-load.png" alt="Classroom-X-Zone" loading="eager" fetchpriority="high" onload="var t=this.parentElement.querySelector('.loader-title');if(t)t.style.display='none';" onerror="this.style.display='none';var t=this.parentElement.querySelector('.loader-title');if(t)t.style.removeProperty('display');">
         <h1 class="loader-title">CLASSROOM-X-ZONE</h1>
         <p class="loader-subtitle">Loading Assets...</p>
         <div class="progress-container">
@@ -1777,7 +1764,7 @@ input::placeholder, textarea::placeholder, button::before, button::after {
                 <span id="current-weekday">Loading…</span>
                 <div class="datetime-detail-row">
                     <span id="current-date">-------- --, ----</span>
-                    <span class="datetime-separator" aria-hidden="true">&#9733;</span>
+                    <span class="datetime-separator" aria-hidden="true">★</span>
                     <time id="current-time">--:--:-- --</time>
                 </div>
             </div>
@@ -1787,7 +1774,7 @@ input::placeholder, textarea::placeholder, button::before, button::after {
         <div class="search-box" role="search">
             <input type="text" id="searchInput" aria-label="Search all games" placeholder="Search..." autocomplete="off" spellcheck="false" oninput="filterItems()">
             <label class="search-icon" for="searchInput" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
             </label>
         </div>
 
@@ -1795,7 +1782,7 @@ input::placeholder, textarea::placeholder, button::before, button::after {
         <div id="home" class="tab-content active">
             <h2 class="visually-hidden" id="home-grid-label">Suggested games</h2>
             <div class="grid square-grid" id="featured-grid" aria-labelledby="home-grid-label"></div>
-            <p class="home-search-empty" id="home-search-empty" hidden>No games match that search.</p>
+            <p class="home-search-empty" id="home-search-empty" hidden="">No games match that search.</p>
         </div>
 
         <!-- TAB: GAMES -->
@@ -1852,7 +1839,7 @@ input::placeholder, textarea::placeholder, button::before, button::after {
                 <!-- COLUMN 1: OTHER -->
                 <div class="settings-col">
                     <div class="col-header">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20 6 9 17 4 12"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         <span>Other</span>
                     </div>
                     
@@ -1885,7 +1872,7 @@ input::placeholder, textarea::placeholder, button::before, button::after {
                 <!-- COLUMN 2: CLOAKING -->
                 <div class="settings-col">
                     <div class="col-header">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ghost"><path d="M9 10h.01"/><path d="M15 10h.01"/><path d="M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ghost"><path d="M9 10h.01"></path><path d="M15 10h.01"></path><path d="M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z"></path></svg>
                         <span>Cloaking</span>
                     </div>
 
@@ -1929,7 +1916,7 @@ input::placeholder, textarea::placeholder, button::before, button::after {
 
                     <div class="setting-subhead" style="text-align:left; margin-top:8px;">Hidden Page Cover</div>
                     <select id="hidden-cover-select" onchange="saveHiddenCover()">
-                        <option value="none" selected>None — use panic URL</option>
+                        <option value="none" selected="">None — use panic URL</option>
                         <option value="classroom">Google Classroom</option>
                         <option value="drive">Google Drive</option>
                         <option value="google">Google</option>
@@ -1959,7 +1946,7 @@ input::placeholder, textarea::placeholder, button::before, button::after {
                 <!-- COLUMN 3: APPEARANCE -->
                 <div class="settings-col">
                     <div class="col-header">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-palette"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-palette"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path></svg>
                         <span>Appearance</span>
                     </div>
 
@@ -1982,7 +1969,7 @@ input::placeholder, textarea::placeholder, button::before, button::after {
                     </div>
 
                     <div class="setting-subhead" style="text-align:left; margin-top:12px;">Background Particle Color</div>
-                    <label class="checkbox-label"><input type="checkbox" id="particle-follow-theme" checked onchange="followThemeParticles(this.checked)">Match theme color</label>
+                    <label class="checkbox-label"><input type="checkbox" id="particle-follow-theme" checked="" onchange="followThemeParticles(this.checked)">Match theme color</label>
                     <div class="btn-row"><input type="color" id="particle-color-input" value="#ff6600" aria-label="Background particle color" oninput="setParticleColor(this.value)" style="width:64px;height:38px;border:1px solid var(--line);background:var(--bg-2);border-radius:8px;cursor:pointer;"><span style="font-size:12px;color:var(--ink-soft);">Choose a color to override the theme.</span></div>
                     <div class="setting-subhead" style="text-align:left; margin-top:8px;">Background</div>
                     <select id="bg-select" onchange="changeBackground(this.value)">
@@ -2023,7 +2010,7 @@ input::placeholder, textarea::placeholder, button::before, button::after {
                 <!-- COLUMN 4: PERFORMANCE -->
                 <div class="settings-col">
                     <div class="col-header">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                         <span>Performance</span>
                     </div>
 
@@ -2067,7 +2054,7 @@ input::placeholder, textarea::placeholder, button::before, button::after {
                     </label>
                     <div class="setting-help">Plays MF DOOM – "Doomsday" on loop after your first click (browsers require that first interaction). Pauses while a game is open. Use the speaker button to mute.</div>
                     <label class="checkbox-label">
-                        <input type="checkbox" id="loadscreen-startup-check" checked onchange="savePerfSettings()">
+                        <input type="checkbox" id="loadscreen-startup-check" checked="" onchange="savePerfSettings()">
                         Loading screen on startup
                     </label>
 
@@ -2123,12 +2110,7 @@ input::placeholder, textarea::placeholder, button::before, button::after {
             </div>
 
             <div class="cxz-frame-wrap">
-                <iframe
-                    id="cxz-game-frame"
-                    class="cxz-game-frame"
-                    allowfullscreen
-                    allow="autoplay; fullscreen; gamepad; focus-without-user-activation *"
-                    title="Game"></iframe>
+                <iframe id="cxz-game-frame" class="cxz-game-frame" allowfullscreen="" allow="autoplay; fullscreen; gamepad; focus-without-user-activation *" title="Game"></iframe>
             </div>
         </div>
 
@@ -2136,10 +2118,7 @@ input::placeholder, textarea::placeholder, button::before, button::after {
 
     <div class="cxz-tool-group">
 
-        <button
-            class="cxz-tool"
-            onclick="CXZPlayer.openBlank()"
-            title="Open in About:Blank">
+        <button class="cxz-tool" onclick="CXZPlayer.openBlank()" title="Open in About:Blank">
 
             <i data-lucide="external-link"></i>
 
@@ -2149,15 +2128,7 @@ input::placeholder, textarea::placeholder, button::before, button::after {
 
             <i data-lucide="volume-2"></i>
 
-            <input
-                id="cxz-volume-slider"
-                type="range"
-                min="0"
-                max="100"
-                value="100"
-                aria-label="Game volume"
-                title="Game volume"
-            >
+            <input id="cxz-volume-slider" type="range" min="0" max="100" value="100" aria-label="Game volume" title="Game volume">
 
             <span id="cxz-volume-text">
                 100%
@@ -2167,55 +2138,37 @@ input::placeholder, textarea::placeholder, button::before, button::after {
 
     </div>
 
-    <div
-        class="cxz-title"
-        id="cxz-game-title"
-    >
+    <div class="cxz-title" id="cxz-game-title">
         Game Title
     </div>
 
     <div class="cxz-tool-group">
 
-        <button
-            class="cxz-tool"
-            onclick="CXZPlayer.toggleConsole()"
-            title="Console">
+        <button class="cxz-tool" onclick="CXZPlayer.toggleConsole()" title="Console">
 
             <i data-lucide="terminal"></i>
 
         </button>
 
-        <button
-            class="cxz-tool"
-            onclick="CXZPlayer.reload()"
-            title="Reload">
+        <button class="cxz-tool" onclick="CXZPlayer.reload()" title="Reload">
 
             <i data-lucide="rotate-cw"></i>
 
         </button>
 
-        <button
-            class="cxz-tool"
-            onclick="CXZPlayer.download()"
-            title="Download Game HTML">
+        <button class="cxz-tool" onclick="CXZPlayer.download()" title="Download Game HTML">
 
             <i data-lucide="download"></i>
 
         </button>
 
-        <button
-            class="cxz-tool"
-            onclick="CXZPlayer.fullscreen()"
-            title="Fullscreen">
+        <button class="cxz-tool" onclick="CXZPlayer.fullscreen()" title="Fullscreen">
 
             <i data-lucide="maximize"></i>
 
         </button>
 
-        <button
-            class="cxz-tool"
-            onclick="CXZPlayer.close()"
-            title="Close">
+        <button class="cxz-tool" onclick="CXZPlayer.close()" title="Close">
 
             <i data-lucide="x"></i>
 
@@ -2239,31 +2192,31 @@ input::placeholder, textarea::placeholder, button::before, button::after {
     <nav class="bottom-dock">
         <!-- Lucide home -->
         <button class="dock-item active" onclick="switchTab('home', this)" title="Home">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
         </button>
         <!-- Lucide gamepad-2 -->
         <button class="dock-item" onclick="switchTab('games', this)" title="Games">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gamepad-2"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><rect width="20" height="12" x="2" y="6" rx="6"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gamepad-2"><line x1="6" x2="10" y1="12" y2="12"></line><line x1="8" x2="8" y1="10" y2="14"></line><line x1="15" x2="15.01" y1="13" y2="13"></line><line x1="18" x2="18.01" y1="11" y2="11"></line><rect width="20" height="12" x="2" y="6" rx="6"></rect></svg>
         </button>
         <!-- Lucide wrench -->
         <button class="dock-item" onclick="switchTab('tools', this)" title="Tools">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wrench"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wrench"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
         </button>
         <!-- Lucide handshake -->
         <button class="dock-item" onclick="switchTab('partners', this)" title="Partners">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-handshake"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-handshake"><path d="m11 17 2 2a1 1 0 1 0 3-3"></path><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"></path><path d="m21 3 1 11h-2"></path><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"></path><path d="M3 4h8"></path></svg>
         </button>
         <!-- Lucide lightbulb -->
         <button class="dock-item" onclick="switchTab('suggest', this)" title="Suggest a Game">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lightbulb"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lightbulb"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path><path d="M9 18h6"></path><path d="M10 22h4"></path></svg>
         </button>
         <!-- Lucide settings -->
         <button class="dock-item" onclick="switchTab('settings', this)" title="Settings">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
         </button>
         <!-- Lucide volume-x -->
         <button class="dock-item" onclick="toggleMuteSound()" id="dock-mute-btn" title="Mute audio" aria-label="Mute audio" aria-pressed="false">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-volume-x"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-volume-x"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="22" x2="16" y1="9" y2="15"></line><line x1="16" x2="22" y1="9" y2="15"></line></svg>
         </button>
     </nav>
 
@@ -4650,5 +4603,6 @@ if (
     })();
 
 </script>
-</body>
-</html>
+
+
+</body></html>
