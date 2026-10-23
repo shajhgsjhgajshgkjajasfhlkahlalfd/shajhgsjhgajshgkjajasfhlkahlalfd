@@ -1627,7 +1627,18 @@ input::placeholder, textarea::placeholder, button::before, button::after {
 
 </style>
 <!-- minecraft-site-font:end -->
-<style id="startup-logo-style">#loading-screen .loader-logo{display:block;width:min(360px,78vw);height:auto;max-height:min(240px,35vh);object-fit:contain;margin:0 auto 18px;flex-shrink:0}</style></head>
+<style id="startup-logo-style">#loading-screen .loader-logo {
+    display: block;
+
+    /* Full size on larger screens; scale down on smaller screens. */
+    width: min(800px, 90vw, 85vh);
+    height: auto;
+    max-height: none;
+
+    object-fit: contain;
+    margin: 0 auto 24px;
+    flex-shrink: 0;
+}</style></head>
 <body data-tab="home">
     <!-- Startup block screen: shown in an iframe, then dismissed automatically -->
     <style>
