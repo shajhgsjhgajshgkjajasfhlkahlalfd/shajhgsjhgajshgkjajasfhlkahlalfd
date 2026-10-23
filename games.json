@@ -112,5 +112,11 @@
     "title": "Retro Bowl",
     "tagline": "An 8-bit version of the classic american football!",
     "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/33.png"
+  },
+  {
+    "file": "ipq.html",
+    "title": "The Impossible Quiz",
+    "tagline": "Useless skips, hand-made keyboards, Blue, red, blue, yellow, horrifying amounts of logic, it's all here!",
+    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/507.png"
   }
 ]
