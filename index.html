@@ -38,13 +38,10 @@
         ══════════════════════════════════════════════════════ */
         :root {
             --accent-color:  #f59e0b;
-            --accent-rgb: 245,158,11;
-            --particle-color: #f59e0b;
-            --particle-rgb: 245,158,11;
             --accent-light:  #fbbf24;
-            --accent-glow:   0 0 24px rgba(var(--accent-rgb, 245,158,11), 0.28);
-            --accent-dim:    rgba(var(--accent-rgb, 245,158,11), 0.10);
-            --accent-border: rgba(var(--accent-rgb, 245,158,11), 0.30);
+            --accent-glow:   0 0 24px rgba(var(--accent-rgb,245,158,11),0.28);
+            --accent-dim:    rgba(var(--accent-rgb,245,158,11),0.10);
+            --accent-border: rgba(var(--accent-rgb,245,158,11),0.30);
 
             --bg:            #080a10;
             --bg-2:          #0f1219;
@@ -88,8 +85,8 @@
         html {
             min-height: 100%;
             background:
-                radial-gradient(ellipse at 80% 0%,   rgba(var(--accent-rgb, 245,158,11), 0.07) 0%, transparent 38rem),
-                radial-gradient(ellipse at 10% 60%,  rgba(var(--accent-rgb, 245,158,11),0.05) 0%, transparent 28rem),
+                radial-gradient(ellipse at 80% 0%,   rgba(var(--accent-rgb,245,158,11),0.07) 0%, transparent 38rem),
+                radial-gradient(ellipse at 10% 60%,  rgba(var(--accent-rgb,245,158,11),0.05) 0%, transparent 28rem),
                 var(--bg);
             scroll-behavior: smooth;
         }
@@ -460,7 +457,7 @@
             border: 1px solid var(--line-solid);
             border-radius: var(--r-xl);
             background:
-                radial-gradient(ellipse at 78% 40%, rgba(var(--accent-rgb, 245,158,11), 0.12) 0%, transparent 22rem),
+                radial-gradient(ellipse at 78% 40%, rgba(var(--accent-rgb,245,158,11),0.12) 0%, transparent 22rem),
                 linear-gradient(118deg, var(--bg-2) 0%, #10141f 50%, #161920 100%);
             box-shadow: 0 24px 70px rgba(0,0,0,0.32), inset 0 1px rgba(255,255,255,0.04);
             isolation: isolate;
@@ -521,11 +518,11 @@
             min-height: 44px;
             margin-top: 22px;
             padding: 0 20px;
-            color: var(--on-accent, #111);
+            color:var(--on-accent,#111);
             border: 0;
             border-radius: var(--r-lg);
             background: var(--accent-color);
-            box-shadow: 0 8px 22px rgba(var(--accent-rgb, 245,158,11), 0.28);
+            box-shadow: 0 8px 22px rgba(var(--accent-rgb,245,158,11),0.28);
             cursor: pointer;
             font-size: 13px; font-weight: 800;
             transition: filter var(--transition), transform var(--transition);
@@ -551,7 +548,7 @@
             position: absolute;
             width: 210px; height: 160px;
             border-radius: 50%;
-            background: rgba(var(--accent-rgb, 245,158,11), 0.16);
+            background: rgba(var(--accent-rgb,245,158,11),0.16);
             filter: blur(50px);
         }
         .hero-orbit {
@@ -735,7 +732,7 @@
         .btn-action:hover, a.btn-action:hover {
             border-color: var(--accent-color);
             background: var(--accent-color);
-            color: var(--on-accent, #111);
+            color:var(--on-accent,#111);
             transform: translateY(-1px);
         }
         button:focus-visible, a:focus-visible,
@@ -764,7 +761,7 @@
         .game-provider-button:hover, .game-provider-button.active {
             color: var(--ink);
             border-color: var(--accent-border);
-            background: rgba(var(--accent-rgb, 245,158,11), 0.08);
+            background: rgba(var(--accent-rgb,245,158,11),0.08);
             transform: translateY(-1px);
         }
         .game-provider-logo {
@@ -972,9 +969,9 @@
         .dock-item svg { width: 16px; height: 16px; flex: 0 0 16px; }
         .dock-item:hover { color: var(--ink); background: rgba(255,255,255,0.07); transform: translateY(-1px); }
         .dock-item.active {
-            color: var(--on-accent, #111);
+            color:var(--on-accent,#111);
             background: var(--accent-color);
-            box-shadow: 0 6px 16px rgba(var(--accent-rgb, 245,158,11), 0.25);
+            box-shadow: 0 6px 16px rgba(var(--accent-rgb,245,158,11),0.25);
         }
         .dock-item#dock-mute-btn {
             min-width: 40px; width: 40px;
@@ -1071,7 +1068,7 @@
             width: 100%; height: 100%;
             pointer-events: none;
             opacity: 0.18;
-            background: radial-gradient(ellipse at 50% 85%, rgba(var(--particle-rgb, 255,102,0),0.45) 0%, var(--bg-2) 45%, var(--bg) 100%);
+            background: radial-gradient(ellipse at 50% 85%, rgba(var(--particle-rgb,255,102,0),0.45) 0%, var(--bg-2) 45%, var(--bg) 100%);
         }
         #cxz-player .cxz-stage {
             position: relative;
@@ -1112,7 +1109,7 @@
             cursor: pointer;
             transition: background var(--transition), color var(--transition);
         }
-        #cxz-player .cxz-close:hover { background: var(--accent-color); color: var(--on-accent, #111); }
+        #cxz-player .cxz-close:hover { background: var(--accent-color); color:var(--on-accent,#111); }
         #cxz-player .cxz-close.left  { left: 10px; }
         #cxz-player .cxz-close.right { right: 10px; }
 
@@ -1171,7 +1168,7 @@
             cursor: pointer;
             transition: background var(--transition), color var(--transition);
         }
-        #cxz-player .cxz-tool:hover { background: var(--accent-color); color: var(--on-accent, #111); border-color: var(--accent-color); }
+        #cxz-player .cxz-tool:hover { background: var(--accent-color); color:var(--on-accent,#111); border-color: var(--accent-color); }
         #cxz-player .cxz-volume {
             height: 26px;
             display: flex; align-items: center; gap: 5px;
@@ -1237,7 +1234,7 @@
             content: var(--crosshair-content, '+');
             font-family: Arial, sans-serif;
             font-size: var(--crosshair-size, 20px); font-weight: 400; line-height: 1;
-            text-shadow: 0 0 6px rgba(var(--accent-rgb, 245,158,11), 0.5);
+            text-shadow: 0 0 6px rgba(var(--accent-rgb,245,158,11),0.5);
             transform: translate(-50%, -50%);
             pointer-events: none;
         }
@@ -1951,7 +1948,6 @@
                     <div class="setting-subhead" style="text-align:left; margin-top:12px;">Background Particle Color</div>
                     <label class="checkbox-label"><input type="checkbox" id="particle-follow-theme" checked onchange="followThemeParticles(this.checked)">Match theme color</label>
                     <div class="btn-row"><input type="color" id="particle-color-input" value="#ff6600" aria-label="Background particle color" oninput="setParticleColor(this.value)" style="width:64px;height:38px;border:1px solid var(--line);background:var(--bg-2);border-radius:8px;cursor:pointer;"><span style="font-size:12px;color:var(--ink-soft);">Choose a color to override the theme.</span></div>
-
                     <div class="setting-subhead" style="text-align:left; margin-top:8px;">Background</div>
                     <select id="bg-select" onchange="changeBackground(this.value)">
                         <option value="starfield">Starfield</option>
@@ -2899,76 +2895,55 @@
         }
 
         // 4. ACCENT THEME SYSTEM
-        function themeRgb(hex) {
-            return [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
-        }
-        function themeMix(rgb, target, amount) {
-            return rgb.map((c, i) => Math.round(c * (1 - amount) + target[i] * amount));
-        }
+        function themeRgb(hex) { return [1,3,5].map(i => parseInt(hex.slice(i,i+2),16)); }
+        function themeMix(rgb, target, amount) { return rgb.map((c,i) => Math.round(c*(1-amount)+target[i]*amount)); }
         function particlePalette() {
+            const custom = localStorage.getItem(PRE+'particle_color');
             const root = document.documentElement;
-            const custom = localStorage.getItem(PRE + 'particle_color');
-            const color = /^#[\da-f]{6}$/i.test(custom || '') ? custom :
-                (root.style.getPropertyValue('--accent-color') || '#ff6600');
-            const rgb = themeRgb(color);
-            root.style.setProperty('--particle-color', color);
-            root.style.setProperty('--particle-rgb', rgb.join(','));
-            const picker = byId('particle-color-input');
-            if (picker) picker.value = color;
-            const follow = byId('particle-follow-theme');
-            if (follow) follow.checked = !custom;
+            const color = /^#[\da-f]{6}$/i.test(custom || '') ? custom : (root.style.getPropertyValue('--accent-color') || '#ff6600');
+            root.style.setProperty('--particle-color',color);
+            root.style.setProperty('--particle-rgb',themeRgb(color).join(','));
+            if (byId('particle-color-input')) byId('particle-color-input').value=color;
+            if (byId('particle-follow-theme')) byId('particle-follow-theme').checked=!custom;
         }
         function setParticleColor(hex) {
             if (!/^#[\da-f]{6}$/i.test(hex)) return;
-            localStorage.setItem(PRE + 'particle_color', hex.toLowerCase());
-            particlePalette();
+            localStorage.setItem(PRE+'particle_color',hex.toLowerCase()); particlePalette();
         }
         function followThemeParticles(enabled) {
-            if (enabled) localStorage.removeItem(PRE + 'particle_color');
-            else localStorage.setItem(PRE + 'particle_color', byId('particle-color-input').value);
+            if(enabled) localStorage.removeItem(PRE+'particle_color');
+            else localStorage.setItem(PRE+'particle_color',byId('particle-color-input').value);
             particlePalette();
         }
-        function setThemeAccent(hex, silent = false) {
-            const normalized = String(hex || '').trim().toLowerCase();
-            if (!/^#[\da-f]{6}$/i.test(normalized)) {
-                if (!silent) showToast('Enter a valid 6-digit hex color, such as #ff6600');
-                return false;
-            }
-            const rgb = themeRgb(normalized);
-            const rgba = alpha => `rgba(${rgb.join(',')},${alpha})`;
-            const mix = (target, amount) => themeMix(rgb, target, amount).join(',');
-            const props = {
-                '--accent-color': normalized,
-                '--accent-rgb': rgb.join(','),
-                '--accent-light': `rgb(${mix([255,255,255], .3)})`,
-                '--accent-glow': `0 0 24px ${rgba(.28)}`,
-                '--accent-dim': rgba(.10), '--accent-border': rgba(.30),
-                '--bg': `rgb(${mix([6,8,12], .97)})`,
-                '--bg-2': `rgb(${mix([12,15,21], .94)})`,
-                '--bg-3': `rgb(${mix([20,24,32], .91)})`,
-                '--bg-card': `rgba(${mix([12,15,21], .94)},.96)`,
-                '--line': rgba(.14), '--line-solid': `rgb(${mix([24,28,38], .84)})`,
-                '--ink': '#f0f2f7', '--ink-soft': `rgb(${mix([145,151,166], .92)})`,
-                '--ink-dim': `rgb(${mix([76,84,103], .94)})`,
-                '--border-color': rgba(.3), '--text-color': '#f0f2f7',
-                '--text-muted': `rgb(${mix([145,151,166], .92)})`,
-                '--on-accent': (.2126 * rgb[0] + .7152 * rgb[1] + .0722 * rgb[2]) > 145 ? '#111111' : '#ffffff'
+        function setThemeAccent(hex, silent=false) {
+            const normalized=String(hex || '').trim().toLowerCase();
+            if(!/^#[\da-f]{6}$/i.test(normalized)) { if(!silent) showToast('Enter a valid 6-digit hex color'); return false; }
+            const rgb=themeRgb(normalized), rgba=a=>`rgba(${rgb.join(',')},${a})`;
+            const mix=(target,amount)=>themeMix(rgb,target,amount).join(',');
+            const props={
+                '--accent-color':normalized,'--accent-rgb':rgb.join(','),
+                '--accent-light':`rgb(${mix([255,255,255],.3)})`, '--accent-glow':`0 0 24px ${rgba(.28)}`,
+                '--accent-dim':rgba(.1),'--accent-border':rgba(.3),
+                '--bg':`rgb(${mix([6,8,12],.97)})`,'--bg-2':`rgb(${mix([12,15,21],.94)})`,
+                '--bg-3':`rgb(${mix([20,24,32],.91)})`,'--bg-card':`rgba(${mix([12,15,21],.94)},.96)`,
+                '--line':rgba(.14),'--line-solid':`rgb(${mix([24,28,38],.84)})`,
+                '--ink':'#f0f2f7','--ink-soft':`rgb(${mix([145,151,166],.92)})`,
+                '--ink-dim':`rgb(${mix([76,84,103],.94)})`,'--border-color':rgba(.3),'--text-color':'#f0f2f7',
+                '--text-muted':`rgb(${mix([145,151,166],.92)})`,
+                '--on-accent':(.2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2])>145?'#111111':'#ffffff'
             };
-            Object.entries(props).forEach(([key,value]) => document.documentElement.style.setProperty(key,value));
-            const input = byId('accent-hex-input');
-            if (input) input.value = normalized;
-            localStorage.setItem(PRE + 'accent', normalized);
-            particlePalette();
-            document.querySelectorAll('#settings .swatch-box, #setup-swatches .swatch-box').forEach(el => {
-                const match = /'(#[\da-f]{6})'/i.exec(el.getAttribute('onclick') || '');
-                const color = el.dataset.color || (match && match[1]);
-                el.classList.toggle('selected', !!color && color.toLowerCase() === normalized);
+            Object.entries(props).forEach(([key,value])=>document.documentElement.style.setProperty(key,value));
+            if(byId('accent-hex-input')) byId('accent-hex-input').value=normalized;
+            localStorage.setItem(PRE+'accent',normalized); particlePalette();
+            document.querySelectorAll('#settings .swatch-box, #setup-swatches .swatch-box').forEach(el=>{
+                const m=/'(#[\da-f]{6})'/i.exec(el.getAttribute('onclick')||'');
+                const color=el.dataset.color||(m&&m[1]);
+                el.classList.toggle('selected',!!color&&color.toLowerCase()===normalized);
             });
-            if (!silent && typeof renderHomeSearch === 'function' && FEATURED_PICKS.length) {
-                const q = byId('searchInput');
-                renderHomeSearch(q && byId('home').classList.contains('active') ? q.value : '');
+            if(!silent && typeof renderHomeSearch==='function' && FEATURED_PICKS.length) {
+                const q=byId('searchInput'); renderHomeSearch(q&&byId('home').classList.contains('active')?q.value:'');
             }
-            if (!silent) showToast(`Theme set to ${normalized}`);
+            if(!silent) showToast(`Theme set to ${normalized}`);
             return true;
         }
 
@@ -3769,15 +3744,15 @@ setTimeout(function() {
 
         // Starfield structures
         const stars = [];
-        const starCount = 50;
+        let starCount = 180;
 
         // Weather and ambient background structures
         const constellationStars = [];
         const rainDrops = [];
         const snowflakes = [];
-        const constellationCount = 46;
+        let constellationCount = 100;
         // Fewer droplets on low-end devices; the shape stays lightweight (one filled path per drop).
-        const rainDropCount = document.body.classList.contains('auto-lite') ? 58 : 92;
+        let rainDropCount = 170;
         const snowflakeCount = 85;
 
         // Ember structures
@@ -3785,6 +3760,11 @@ setTimeout(function() {
         const emberCount = 30;
 
         function initBgObjects() {
+            const lite = document.body.classList.contains('auto-lite');
+            const area = cw * ch;
+            starCount = Math.min(lite ? 220 : 420, Math.max(lite ? 100 : 160, Math.round(area / (lite ? 6500 : 4200))));
+            constellationCount = Math.min(lite ? 100 : 180, Math.max(lite ? 55 : 85, Math.round(area / (lite ? 15000 : 10000))));
+            rainDropCount = Math.min(lite ? 150 : 280, Math.max(lite ? 70 : 130, Math.round(area / (lite ? 10500 : 6500))));
             columns = Math.floor(cw / fontSize);
             drops = [];
             for (let i = 0; i < columns; i++) drops[i] = Math.random() * -50;
@@ -3794,9 +3774,10 @@ setTimeout(function() {
                 stars.push({
                     x: Math.random() * cw,
                     y: Math.random() * ch,
-                    size: Math.random() * 2 + 0.8,
-                    speed: Math.random() * 0.4 + 0.1,
-                    alpha: Math.random() * 0.8 + 0.2
+                    size: Math.pow(Math.random(), 2) * 1.7 + 0.35,
+                    speed: Math.random() * 0.22 + 0.025,
+                    phase: Math.random() * Math.PI * 2,
+                    alpha: Math.random() * 0.65 + 0.2
                 });
             }
 
@@ -3813,16 +3794,19 @@ setTimeout(function() {
 
             rainDrops.length = 0;
             for (let i = 0; i < rainDropCount; i++) {
+                const depth = Math.pow(Math.random(), 1.4);
                 rainDrops.push({
-                    x: Math.random() * cw,
+                    x: Math.random() * (cw + 100) - 50,
                     y: Math.random() * ch,
-                    length: Math.random() * 8 + 7,
-                    width: Math.random() * 1.15 + 0.75,
-                    speed: Math.random() * 3.1 + 3.8,
-                    drift: Math.random() * 0.16 + 0.08,
-                    alpha: Math.random() * 0.22 + 0.2
+                    depth,
+                    length: 7 + depth * 24 + Math.random() * 5,
+                    width: .45 + depth * .9,
+                    speed: 230 + depth * 610 + Math.random() * 70,
+                    drift: .075 + Math.random() * .035,
+                    alpha: .10 + depth * .34
                 });
             }
+            rainDrops.sort((a,b) => a.depth-b.depth);
 
             snowflakes.length = 0;
             for (let i = 0; i < snowflakeCount; i++) {
@@ -3875,23 +3859,23 @@ setTimeout(function() {
 
             // Limit canvas work: ~12fps on lower-end devices, ~20fps otherwise.
             // CSS UI animations remain active independently of this decorative canvas.
-            const frameInterval = document.body.classList.contains('auto-lite') ? 83 : 50;
+            const frameInterval = document.body.classList.contains('auto-lite') ? 83 : (currentBgType === 'rain' ? 1000 / 30 : 50);
             if (now - lastFrameTime < frameInterval) {
                 bgFrameHandle = requestAnimationFrame(renderBg);
                 return;
             }
+            const dt = lastFrameTime ? Math.min((now-lastFrameTime)/1000, .1) : frameInterval/1000;
             lastFrameTime = now;
 
-            const themeStyle = getComputedStyle(document.documentElement);
-            const accent = themeStyle.getPropertyValue('--particle-color').trim() || '#ff6600';
-            const particleRgb = themeRgb(accent);
-            const particleLight = themeMix(particleRgb, [255,255,255], .45).join(',');
-            const particleSecondary = [particleRgb[1], particleRgb[2], particleRgb[0]].join(',');
-            const particle = alpha => `rgba(${particleRgb.join(',')},${alpha})`;
-            const backgroundColor = themeStyle.getPropertyValue('--bg').trim() || '#080a10';
+            const style = getComputedStyle(document.documentElement);
+            const accent = style.getPropertyValue('--particle-color').trim() || style.getPropertyValue('--accent-color').trim() || '#ff6600';
+            const rgb = themeRgb(accent);
+            const particle = alpha => `rgba(${rgb.join(',')},${alpha})`;
+            const particleLight = alpha => `rgba(${themeMix(rgb,[255,255,255],.45).join(',')},${alpha})`;
+            const bgColor = style.getPropertyValue('--bg').trim() || '#080a10';
 
             if (currentBgType === 'matrix') {
-                ctx.fillStyle = backgroundColor.replace('rgb(', 'rgba(').replace(')', ',0.12)');
+                ctx.fillStyle = bgColor.startsWith('rgb(') ? bgColor.replace('rgb(', 'rgba(').replace(')', ',0.12)') : 'rgba(8,10,16,0.12)';
                 ctx.fillRect(0, 0, cw, ch);
                 ctx.fillStyle = accent;
                 ctx.font = fontSize + "px 'MinecraftUI', monospace";
@@ -3905,15 +3889,15 @@ setTimeout(function() {
                     drops[i]++;
                 }
             } else if (currentBgType === 'starfield') {
-                ctx.fillStyle = backgroundColor;
+                ctx.fillStyle = bgColor;
                 ctx.fillRect(0, 0, cw, ch);
 
                 for (let i = 0; i < stars.length; i++) {
                     const s = stars[i];
-                    s.y += s.speed;
+                    s.y += s.speed * dt * 20;
                     if (s.y > ch) { s.y = 0; s.x = Math.random() * cw; }
 
-                    ctx.fillStyle = `rgba(${particleRgb.join(',')}, ${s.alpha})`;
+                    ctx.fillStyle = particleLight(s.alpha * (.82 + .18 * Math.sin(now / 1700 + s.phase)));
                     ctx.beginPath();
                     ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
                     ctx.fill();
@@ -3927,35 +3911,36 @@ setTimeout(function() {
                     p.x += p.speedX;
                     if (p.y < -5) { p.y = ch + 5; p.x = Math.random() * cw; }
 
-                    ctx.fillStyle = `rgba(${particleRgb.join(',')}, ${p.alpha})`;
+                    ctx.fillStyle = particle(p.alpha);
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
                     ctx.fill();
                 }
             } else if (currentBgType === 'rain') {
-                ctx.clearRect(0, 0, cw, ch);
+                ctx.clearRect(0,0,cw,ch);
+                const wind = .025 * Math.sin(now / 6300) + .012 * Math.sin(now / 2300);
+                ctx.lineCap = 'round';
                 for (const drop of rainDrops) {
-                    drop.y += drop.speed;
-                    drop.x -= drop.speed * drop.drift;
-                    if (drop.y - drop.length > ch) {
-                        drop.y = -drop.length;
-                        drop.x = Math.random() * cw;
+                    const slope = drop.drift + wind;
+                    drop.y += drop.speed * dt;
+                    drop.x -= drop.speed * dt * slope;
+                    if (drop.y-drop.length > ch) {
+                        drop.y = -drop.length - Math.random()*35;
+                        drop.x = Math.random()*(cw+100)-50;
                     }
-
-                    // A slim, tapered water drop with a rounded leading end.
-                    // One simple filled path per particle keeps this inexpensive to draw.
-                    const tailX = drop.x - drop.length * drop.drift;
-                    const tailY = drop.y - drop.length;
-                    const headX = drop.x;
-                    const headY = drop.y;
-                    const w = drop.width;
-                    ctx.fillStyle = `rgba(${particleRgb.join(',')}, ${drop.alpha})`;
+                    if(drop.x < -50) drop.x = cw+30;
+                    const tailX = drop.x + drop.length*slope;
+                    const tailY = drop.y-drop.length;
+                    const gradient = ctx.createLinearGradient(tailX,tailY,drop.x,drop.y);
+                    gradient.addColorStop(0,particle(0));
+                    gradient.addColorStop(.45,particle(drop.alpha*.55));
+                    gradient.addColorStop(1,particleLight(drop.alpha));
+                    ctx.strokeStyle = gradient;
+                    ctx.lineWidth = drop.width;
                     ctx.beginPath();
-                    ctx.moveTo(tailX, tailY);
-                    ctx.quadraticCurveTo(tailX + w * 0.65, tailY + drop.length * 0.18, headX, headY - w * 0.45);
-                    ctx.quadraticCurveTo(headX + w * 1.15, headY + w * 0.18, headX, headY + w * 0.65);
-                    ctx.quadraticCurveTo(headX - w * 1.1, headY + w * 0.18, tailX, tailY);
-                    ctx.fill();
+                    ctx.moveTo(tailX,tailY);
+                    ctx.lineTo(drop.x,drop.y);
+                    ctx.stroke();
                 }
             } else if (currentBgType === 'snow') {
                 ctx.clearRect(0, 0, cw, ch);
@@ -3966,39 +3951,60 @@ setTimeout(function() {
                         flake.y = -flake.radius;
                         flake.x = Math.random() * cw;
                     }
-                    ctx.fillStyle = `rgba(${particleRgb.join(',')}, ${flake.alpha})`;
+                    ctx.fillStyle = particleLight(flake.alpha);
                     ctx.beginPath();
                     ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
                     ctx.fill();
                 }
             } else if (currentBgType === 'constellations') {
-                ctx.clearRect(0, 0, cw, ch);
-                for (const star of constellationStars) {
-                    star.x += star.drift;
-                    if (star.x < -2) star.x = cw + 2;
-                    if (star.x > cw + 2) star.x = -2;
+                ctx.clearRect(0,0,cw,ch);
+                // A spatial grid limits connection searches to nearby stars.
+                const reach = Math.max(120,Math.min(175,Math.sqrt(cw*ch/constellationStars.length)*1.55));
+                const cells = new Map();
+                const key = (x,y) => x+','+y;
+                for(let i=0;i<constellationStars.length;i++) {
+                    const star=constellationStars[i];
+                    star.x += star.drift*dt*20;
+                    if(star.x < -2) star.x=cw+2;
+                    if(star.x > cw+2) star.x=-2;
+                    const k=key(Math.floor(star.x/reach),Math.floor(star.y/reach));
+                    if(!cells.has(k)) cells.set(k,[]);
+                    cells.get(k).push(i);
                 }
-                for (let i = 0; i < constellationStars.length; i++) {
-                    const a = constellationStars[i];
-                    for (let j = i + 1; j < constellationStars.length; j++) {
-                        const b = constellationStars[j];
-                        const dx = a.x - b.x;
-                        const dy = a.y - b.y;
-                        const distance = Math.sqrt(dx * dx + dy * dy);
-                        if (distance < 118) {
-                            ctx.strokeStyle = `rgba(${particleRgb.join(',')}, ${(1 - distance / 118) * 0.24})`;
-                            ctx.lineWidth = 0.7;
-                            ctx.beginPath();
-                            ctx.moveTo(a.x, a.y);
-                            ctx.lineTo(b.x, b.y);
-                            ctx.stroke();
+                const degrees = new Uint8Array(constellationStars.length);
+                ctx.lineWidth=.65;
+                for(let i=0;i<constellationStars.length;i++) {
+                    const a=constellationStars[i];
+                    const gx=Math.floor(a.x/reach), gy=Math.floor(a.y/reach);
+                    const near=[];
+                    for(let ox=-1;ox<=1;ox++) for(let oy=-1;oy<=1;oy++) {
+                        const bucket=cells.get(key(gx+ox,gy+oy));
+                        if(!bucket) continue;
+                        for(const j of bucket) {
+                            if(j<=i) continue;
+                            const b=constellationStars[j], dx=a.x-b.x, dy=a.y-b.y;
+                            const d2=dx*dx+dy*dy;
+                            if(d2<reach*reach) near.push({j,d:Math.sqrt(d2)});
                         }
                     }
-                    const twinkle = 0.38 + (Math.sin(now / 850 + a.phase) + 1) * 0.24;
-                    ctx.fillStyle = `rgba(${particleRgb.join(',')}, ${twinkle})`;
-                    ctx.beginPath();
-                    ctx.arc(a.x, a.y, a.size, 0, Math.PI * 2);
-                    ctx.fill();
+                    near.sort((a,b)=>a.d-b.d);
+                    for(const edge of near) {
+                        if(degrees[i]>=3) break;
+                        if(degrees[edge.j]>=3) continue;
+                        const b=constellationStars[edge.j];
+                        ctx.strokeStyle=particle((1-edge.d/reach)*.38);
+                        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+                        degrees[i]++; degrees[edge.j]++;
+                    }
+                }
+                for(const star of constellationStars) {
+                    const twinkle=.48+(Math.sin(now/1400+star.phase)+1)*.2;
+                    if(star.size>1.65) {
+                        ctx.fillStyle=particle(.075*twinkle);
+                        ctx.beginPath();ctx.arc(star.x,star.y,star.size*3,0,Math.PI*2);ctx.fill();
+                    }
+                    ctx.fillStyle=particleLight(twinkle);
+                    ctx.beginPath();ctx.arc(star.x,star.y,star.size*.8,0,Math.PI*2);ctx.fill();
                 }
             } else if (currentBgType === 'aurora') {
                 ctx.clearRect(0, 0, cw, ch);
@@ -4010,11 +4016,11 @@ setTimeout(function() {
                     const y = ch * (0.16 + i * 0.065) + wave * 27;
                     const gradient = ctx.createLinearGradient(0, y - 45, cw, y + 55);
                     gradient.addColorStop(0, particle(0));
-                    gradient.addColorStop(0.32, particle(0.48));
-                    gradient.addColorStop(0.64, `rgba(${particleSecondary},0.42)`);
-                    gradient.addColorStop(1, `rgba(${particleSecondary},0)`);
+                    gradient.addColorStop(0.32, particle(.48));
+                    gradient.addColorStop(0.64, particleLight(.42));
+                    gradient.addColorStop(1, particleLight(0));
                     ctx.strokeStyle = gradient;
-                    ctx.shadowColor = i % 2 ? `rgb(${particleSecondary})` : accent;
+                    ctx.shadowColor = accent;
                     ctx.globalAlpha = 0.3;
                     ctx.lineWidth = 58 - i * 7;
                     ctx.beginPath();
