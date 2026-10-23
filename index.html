@@ -1628,6 +1628,16 @@ input::placeholder, textarea::placeholder, button::before, button::after {
 
 </style>
 <!-- minecraft-site-font:end -->
+<!-- loading-logo-style:start -->
+<style>
+#loading-screen .loader-logo {
+ display:block; width:min(360px,78vw); height:auto;
+ max-height: min(240px,35vh); object-fit:contain;
+ margin:0 auto 18px; flex-shrink:0;
+}
+
+</style>
+<!-- loading-logo-style:end -->
 </head>
 <body data-tab="home">
     <!-- Startup block screen: shown in an iframe, then dismissed automatically -->
@@ -1706,7 +1716,8 @@ input::placeholder, textarea::placeholder, button::before, button::after {
                 // Never let a blocked fetch keep the whole site behind this overlay.
                 fetchTimer = setTimeout(function () {
                     if (token !== loadToken) return;
-                    renderBlockScreen('<!doctype html><html><body style="margin:0;background:#090d18;color:#e8edf8;font:16px system-ui;display:grid;place-items:center;min-height:100vh"><main style="padding:2rem;text-align:center"><h2>Block screen timed out</h2><p>Continuing to Classroom-X-Zone…</p></main></body></html>', token);
+                    renderBlockScreen('<!doctype html><html><body style="margin:0;background:#090d18;color:#e8edf8;font:16px system-ui;display:grid;place-items:center;min-height:100vh"><main style="padding:2rem;text-align:center"><h2>Block screen timed out</h2><p>Continuing to Classroom-X-Zone…</p></main><!-- loading-logo-boot:start --><script>(function(){var img=document.getElementById("startup-loading-logo");function ready(){var title=document.querySelector("#loading-screen .loader-title");if(img&&img.naturalWidth&&title)title.style.display="none";}if(img){img.addEventListener("load",ready);if(img.complete)ready();}})();</script><!-- loading-logo-boot:end -->
+</body></html>', token);
                 }, 5000);
             } catch (e) {
                 window.__cxzBlockDone = true;
@@ -1747,6 +1758,7 @@ input::placeholder, textarea::placeholder, button::before, button::after {
 
     <!-- Startup Loading Screen -->
     <div id="loading-screen">
+<img class="loader-logo" id="startup-loading-logo" src="./g/assets/log-load.png" alt="Classroom-X-Zone" loading="eager" fetchpriority="high" decoding="async" onerror="this.hidden=true;this.style.display='none';var t=document.querySelector('#loading-screen .loader-title');if(t)t.style.removeProperty('display');">
         <h1 class="loader-title">CLASSROOM-X-ZONE</h1>
         <p class="loader-subtitle">Loading Assets...</p>
         <div class="progress-container">
