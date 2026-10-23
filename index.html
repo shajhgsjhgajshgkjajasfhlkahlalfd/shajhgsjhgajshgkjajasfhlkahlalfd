@@ -1604,6 +1604,30 @@
         .square-grid .card h3 { opacity: 1; transform: none; font-size: 11px; }
     }
 </style>
+<!-- minecraft-site-font:start -->
+<style id="minecraft-site-font">
+@font-face {
+  font-family: 'MinecraftUI';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Minecraft'), url('https://fonts.cdnfonts.com/s/25041/1_MinecraftRegular1.woff') format('woff');
+}
+:root {
+  --mc-font: 'MinecraftUI', 'Press Start 2P', monospace;
+  --font-ui: var(--mc-font) !important;
+  --font-display: var(--mc-font) !important;
+  --font-mono: var(--mc-font) !important;
+}
+html, body, body *:not(svg):not(svg *):not(math):not(math *):not(.fa):not(.fas):not(.far):not(.fab):not(.material-icons):not([class*="icon-font"]) {
+  font-family: var(--mc-font) !important;
+}
+input::placeholder, textarea::placeholder, button::before, button::after {
+  font-family: var(--mc-font) !important;
+}
+
+</style>
+<!-- minecraft-site-font:end -->
 </head>
 <body data-tab="home">
     <!-- Startup block screen: shown in an iframe, then dismissed automatically -->
