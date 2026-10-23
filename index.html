@@ -38,10 +38,13 @@
         ══════════════════════════════════════════════════════ */
         :root {
             --accent-color:  #f59e0b;
+            --accent-rgb: 245,158,11;
+            --particle-color: #f59e0b;
+            --particle-rgb: 245,158,11;
             --accent-light:  #fbbf24;
-            --accent-glow:   0 0 24px rgba(245, 158, 11, 0.28);
-            --accent-dim:    rgba(245, 158, 11, 0.10);
-            --accent-border: rgba(245, 158, 11, 0.30);
+            --accent-glow:   0 0 24px rgba(var(--accent-rgb, 245,158,11), 0.28);
+            --accent-dim:    rgba(var(--accent-rgb, 245,158,11), 0.10);
+            --accent-border: rgba(var(--accent-rgb, 245,158,11), 0.30);
 
             --bg:            #080a10;
             --bg-2:          #0f1219;
@@ -85,8 +88,8 @@
         html {
             min-height: 100%;
             background:
-                radial-gradient(ellipse at 80% 0%,   rgba(245,158,11,0.07) 0%, transparent 38rem),
-                radial-gradient(ellipse at 10% 60%,  rgba(99,102,241,0.05) 0%, transparent 28rem),
+                radial-gradient(ellipse at 80% 0%,   rgba(var(--accent-rgb, 245,158,11), 0.07) 0%, transparent 38rem),
+                radial-gradient(ellipse at 10% 60%,  rgba(var(--accent-rgb, 245,158,11),0.05) 0%, transparent 28rem),
                 var(--bg);
             scroll-behavior: smooth;
         }
@@ -174,7 +177,7 @@
         #loading-screen {
             position: fixed;
             inset: 0;
-            background: radial-gradient(ellipse at center, #131824 0%, var(--bg) 60%);
+            background: radial-gradient(ellipse at center, var(--bg-2) 0%, var(--bg) 60%);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -457,8 +460,8 @@
             border: 1px solid var(--line-solid);
             border-radius: var(--r-xl);
             background:
-                radial-gradient(ellipse at 78% 40%, rgba(245,158,11,0.12) 0%, transparent 22rem),
-                linear-gradient(118deg, #141926 0%, #10141f 50%, #161920 100%);
+                radial-gradient(ellipse at 78% 40%, rgba(var(--accent-rgb, 245,158,11), 0.12) 0%, transparent 22rem),
+                linear-gradient(118deg, var(--bg-2) 0%, #10141f 50%, #161920 100%);
             box-shadow: 0 24px 70px rgba(0,0,0,0.32), inset 0 1px rgba(255,255,255,0.04);
             isolation: isolate;
         }
@@ -518,11 +521,11 @@
             min-height: 44px;
             margin-top: 22px;
             padding: 0 20px;
-            color: #111;
+            color: var(--on-accent, #111);
             border: 0;
             border-radius: var(--r-lg);
             background: var(--accent-color);
-            box-shadow: 0 8px 22px rgba(245,158,11,0.28);
+            box-shadow: 0 8px 22px rgba(var(--accent-rgb, 245,158,11), 0.28);
             cursor: pointer;
             font-size: 13px; font-weight: 800;
             transition: filter var(--transition), transform var(--transition);
@@ -548,7 +551,7 @@
             position: absolute;
             width: 210px; height: 160px;
             border-radius: 50%;
-            background: rgba(245,158,11,0.16);
+            background: rgba(var(--accent-rgb, 245,158,11), 0.16);
             filter: blur(50px);
         }
         .hero-orbit {
@@ -640,7 +643,7 @@
             color: var(--ink);
             border: 1px solid var(--line-solid);
             border-radius: var(--r-lg);
-            background: linear-gradient(155deg, rgba(20,25,38,0.98), rgba(13,17,27,0.98));
+            background: linear-gradient(155deg, var(--bg-card), var(--bg-card));
             box-shadow: 0 8px 22px rgba(0,0,0,0.18), inset 0 1px rgba(255,255,255,0.02);
             text-align: left;
             text-decoration: none;
@@ -687,7 +690,7 @@
             padding: 10px;
             border: 1px solid var(--line-solid);
             border-radius: var(--r-lg);
-            background: linear-gradient(155deg, rgba(20,25,38,0.98), rgba(13,17,27,0.98));
+            background: linear-gradient(155deg, var(--bg-card), var(--bg-card));
             box-shadow: 0 8px 22px rgba(0,0,0,0.16);
             display: flex;
             flex-direction: column;
@@ -732,7 +735,7 @@
         .btn-action:hover, a.btn-action:hover {
             border-color: var(--accent-color);
             background: var(--accent-color);
-            color: #111;
+            color: var(--on-accent, #111);
             transform: translateY(-1px);
         }
         button:focus-visible, a:focus-visible,
@@ -761,7 +764,7 @@
         .game-provider-button:hover, .game-provider-button.active {
             color: var(--ink);
             border-color: var(--accent-border);
-            background: rgba(245,158,11,0.08);
+            background: rgba(var(--accent-rgb, 245,158,11), 0.08);
             transform: translateY(-1px);
         }
         .game-provider-logo {
@@ -969,9 +972,9 @@
         .dock-item svg { width: 16px; height: 16px; flex: 0 0 16px; }
         .dock-item:hover { color: var(--ink); background: rgba(255,255,255,0.07); transform: translateY(-1px); }
         .dock-item.active {
-            color: #111;
+            color: var(--on-accent, #111);
             background: var(--accent-color);
-            box-shadow: 0 6px 16px rgba(245,158,11,0.25);
+            box-shadow: 0 6px 16px rgba(var(--accent-rgb, 245,158,11), 0.25);
         }
         .dock-item#dock-mute-btn {
             min-width: 40px; width: 40px;
@@ -1068,7 +1071,7 @@
             width: 100%; height: 100%;
             pointer-events: none;
             opacity: 0.18;
-            background: radial-gradient(ellipse at 50% 85%, #3a1f00 0%, #110e18 45%, #06070c 100%);
+            background: radial-gradient(ellipse at 50% 85%, rgba(var(--particle-rgb, 255,102,0),0.45) 0%, var(--bg-2) 45%, var(--bg) 100%);
         }
         #cxz-player .cxz-stage {
             position: relative;
@@ -1082,7 +1085,7 @@
             border-radius: var(--r-lg);
             border: 1px solid rgba(255,255,255,0.13);
             box-shadow: 0 24px 70px rgba(0,0,0,0.5);
-            background: #10141d;
+            background: var(--bg-2);
             overflow: hidden;
         }
         #cxz-game-window:fullscreen .cxz-close { display: none; }
@@ -1109,14 +1112,14 @@
             cursor: pointer;
             transition: background var(--transition), color var(--transition);
         }
-        #cxz-player .cxz-close:hover { background: var(--accent-color); color: #111; }
+        #cxz-player .cxz-close:hover { background: var(--accent-color); color: var(--on-accent, #111); }
         #cxz-player .cxz-close.left  { left: 10px; }
         #cxz-player .cxz-close.right { right: 10px; }
 
         #cxz-player .cxz-loader {
             position: absolute; inset: 0; z-index: 20;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: #10141d;
+            background: var(--bg-2);
             transition: opacity 0.4s ease;
         }
         #cxz-player .cxz-loader.hidden { opacity: 0; pointer-events: none; }
@@ -1163,19 +1166,19 @@
             display: flex; align-items: center; justify-content: center;
             border: 1px solid rgba(255,255,255,0.12);
             border-radius: var(--r);
-            background: rgba(18,22,32,0.88);
+            background: var(--bg-card);
             color: var(--ink-soft);
             cursor: pointer;
             transition: background var(--transition), color var(--transition);
         }
-        #cxz-player .cxz-tool:hover { background: var(--accent-color); color: #111; border-color: var(--accent-color); }
+        #cxz-player .cxz-tool:hover { background: var(--accent-color); color: var(--on-accent, #111); border-color: var(--accent-color); }
         #cxz-player .cxz-volume {
             height: 26px;
             display: flex; align-items: center; gap: 5px;
             padding: 3px 8px;
             border: 1px solid rgba(255,255,255,0.12);
             border-radius: var(--r);
-            background: rgba(18,22,32,0.88);
+            background: var(--bg-card);
         }
         #cxz-player .cxz-volume input { width: 65px; }
         #cxz-player .cxz-title {
@@ -1221,9 +1224,9 @@
         body.auto-lite .tab-content { will-change: auto !important; }
         body.auto-lite .hero-art-glow, body.auto-lite .hero-orbit,
         body.auto-lite .hero-floating-chip { display: none !important; }
-        body.auto-lite .home-hero { background: #141926 !important; }
+        body.auto-lite .home-hero { background: var(--bg-2) !important; }
         body.auto-lite .card, body.auto-lite .tool-card,
-        body.auto-lite .settings-col { background: #141926 !important; }
+        body.auto-lite .settings-col { background: var(--bg-2) !important; }
         body.auto-lite canvas#bg-canvas { opacity: 0.4; }
 
         /* Custom cursor */
@@ -1234,7 +1237,7 @@
             content: var(--crosshair-content, '+');
             font-family: Arial, sans-serif;
             font-size: var(--crosshair-size, 20px); font-weight: 400; line-height: 1;
-            text-shadow: 0 0 6px rgba(245,158,11,0.5);
+            text-shadow: 0 0 6px rgba(var(--accent-rgb, 245,158,11), 0.5);
             transform: translate(-50%, -50%);
             pointer-events: none;
         }
@@ -1927,7 +1930,7 @@
                         <span>Appearance</span>
                     </div>
 
-                    <div class="setting-subhead" style="text-align:left;">Accent Color</div>
+                    <div class="setting-subhead" style="text-align:left;">Theme Color</div>
                     <!-- Swatches from Image 2 -->
                     <div class="color-swatches-grid">
                         <div class="swatch-box" style="background:#ff6600;" onclick="setThemeAccent('#ff6600')"></div>
@@ -1944,6 +1947,10 @@
                         <input type="text" id="accent-hex-input" value="#ff6600">
                         <button class="btn-action" style="width:80px;" onclick="setThemeAccent(document.getElementById('accent-hex-input').value)">Apply</button>
                     </div>
+
+                    <div class="setting-subhead" style="text-align:left; margin-top:12px;">Background Particle Color</div>
+                    <label class="checkbox-label"><input type="checkbox" id="particle-follow-theme" checked onchange="followThemeParticles(this.checked)">Match theme color</label>
+                    <div class="btn-row"><input type="color" id="particle-color-input" value="#ff6600" aria-label="Background particle color" oninput="setParticleColor(this.value)" style="width:64px;height:38px;border:1px solid var(--line);background:var(--bg-2);border-radius:8px;cursor:pointer;"><span style="font-size:12px;color:var(--ink-soft);">Choose a color to override the theme.</span></div>
 
                     <div class="setting-subhead" style="text-align:left; margin-top:8px;">Background</div>
                     <select id="bg-select" onchange="changeBackground(this.value)">
@@ -2235,7 +2242,7 @@
             <p class="setup-sub">Pick a few options now, or skip. You can change everything later in Settings.</p>
 
             <div class="setup-section">
-                <div class="setting-subhead" style="text-align:left;">Accent Color</div>
+                <div class="setting-subhead" style="text-align:left;">Theme Color</div>
                 <div class="color-swatches-grid" id="setup-swatches"></div>
             </div>
 
@@ -2892,25 +2899,76 @@
         }
 
         // 4. ACCENT THEME SYSTEM
+        function themeRgb(hex) {
+            return [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+        }
+        function themeMix(rgb, target, amount) {
+            return rgb.map((c, i) => Math.round(c * (1 - amount) + target[i] * amount));
+        }
+        function particlePalette() {
+            const root = document.documentElement;
+            const custom = localStorage.getItem(PRE + 'particle_color');
+            const color = /^#[\da-f]{6}$/i.test(custom || '') ? custom :
+                (root.style.getPropertyValue('--accent-color') || '#ff6600');
+            const rgb = themeRgb(color);
+            root.style.setProperty('--particle-color', color);
+            root.style.setProperty('--particle-rgb', rgb.join(','));
+            const picker = byId('particle-color-input');
+            if (picker) picker.value = color;
+            const follow = byId('particle-follow-theme');
+            if (follow) follow.checked = !custom;
+        }
+        function setParticleColor(hex) {
+            if (!/^#[\da-f]{6}$/i.test(hex)) return;
+            localStorage.setItem(PRE + 'particle_color', hex.toLowerCase());
+            particlePalette();
+        }
+        function followThemeParticles(enabled) {
+            if (enabled) localStorage.removeItem(PRE + 'particle_color');
+            else localStorage.setItem(PRE + 'particle_color', byId('particle-color-input').value);
+            particlePalette();
+        }
         function setThemeAccent(hex, silent = false) {
-            const color = String(hex || '').trim();
-            if (!/^#[\da-f]{6}$/i.test(color) || !CSS.supports('color', color)) {
+            const normalized = String(hex || '').trim().toLowerCase();
+            if (!/^#[\da-f]{6}$/i.test(normalized)) {
                 if (!silent) showToast('Enter a valid 6-digit hex color, such as #ff6600');
                 return false;
             }
-            const normalized = color.toLowerCase();
-            document.documentElement.style.setProperty('--accent-color', normalized);
-            document.documentElement.style.setProperty('--accent-glow', `0 10px 30px color-mix(in srgb, ${normalized} 22%, transparent)`);
-            document.documentElement.style.setProperty('--border-color', normalized);
-            document.documentElement.style.setProperty('--text-color', normalized);
+            const rgb = themeRgb(normalized);
+            const rgba = alpha => `rgba(${rgb.join(',')},${alpha})`;
+            const mix = (target, amount) => themeMix(rgb, target, amount).join(',');
+            const props = {
+                '--accent-color': normalized,
+                '--accent-rgb': rgb.join(','),
+                '--accent-light': `rgb(${mix([255,255,255], .3)})`,
+                '--accent-glow': `0 0 24px ${rgba(.28)}`,
+                '--accent-dim': rgba(.10), '--accent-border': rgba(.30),
+                '--bg': `rgb(${mix([6,8,12], .97)})`,
+                '--bg-2': `rgb(${mix([12,15,21], .94)})`,
+                '--bg-3': `rgb(${mix([20,24,32], .91)})`,
+                '--bg-card': `rgba(${mix([12,15,21], .94)},.96)`,
+                '--line': rgba(.14), '--line-solid': `rgb(${mix([24,28,38], .84)})`,
+                '--ink': '#f0f2f7', '--ink-soft': `rgb(${mix([145,151,166], .92)})`,
+                '--ink-dim': `rgb(${mix([76,84,103], .94)})`,
+                '--border-color': rgba(.3), '--text-color': '#f0f2f7',
+                '--text-muted': `rgb(${mix([145,151,166], .92)})`,
+                '--on-accent': (.2126 * rgb[0] + .7152 * rgb[1] + .0722 * rgb[2]) > 145 ? '#111111' : '#ffffff'
+            };
+            Object.entries(props).forEach(([key,value]) => document.documentElement.style.setProperty(key,value));
             const input = byId('accent-hex-input');
             if (input) input.value = normalized;
             localStorage.setItem(PRE + 'accent', normalized);
+            particlePalette();
+            document.querySelectorAll('#settings .swatch-box, #setup-swatches .swatch-box').forEach(el => {
+                const match = /'(#[\da-f]{6})'/i.exec(el.getAttribute('onclick') || '');
+                const color = el.dataset.color || (match && match[1]);
+                el.classList.toggle('selected', !!color && color.toLowerCase() === normalized);
+            });
             if (!silent && typeof renderHomeSearch === 'function' && FEATURED_PICKS.length) {
                 const q = byId('searchInput');
                 renderHomeSearch(q && byId('home').classList.contains('active') ? q.value : '');
             }
-            if (!silent) showToast(`Accent set to ${normalized}`);
+            if (!silent) showToast(`Theme set to ${normalized}`);
             return true;
         }
 
@@ -3824,10 +3882,16 @@ setTimeout(function() {
             }
             lastFrameTime = now;
 
-            const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#ff6600';
+            const themeStyle = getComputedStyle(document.documentElement);
+            const accent = themeStyle.getPropertyValue('--particle-color').trim() || '#ff6600';
+            const particleRgb = themeRgb(accent);
+            const particleLight = themeMix(particleRgb, [255,255,255], .45).join(',');
+            const particleSecondary = [particleRgb[1], particleRgb[2], particleRgb[0]].join(',');
+            const particle = alpha => `rgba(${particleRgb.join(',')},${alpha})`;
+            const backgroundColor = themeStyle.getPropertyValue('--bg').trim() || '#080a10';
 
             if (currentBgType === 'matrix') {
-                ctx.fillStyle = "rgba(8, 8, 14, 0.12)";
+                ctx.fillStyle = backgroundColor.replace('rgb(', 'rgba(').replace(')', ',0.12)');
                 ctx.fillRect(0, 0, cw, ch);
                 ctx.fillStyle = accent;
                 ctx.font = fontSize + "px 'MinecraftUI', monospace";
@@ -3841,7 +3905,7 @@ setTimeout(function() {
                     drops[i]++;
                 }
             } else if (currentBgType === 'starfield') {
-                ctx.fillStyle = "#08080c";
+                ctx.fillStyle = backgroundColor;
                 ctx.fillRect(0, 0, cw, ch);
 
                 for (let i = 0; i < stars.length; i++) {
@@ -3849,7 +3913,7 @@ setTimeout(function() {
                     s.y += s.speed;
                     if (s.y > ch) { s.y = 0; s.x = Math.random() * cw; }
 
-                    ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+                    ctx.fillStyle = `rgba(${particleRgb.join(',')}, ${s.alpha})`;
                     ctx.beginPath();
                     ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
                     ctx.fill();
@@ -3863,7 +3927,7 @@ setTimeout(function() {
                     p.x += p.speedX;
                     if (p.y < -5) { p.y = ch + 5; p.x = Math.random() * cw; }
 
-                    ctx.fillStyle = `rgba(255, 110, 0, ${p.alpha})`;
+                    ctx.fillStyle = `rgba(${particleRgb.join(',')}, ${p.alpha})`;
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
                     ctx.fill();
@@ -3885,7 +3949,7 @@ setTimeout(function() {
                     const headX = drop.x;
                     const headY = drop.y;
                     const w = drop.width;
-                    ctx.fillStyle = `rgba(174, 207, 239, ${drop.alpha})`;
+                    ctx.fillStyle = `rgba(${particleRgb.join(',')}, ${drop.alpha})`;
                     ctx.beginPath();
                     ctx.moveTo(tailX, tailY);
                     ctx.quadraticCurveTo(tailX + w * 0.65, tailY + drop.length * 0.18, headX, headY - w * 0.45);
@@ -3902,7 +3966,7 @@ setTimeout(function() {
                         flake.y = -flake.radius;
                         flake.x = Math.random() * cw;
                     }
-                    ctx.fillStyle = `rgba(224, 238, 255, ${flake.alpha})`;
+                    ctx.fillStyle = `rgba(${particleRgb.join(',')}, ${flake.alpha})`;
                     ctx.beginPath();
                     ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
                     ctx.fill();
@@ -3922,7 +3986,7 @@ setTimeout(function() {
                         const dy = a.y - b.y;
                         const distance = Math.sqrt(dx * dx + dy * dy);
                         if (distance < 118) {
-                            ctx.strokeStyle = `rgba(142, 179, 232, ${(1 - distance / 118) * 0.24})`;
+                            ctx.strokeStyle = `rgba(${particleRgb.join(',')}, ${(1 - distance / 118) * 0.24})`;
                             ctx.lineWidth = 0.7;
                             ctx.beginPath();
                             ctx.moveTo(a.x, a.y);
@@ -3931,7 +3995,7 @@ setTimeout(function() {
                         }
                     }
                     const twinkle = 0.38 + (Math.sin(now / 850 + a.phase) + 1) * 0.24;
-                    ctx.fillStyle = `rgba(225, 237, 255, ${twinkle})`;
+                    ctx.fillStyle = `rgba(${particleRgb.join(',')}, ${twinkle})`;
                     ctx.beginPath();
                     ctx.arc(a.x, a.y, a.size, 0, Math.PI * 2);
                     ctx.fill();
@@ -3945,12 +4009,12 @@ setTimeout(function() {
                     const wave = Math.sin(now / (1800 + i * 350) + i * 1.7);
                     const y = ch * (0.16 + i * 0.065) + wave * 27;
                     const gradient = ctx.createLinearGradient(0, y - 45, cw, y + 55);
-                    gradient.addColorStop(0, 'rgba(26, 191, 163, 0)');
-                    gradient.addColorStop(0.32, 'rgba(26, 191, 163, 0.48)');
-                    gradient.addColorStop(0.64, 'rgba(101, 113, 244, 0.42)');
-                    gradient.addColorStop(1, 'rgba(101, 113, 244, 0)');
+                    gradient.addColorStop(0, particle(0));
+                    gradient.addColorStop(0.32, particle(0.48));
+                    gradient.addColorStop(0.64, `rgba(${particleSecondary},0.42)`);
+                    gradient.addColorStop(1, `rgba(${particleSecondary},0)`);
                     ctx.strokeStyle = gradient;
-                    ctx.shadowColor = i % 2 ? '#7076ff' : '#24d4ae';
+                    ctx.shadowColor = i % 2 ? `rgb(${particleSecondary})` : accent;
                     ctx.globalAlpha = 0.3;
                     ctx.lineWidth = 58 - i * 7;
                     ctx.beginPath();
