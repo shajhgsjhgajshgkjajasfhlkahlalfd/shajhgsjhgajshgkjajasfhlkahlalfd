@@ -4,7 +4,6 @@
 
 ## 🚀 Features
 
-*   **Proxied Loading:** Bypasses strict network filters and firewalls.
 *   **Tab Cloaking:** Disguises the site tab as a school assignment or generic utility (e.g., Google Docs, Canvas).
 *   **Clean UI/UX:** Dark-themed, responsive layout optimized for all device sizes.
 *   **Ad-Free Experience:** Zero intrusive popups or hidden redirect scripts.
