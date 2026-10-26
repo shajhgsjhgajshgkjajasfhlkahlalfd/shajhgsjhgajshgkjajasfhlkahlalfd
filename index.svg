@@ -1,48 +1,64 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" width="100%" height="100%" viewBox="0 0 1920 1080">
-  <foreignObject id="fo" width="1920" height="1080" x="0" y="0">
-    <xhtml:html xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;margin:0;padding:0;">
-    <xhtml:head>
-      <xhtml:title>Home - Classroom</xhtml:title>
-      <xhtml:link rel="icon" type="image/x-icon" href="https://ssl.gstatic.com/classroom/favicon.png" />
-      <xhtml:style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
-        iframe { position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-      </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-      <xhtml:iframe id="fm" src="about:blank"></xhtml:iframe>
-      <xhtml:script>
-      //<![CDATA[
-        (function() {
-          function size() {
-            var w = window.innerWidth, h = window.innerHeight;
-            var svg = document.querySelector('svg');
-            var fo  = document.querySelector('foreignObject');
-            if (svg) { svg.setAttribute('width', w); svg.setAttribute('height', h); svg.setAttribute('viewBox','0 0 '+w+' '+h); }
-            if (fo)  { fo.setAttribute('width', w);  fo.setAttribute('height', h); }
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Home - Classroom</title><link id="outer-icon" rel="icon" href="https://ssl.gstatic.com/classroom/favicon.png">
+<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#090b10;color:#eee;font:16px system-ui}iframe{position:fixed;inset:0;width:100%;height:100%;border:0} [hidden]{display:none!important}#status{padding:24px;line-height:1.6}</style>
+</head><body><div id="status" role="status">Loading the latest site...</div>
+<iframe id="site" title="Classroom-x-zone" allowfullscreen allow="autoplay; fullscreen; keyboard-lock; gamepad" hidden></iframe>
+<script>
+(async function () {
+  const repo = "shajhgsjhgajshgkjajasfhlkahlalfd/shajhgsjhgajshgkjajasfhlkahlalfd";
+  const status = document.getElementById('status');
+  const frame = document.getElementById('site');
+  async function get(url, options) {
+    const response = await fetch(url, {...options, signal: AbortSignal.timeout(25000)});
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    return response;
+  }
+  try {
+    const ref = await (await get('https://api.github.com/repos/' + repo + '/commits/main?_fresh=' + Date.now(), {
+      cache: 'no-store', headers: {Accept: 'application/vnd.github+json'}
+    })).json();
+    if (!/^[a-f0-9]{40}$/i.test(ref.sha || '')) throw new Error('Invalid commit response');
+    const base = 'https://cdn.jsdelivr.net/gh/' + repo + '@' + ref.sha + '/';
+    const html = await (await get(base + 'index.html', {cache: 'no-store'})).text();
+    const parsed = new DOMParser().parseFromString(html, 'text/html');
+    parsed.querySelectorAll('base').forEach(node => node.remove());
+    const baseTag = parsed.createElement('base');
+    baseTag.href = base;
+    parsed.head.prepend(baseTag);
+    let observer;
+    function connect() {
+      try {
+        const doc = frame.contentDocument;
+        if (!doc || !doc.head) return;
+        if (observer) observer.disconnect();
+        function sync() {
+          document.title = doc.title || 'Classroom-x-zone';
+          const source = doc.querySelector('#favicon') || doc.querySelector('link[rel~="icon"]');
+          const href = source ? new URL(source.getAttribute('href') || '', doc.baseURI).href : '';
+          const target = document.getElementById('outer-icon');
+          if (href && /^(https?:|data:|blob:)/i.test(href) && target.getAttribute('href') !== href) {
+            target.href = href;
+            if (source.type) target.type = source.type;
+            else target.removeAttribute('type');
           }
-          size();
-          window.addEventListener('resize', size);
-          (async () => {
-            try {
-              const url = 'https://cdn.jsdelivr.net/gh/shajhgsjhgajshgkjajasfhlkahlalfd/shajhgsjhgajshgkjajasfhlkahlalfd@main/index.html';
-              const res = await fetch(url);
-              const text = await res.text();
-              const frame = document.getElementById('fm');
-              const fdoc = frame.contentDocument || frame.contentWindow.document;
-              fdoc.open();
-              fdoc.write(text);
-              fdoc.close();
-            } catch(e) {
-              console.error('Loader error:', e);
-            }
-          })();
-        })();
-      //]]>
-      </xhtml:script>
-    </xhtml:body>
-    </xhtml:html>
-  </foreignObject>
-</svg>
+        }
+        observer = new MutationObserver(sync);
+        observer.observe(doc.head, {subtree: true, childList: true, characterData: true, attributes: true});
+        sync();
+      } catch (error) { console.warn('Tab sync:', error); }
+    }
+    frame.addEventListener('load', connect);
+    const doc = frame.contentDocument;
+    doc.open();
+    doc.write('<!doctype html>\n' + parsed.documentElement.outerHTML);
+    doc.close();
+    connect();
+    status.hidden = true;
+    frame.hidden = false;
+  } catch (error) {
+    console.error('Loader error:', error);
+    status.textContent = 'Unable to load the latest site: ' + error.message + '. Check your connection or GitHub API limits, then reload. No older copy was loaded.';
+  }
+})();
+</script></body></html>
