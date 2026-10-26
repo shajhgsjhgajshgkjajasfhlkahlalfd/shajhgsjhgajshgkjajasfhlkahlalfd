@@ -222,6 +222,44 @@
         base.href = assetBase;
         parsed.head.prepend(base);
 
+    // Diagnose blob creation inside the loaded site.
+const diagnostic = parsed.createElement('script');
+
+diagnostic.textContent = `
+(function () {
+  const originalCreateObjectURL = URL.createObjectURL;
+
+  URL.createObjectURL = function (object) {
+    const url = originalCreateObjectURL.call(URL, object);
+
+    console.warn('[SVG diagnostic] Blob URL created:', {
+      url: url,
+      type: object && object.type,
+      frameURL: location.href
+    });
+
+    console.trace('[SVG diagnostic] Blob creation stack');
+
+    // With DevTools open, pause here to inspect the caller.
+    debugger;
+
+    return url;
+  };
+
+  const originalOpen = window.open;
+
+  window.open = function (url) {
+    console.warn('[SVG diagnostic] window.open:', url);
+    console.trace('[SVG diagnostic] Window-opening stack');
+
+    return originalOpen.apply(window, arguments);
+  };
+})();
+`;
+
+// Run before the site's own scripts.
+parsed.head.insertBefore(diagnostic, base.nextSibling);
+
         frame.addEventListener('load', connectTabCloak);
 
         const siteDocument = frame.contentDocument;
