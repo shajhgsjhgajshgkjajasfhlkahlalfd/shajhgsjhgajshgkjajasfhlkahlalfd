@@ -247,4 +247,12 @@
         status.textContent =
           'Unable to load the latest site: ' +
           error.message +
-          '. Check your connection or GitHub API limits, then
+          '. Check your connection or GitHub API limits, then reload. ' +
+          'No older copy was loaded.';
+      }
+    }
+
+    loadSite();
+  })();
+  ]]></script>
+</svg>
