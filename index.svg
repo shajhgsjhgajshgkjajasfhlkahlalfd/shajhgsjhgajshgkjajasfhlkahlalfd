@@ -1,64 +1,257 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Home - Classroom</title><link id="outer-icon" rel="icon" href="https://ssl.gstatic.com/classroom/favicon.png">
-<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#090b10;color:#eee;font:16px system-ui}iframe{position:fixed;inset:0;width:100%;height:100%;border:0} [hidden]{display:none!important}#status{padding:24px;line-height:1.6}</style>
-</head><body><div id="status" role="status">Loading the latest site...</div>
-<iframe id="site" title="Classroom-x-zone" allowfullscreen allow="autoplay; fullscreen; keyboard-lock; gamepad" hidden></iframe>
-<script>
-(async function () {
-  const repo = "shajhgsjhgajshgkjajasfhlkahlalfd/shajhgsjhgajshgkjajasfhlkahlalfd";
-  const status = document.getElementById('status');
-  const frame = document.getElementById('site');
-  async function get(url, options) {
-    const response = await fetch(url, {...options, signal: AbortSignal.timeout(25000)});
-    if (!response.ok) throw new Error('HTTP ' + response.status);
-    return response;
-  }
-  try {
-    const ref = await (await get('https://api.github.com/repos/' + repo + '/commits/main?_fresh=' + Date.now(), {
-      cache: 'no-store', headers: {Accept: 'application/vnd.github+json'}
-    })).json();
-    if (!/^[a-f0-9]{40}$/i.test(ref.sha || '')) throw new Error('Invalid commit response');
-    const base = 'https://cdn.jsdelivr.net/gh/' + repo + '@' + ref.sha + '/';
-    const html = await (await get(base + 'index.html', {cache: 'no-store'})).text();
-    const parsed = new DOMParser().parseFromString(html, 'text/html');
-    parsed.querySelectorAll('base').forEach(node => node.remove());
-    const baseTag = parsed.createElement('base');
-    baseTag.href = base;
-    parsed.head.prepend(baseTag);
-    let observer;
-    function connect() {
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="100%" height="100%">
+  <title>Home - Classroom</title>
+
+  <text x="24" y="40" fill="gray">
+    Loading site...
+  </text>
+
+  <script><![CDATA[
+  (function () {
+    const wrapper = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+  <title>Home - Classroom</title>
+
+  <link id="outer-icon"
+        rel="icon"
+        href="https://ssl.gstatic.com/classroom/favicon.png">
+
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #090b10;
+      color: #eee;
+      font: 16px system-ui, sans-serif;
+    }
+
+    iframe {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    #status {
+      padding: 24px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="status" role="status">
+    Loading the latest site...
+  </div>
+
+  <iframe
+    id="site"
+    title="Classroom-x-zone"
+    allowfullscreen
+    allow="autoplay; fullscreen; keyboard-lock; gamepad"
+    hidden>
+  </iframe>
+
+  <script>
+  (async function () {
+    const repository =
+      'shajhgsjhgajshgkjajasfhlkahlalfd/' +
+      'shajhgsjhgajshgkjajasfhlkahlalfd';
+
+    const status = document.getElementById('status');
+    const frame = document.getElementById('site');
+
+    let observer = null;
+
+    async function fetchChecked(url, options) {
+      const controller = new AbortController();
+      const timeout = setTimeout(function () {
+        controller.abort();
+      }, 25000);
+
       try {
-        const doc = frame.contentDocument;
-        if (!doc || !doc.head) return;
-        if (observer) observer.disconnect();
-        function sync() {
-          document.title = doc.title || 'Classroom-x-zone';
-          const source = doc.querySelector('#favicon') || doc.querySelector('link[rel~="icon"]');
-          const href = source ? new URL(source.getAttribute('href') || '', doc.baseURI).href : '';
+        const response = await fetch(url, {
+          ...options,
+          signal: controller.signal
+        });
+
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status);
+        }
+
+        // Read the body before clearing the timeout.
+        return await response.text();
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+
+    function connectTabCloak() {
+      try {
+        const siteDocument = frame.contentDocument;
+
+        if (!siteDocument || !siteDocument.head) {
+          return;
+        }
+
+        if (observer) {
+          observer.disconnect();
+        }
+
+        function syncTab() {
+          document.title =
+            siteDocument.title || 'Classroom-x-zone';
+
+          const source =
+            siteDocument.querySelector('#favicon') ||
+            siteDocument.querySelector('link[rel~="icon"]');
+
+          if (!source) {
+            return;
+          }
+
+          const rawHref = source.getAttribute('href');
+
+          if (!rawHref) {
+            return;
+          }
+
+          const iconURL =
+            new URL(rawHref, siteDocument.baseURI).href;
+
+          if (!/^(https?:|data:|blob:)/i.test(iconURL)) {
+            return;
+          }
+
           const target = document.getElementById('outer-icon');
-          if (href && /^(https?:|data:|blob:)/i.test(href) && target.getAttribute('href') !== href) {
-            target.href = href;
-            if (source.type) target.type = source.type;
-            else target.removeAttribute('type');
+
+          if (target.getAttribute('href') !== iconURL) {
+            target.setAttribute('href', iconURL);
+          }
+
+          const iconType = source.getAttribute('type');
+
+          if (iconType) {
+            target.setAttribute('type', iconType);
+          } else {
+            target.removeAttribute('type');
           }
         }
-        observer = new MutationObserver(sync);
-        observer.observe(doc.head, {subtree: true, childList: true, characterData: true, attributes: true});
-        sync();
-      } catch (error) { console.warn('Tab sync:', error); }
+
+        observer = new MutationObserver(syncTab);
+
+        observer.observe(siteDocument.head, {
+          subtree: true,
+          childList: true,
+          characterData: true,
+          attributes: true
+        });
+
+        syncTab();
+      } catch (error) {
+        console.warn('Tab cloak synchronization failed:', error);
+      }
     }
-    frame.addEventListener('load', connect);
-    const doc = frame.contentDocument;
-    doc.open();
-    doc.write('<!doctype html>\n' + parsed.documentElement.outerHTML);
-    doc.close();
-    connect();
-    status.hidden = true;
-    frame.hidden = false;
-  } catch (error) {
-    console.error('Loader error:', error);
-    status.textContent = 'Unable to load the latest site: ' + error.message + '. Check your connection or GitHub API limits, then reload. No older copy was loaded.';
-  }
-})();
-</script></body></html>
+
+    try {
+      // Resolve the current main-branch commit on each launch.
+      const commitURL =
+        'https://api.github.com/repos/' +
+        repository +
+        '/commits/main?_fresh=' +
+        Date.now();
+
+      const commit = JSON.parse(
+        await fetchChecked(commitURL, {
+          cache: 'no-store',
+          headers: {
+            Accept: 'application/vnd.github+json'
+          }
+        })
+      );
+
+      if (!/^[a-f0-9]{40}$/i.test(commit.sha || '')) {
+        throw new Error('GitHub returned an invalid commit.');
+      }
+
+      // Fetch an exact commit instead of a cached branch alias.
+      const assetBase =
+        'https://cdn.jsdelivr.net/gh/' +
+        repository +
+        '@' +
+        commit.sha +
+        '/';
+
+      const siteHTML = await fetchChecked(
+        assetBase + 'index.html',
+        { cache: 'no-store' }
+      );
+
+      const parsed = new DOMParser().parseFromString(
+        siteHTML,
+        'text/html'
+      );
+
+      // Keep relative assets tied to this version of the site.
+      parsed.querySelectorAll('base').forEach(function (node) {
+        node.remove();
+      });
+
+      const base = parsed.createElement('base');
+      base.href = assetBase;
+      parsed.head.prepend(base);
+
+      frame.addEventListener('load', connectTabCloak);
+
+      const siteDocument = frame.contentDocument;
+
+      if (!siteDocument) {
+        throw new Error('Unable to initialize the site frame.');
+      }
+
+      siteDocument.open();
+      siteDocument.write(
+        '<!doctype html>\\n' + parsed.documentElement.outerHTML
+      );
+      siteDocument.close();
+
+      connectTabCloak();
+
+      status.hidden = true;
+      frame.hidden = false;
+    } catch (error) {
+      console.error('Loader error:', error);
+
+      status.textContent =
+        'Unable to load the latest site: ' +
+        error.message +
+        '. Check your connection or GitHub API limits, then reload. ' +
+        'No older copy was loaded.';
+    }
+  })();
+  <\/script>
+</body>
+</html>`;
+
+    const wrapperURL = URL.createObjectURL(
+      new Blob([wrapper], { type: 'text/html' })
+    );
+
+    window.location.replace(wrapperURL);
+  })();
+  ]]></script>
+</svg>
