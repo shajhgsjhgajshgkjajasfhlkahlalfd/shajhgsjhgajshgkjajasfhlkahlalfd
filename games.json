@@ -124,5 +124,77 @@
     "title": "Rooftop Snipers",
     "tagline": "Shoot your opponent off the building.",
     "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/283.png"
+  },
+    {
+    "file": "ovo.html",
+    "title": "OvO",
+    "tagline": "Precision Parkour Platformer",
+    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/1.png"
+  },
+  {
+    "file": "block-blast.html",
+    "title": "Block Blast",
+    "tagline": "Block Puzzle",
+    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/6.png"
+  },
+  {
+    "file": "jetpack-joyride.html",
+    "title": "Jetpack Joyride",
+    "tagline": "Jetpack Arcade Runner",
+    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/7.png"
+  },
+  {
+    "file": "stickman-hook.html",
+    "title": "Stickman Hook",
+    "tagline": "Swing Through Obstacle Courses",
+    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/11.png"
+  },
+  {
+    "file": "crossy-road.html",
+    "title": "Crossy Road",
+    "tagline": "Endless Road-Crossing Arcade",
+    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/24.png"
+  },
+  {
+    "file": "vex-7.html",
+    "title": "Vex 7",
+    "tagline": "Stickman Obstacle Platformer",
+    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/52.png"
+  },
+  {
+    "file": "boxing-random.html",
+    "title": "Boxing Random",
+    "tagline": "Chaotic Two-Player Boxing",
+    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/77.png"
+  },
+  {
+    "file": "cut-the-rope.html",
+    "title": "Cut the Rope",
+    "tagline": "Candy-Cutting Physics Puzzles",
+    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/85.png"
+  },
+  {
+    "file": "tiny-fishing.html",
+    "title": "Tiny Fishing",
+    "tagline": "Catch Fish and Upgrade Your Gear",
+    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/108.png"
+  },
+  {
+    "file": "snow-rider-3d.html",
+    "title": "Snow Rider 3D",
+    "tagline": "Downhill Sledding",
+    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/119.png"
+  },
+  {
+    "file": "poly-track.html",
+    "title": "Poly Track",
+    "tagline": "Low-Poly Stunt Racing",
+    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/123.png"
+  },
+  {
+    "file": "tunnel-rush.html",
+    "title": "Tunnel Rush",
+    "tagline": "High-Speed Tunnel Dodging",
+    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/206.png"
   }
 ]
