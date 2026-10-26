@@ -118,5 +118,11 @@
     "title": "The Impossible Quiz",
     "tagline": "Useless skips, hand-made keyboards, Blue, red, blue, yellow, horrifying amounts of logic, it's all here!",
     "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/507.png"
+  },
+  {
+    "file": "rooftop-snipers/index.html",
+    "title": "Rooftop Snipers",
+    "tagline": "Shoot your opponent off the building.",
+    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/283.png"
   }
 ]
