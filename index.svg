@@ -1,85 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="100%" height="100%">
-  <title>Home - Classroom</title>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+  width="100%"
+  height="100%"
+  viewBox="0 0 1920 1080">
 
-  <text x="24" y="40" fill="gray">
-    Loading site...
-  </text>
+  <title id="outer-title">Home - Classroom</title>
+
+  <defs>
+    <xhtml:link
+      id="outer-icon"
+      rel="icon"
+      href="https://ssl.gstatic.com/classroom/favicon.png" />
+  </defs>
+
+  <foreignObject
+    id="fo"
+    x="0"
+    y="0"
+    width="1920"
+    height="1080">
+
+    <xhtml:div
+      style="position:relative;width:100%;height:100%;overflow:hidden;background:#090b10;">
+
+      <xhtml:div
+        id="status"
+        role="status"
+        style="padding:24px;color:#eee;font:16px system-ui;line-height:1.6;">
+        Loading the latest site...
+      </xhtml:div>
+
+      <xhtml:iframe
+        id="fm"
+        src="about:blank"
+        title="Classroom-x-zone"
+        allowfullscreen="allowfullscreen"
+        allow="autoplay; fullscreen; keyboard-lock; gamepad"
+        style="position:absolute;inset:0;width:100%;height:100%;border:0;visibility:hidden;">
+      </xhtml:iframe>
+
+    </xhtml:div>
+  </foreignObject>
 
   <script><![CDATA[
   (function () {
-    const wrapper = `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1">
+    'use strict';
 
-  <title>Home - Classroom</title>
-
-  <link id="outer-icon"
-        rel="icon"
-        href="https://ssl.gstatic.com/classroom/favicon.png">
-
-  <style>
-    html, body {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #090b10;
-      color: #eee;
-      font: 16px system-ui, sans-serif;
-    }
-
-    iframe {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
-
-    [hidden] {
-      display: none !important;
-    }
-
-    #status {
-      padding: 24px;
-      line-height: 1.6;
-      overflow-wrap: anywhere;
-    }
-  </style>
-</head>
-
-<body>
-  <div id="status" role="status">
-    Loading the latest site...
-  </div>
-
-  <iframe
-    id="site"
-    title="Classroom-x-zone"
-    allowfullscreen
-    allow="autoplay; fullscreen; keyboard-lock; gamepad"
-    hidden>
-  </iframe>
-
-  <script>
-  (async function () {
     const repository =
       'shajhgsjhgajshgkjajasfhlkahlalfd/' +
       'shajhgsjhgajshgkjajasfhlkahlalfd';
 
+    const svg = document.documentElement;
+    const foreignObject = document.getElementById('fo');
+    const frame = document.getElementById('fm');
     const status = document.getElementById('status');
-    const frame = document.getElementById('site');
+    const outerTitle = document.getElementById('outer-title');
+    const outerIcon = document.getElementById('outer-icon');
 
-    let observer = null;
+    let tabObserver = null;
 
-    async function fetchChecked(url, options) {
+    function resize() {
+      const width = Math.max(1, window.innerWidth);
+      const height = Math.max(1, window.innerHeight);
+
+      svg.setAttribute('width', width);
+      svg.setAttribute('height', height);
+      svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+
+      foreignObject.setAttribute('width', width);
+      foreignObject.setAttribute('height', height);
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    async function fetchText(url, options) {
       const controller = new AbortController();
-      const timeout = setTimeout(function () {
+
+      const timeout = window.setTimeout(function () {
         controller.abort();
       }, 25000);
 
@@ -93,10 +93,9 @@
           throw new Error('HTTP ' + response.status);
         }
 
-        // Read the body before clearing the timeout.
         return await response.text();
       } finally {
-        clearTimeout(timeout);
+        window.clearTimeout(timeout);
       }
     }
 
@@ -108,150 +107,152 @@
           return;
         }
 
-        if (observer) {
-          observer.disconnect();
+        if (tabObserver) {
+          tabObserver.disconnect();
         }
 
-        function syncTab() {
-          document.title =
+        function syncTabCloak() {
+          const title =
             siteDocument.title || 'Classroom-x-zone';
 
-          const source =
+          if (outerTitle.textContent !== title) {
+            outerTitle.textContent = title;
+          }
+
+          // Update the actual outer document, not just the iframe.
+          if (document.title !== title) {
+            document.title = title;
+          }
+
+          const sourceIcon =
             siteDocument.querySelector('#favicon') ||
             siteDocument.querySelector('link[rel~="icon"]');
 
-          if (!source) {
+          if (!sourceIcon) {
             return;
           }
 
-          const rawHref = source.getAttribute('href');
+          const rawURL = sourceIcon.getAttribute('href');
 
-          if (!rawHref) {
+          if (!rawURL) {
             return;
           }
 
           const iconURL =
-            new URL(rawHref, siteDocument.baseURI).href;
+            new URL(rawURL, siteDocument.baseURI).href;
 
           if (!/^(https?:|data:|blob:)/i.test(iconURL)) {
             return;
           }
 
-          const target = document.getElementById('outer-icon');
-
-          if (target.getAttribute('href') !== iconURL) {
-            target.setAttribute('href', iconURL);
+          if (outerIcon.getAttribute('href') !== iconURL) {
+            outerIcon.setAttribute('href', iconURL);
           }
 
-          const iconType = source.getAttribute('type');
+          const iconType = sourceIcon.getAttribute('type');
 
           if (iconType) {
-            target.setAttribute('type', iconType);
+            outerIcon.setAttribute('type', iconType);
           } else {
-            target.removeAttribute('type');
+            outerIcon.removeAttribute('type');
           }
         }
 
-        observer = new MutationObserver(syncTab);
+        tabObserver = new MutationObserver(syncTabCloak);
 
-        observer.observe(siteDocument.head, {
+        tabObserver.observe(siteDocument.head, {
           subtree: true,
           childList: true,
           characterData: true,
           attributes: true
         });
 
-        syncTab();
+        syncTabCloak();
       } catch (error) {
         console.warn('Tab cloak synchronization failed:', error);
       }
     }
 
-    try {
-      // Resolve the current main-branch commit on each launch.
-      const commitURL =
-        'https://api.github.com/repos/' +
-        repository +
-        '/commits/main?_fresh=' +
-        Date.now();
+    async function loadSite() {
+      try {
+        // Resolve the current main-branch commit on each load.
+        const commitURL =
+          'https://api.github.com/repos/' +
+          repository +
+          '/commits/main?_fresh=' +
+          Date.now();
 
-      const commit = JSON.parse(
-        await fetchChecked(commitURL, {
-          cache: 'no-store',
-          headers: {
-            Accept: 'application/vnd.github+json'
-          }
-        })
-      );
+        const commit = JSON.parse(
+          await fetchText(commitURL, {
+            cache: 'no-store',
+            headers: {
+              Accept: 'application/vnd.github+json'
+            }
+          })
+        );
 
-      if (!/^[a-f0-9]{40}$/i.test(commit.sha || '')) {
-        throw new Error('GitHub returned an invalid commit.');
+        if (!/^[a-f0-9]{40}$/i.test(commit.sha || '')) {
+          throw new Error('GitHub returned an invalid commit.');
+        }
+
+        // Use an exact commit rather than the cached @main alias.
+        const assetBase =
+          'https://cdn.jsdelivr.net/gh/' +
+          repository +
+          '@' +
+          commit.sha +
+          '/';
+
+        const html = await fetchText(
+          assetBase + 'index.html',
+          { cache: 'no-store' }
+        );
+
+        const parsed = new DOMParser().parseFromString(
+          html,
+          'text/html'
+        );
+
+        // Resolve relative assets against this exact site version.
+        parsed.querySelectorAll('base').forEach(function (node) {
+          node.remove();
+        });
+
+        const base = parsed.createElement('base');
+        base.href = assetBase;
+        parsed.head.prepend(base);
+
+        frame.addEventListener('load', connectTabCloak);
+
+        const siteDocument = frame.contentDocument;
+
+        if (!siteDocument) {
+          throw new Error('Unable to access the site iframe.');
+        }
+
+        // Write into the iframe; leave the outer SVG untouched.
+        siteDocument.open();
+        siteDocument.write(
+          '<!doctype html>\n' + parsed.documentElement.outerHTML
+        );
+        siteDocument.close();
+
+        connectTabCloak();
+
+        status.style.display = 'none';
+        frame.style.visibility = 'visible';
+      } catch (error) {
+        console.error('Loader error:', error);
+
+        status.textContent =
+          'Unable to load the latest site: ' +
+          error.message +
+          '. Check your connection or GitHub API limits, then reload. ' +
+          'No older copy was loaded.';
       }
-
-      // Fetch an exact commit instead of a cached branch alias.
-      const assetBase =
-        'https://cdn.jsdelivr.net/gh/' +
-        repository +
-        '@' +
-        commit.sha +
-        '/';
-
-      const siteHTML = await fetchChecked(
-        assetBase + 'index.html',
-        { cache: 'no-store' }
-      );
-
-      const parsed = new DOMParser().parseFromString(
-        siteHTML,
-        'text/html'
-      );
-
-      // Keep relative assets tied to this version of the site.
-      parsed.querySelectorAll('base').forEach(function (node) {
-        node.remove();
-      });
-
-      const base = parsed.createElement('base');
-      base.href = assetBase;
-      parsed.head.prepend(base);
-
-      frame.addEventListener('load', connectTabCloak);
-
-      const siteDocument = frame.contentDocument;
-
-      if (!siteDocument) {
-        throw new Error('Unable to initialize the site frame.');
-      }
-
-      siteDocument.open();
-      siteDocument.write(
-        '<!doctype html>\\n' + parsed.documentElement.outerHTML
-      );
-      siteDocument.close();
-
-      connectTabCloak();
-
-      status.hidden = true;
-      frame.hidden = false;
-    } catch (error) {
-      console.error('Loader error:', error);
-
-      status.textContent =
-        'Unable to load the latest site: ' +
-        error.message +
-        '. Check your connection or GitHub API limits, then reload. ' +
-        'No older copy was loaded.';
     }
-  })();
-  <\/script>
-</body>
-</html>`;
 
-    const wrapperURL = URL.createObjectURL(
-      new Blob([wrapper], { type: 'text/html' })
-    );
-
-    window.location.replace(wrapperURL);
+    loadSite();
   })();
   ]]></script>
 </svg>
