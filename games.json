@@ -132,12 +132,6 @@
     "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/1.png"
   },
   {
-    "file": "block-blast.html",
-    "title": "Block Blast",
-    "tagline": "Block Puzzle",
-    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/6.png"
-  },
-  {
     "file": "jetpack-joyride.html",
     "title": "Jetpack Joyride",
     "tagline": "Jetpack Arcade Runner",
@@ -150,22 +144,10 @@
     "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/11.png"
   },
   {
-    "file": "crossy-road.html",
-    "title": "Crossy Road",
-    "tagline": "Endless Road-Crossing Arcade",
-    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/24.png"
-  },
-  {
     "file": "vex-7.html",
     "title": "Vex 7",
     "tagline": "Stickman Obstacle Platformer",
     "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/52.png"
-  },
-  {
-    "file": "boxing-random.html",
-    "title": "Boxing Random",
-    "tagline": "Chaotic Two-Player Boxing",
-    "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/77.png"
   },
   {
     "file": "cut-the-rope.html",
