@@ -178,5 +178,11 @@
     "title": "Tunnel Rush",
     "tagline": "High-Speed Tunnel Dodging",
     "img": "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/206.png"
+  },
+{
+    "file": "drive-mad/index.html",
+    "title": "Drive Mad",
+    "tagline": "Drive. Crash. Flip over. Try again.",
+    "img": "./g/assets/drive-mad.jpg"
   }
 ]
