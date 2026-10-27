@@ -1,6 +1,6 @@
 [
   {
-    "file": "1v1.lol.html",
+    "file": "1v1.lol/index.html",
     "title": "1v1.lol",
     "tagline": "Multiplayer Shooter",
     "img": "./g/assets/1v1-lol.png"
@@ -60,7 +60,7 @@
     "img": "./g/assets/Geometry-Dash.png"
   },
   {
-    "file": "slope.html",
+    "file": "slope/index.html",
     "title": "Slope",
     "tagline": "Endless Runner",
     "img": "./g/assets/slope.png"
