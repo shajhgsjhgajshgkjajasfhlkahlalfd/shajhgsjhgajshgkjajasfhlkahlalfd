@@ -1555,7 +1555,8 @@
     .search-icon { transition: right 0.7s cubic-bezier(0.65, 0, 0.35, 1); }
     .search-icon svg { transition: width 0.7s cubic-bezier(0.65, 0, 0.35, 1), height 0.7s cubic-bezier(0.65, 0, 0.35, 1); }
     body[data-tab="suggest"] .search-box,
-    body[data-tab="settings"] .search-box {
+    body[data-tab="settings"] .search-box,
+    body[data-tab="proxy"] .search-box {
         max-height: 0;
         margin-bottom: 0;
         opacity: 0;
@@ -1785,6 +1786,33 @@
             <p class="page-description">Projects and people that help make the arcade more fun.</p>
             <div class="grid" id="partners-grid"></div>
         </div>
+
+        <!-- TAB: PROXY -->
+<div id="proxy" class="tab-content">
+    <h2 class="section-title">Proxy</h2>
+
+    <div style="
+        width:100%;
+        height:calc(100vh - 220px);
+        border:1px solid var(--line-solid);
+        border-radius:var(--r-lg);
+        overflow:hidden;
+        background:var(--bg-2);
+    ">
+        <iframe
+            id="proxy-frame"
+            src="./g/games/other/GUST.html"
+            style="
+                width:100%;
+                height:100%;
+                border:none;
+                display:block;
+                background:#000;
+            "
+            allowfullscreen>
+        </iframe>
+    </div>
+</div>
 
         <!-- TAB: SUGGEST -->
         <div id="suggest" class="tab-content">
@@ -2215,6 +2243,15 @@
         <button class="dock-item" onclick="switchTab('partners', this)" title="Partners">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-handshake"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></svg>
         </button>
+
+        <button class="dock-item"
+        onclick="switchTab('proxy', this)"
+        title="Proxy">
+
+    <i data-lucide="globe"></i>
+
+</button>
+        
         <!-- Lucide lightbulb -->
         <button class="dock-item" onclick="switchTab('suggest', this)" title="Suggest a Game">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lightbulb"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
@@ -2846,7 +2883,7 @@
             let activeBtn = btn;
             if (!activeBtn) {
                 // Find matching button
-                const btnIdx = ['home', 'games', 'tools', 'partners', 'suggest', 'settings'].indexOf(tabId);
+                const btnIdx = ['home', 'games', 'tools','proxy', 'partners', 'suggest', 'settings'].indexOf(tabId);
                 const buttons = document.querySelectorAll('.dock-item');
                 if (btnIdx >= 0 && buttons[btnIdx]) activeBtn = buttons[btnIdx];
             }
