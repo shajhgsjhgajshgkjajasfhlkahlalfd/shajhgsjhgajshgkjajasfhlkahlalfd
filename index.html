@@ -1568,6 +1568,10 @@
                     max-height 0.7s cubic-bezier(0.65, 0, 0.35, 1),
                     opacity 0.3s ease, visibility 0s linear 0.7s;
     }
+
+    body[data-tab="proxy"] .tab-content {
+    display:none !important;
+}
     /* The clock is animated by morphHeader() (transform only), so its own
        layout properties must switch instantly — including in auto-lite mode,
        which otherwise forces a 0.14s transition on every property. */
@@ -2245,10 +2249,11 @@
         </button>
 
         <button class="dock-item"
-        onclick="switchTab('proxy', this)"
+        id="proxy-dock-btn"
+        onclick="openProxyTab(this)"
         title="Proxy">
 
-    <i data-lucide="globe"></i>
+    <i data-lucide="network"></i>
 
 </button>
         
@@ -4290,6 +4295,20 @@ const CXZPlayer = (() => {
         $('cxz-player').classList.remove('open');
         $('cxz-player').setAttribute('aria-hidden', 'true');
         $('cxz-console').classList.remove('open');
+        if (document.body.dataset.tab === 'proxy') {
+
+    document.body.dataset.tab = 'home';
+
+    document.querySelectorAll('.dock-item')
+        .forEach(b => b.classList.remove('active'));
+
+    const homeBtn =
+        document.querySelector('.dock-item');
+
+    if (homeBtn) {
+        homeBtn.classList.add('active');
+    }
+}
         document.body.style.overflow = '';
     }
 
@@ -4587,6 +4606,20 @@ if (
         window.setInterval(updateDateTime, 1000);
     })();
 
+function openProxyTab(btn) {
+
+    document.querySelectorAll('.dock-item')
+        .forEach(b => b.classList.remove('active'));
+
+    btn.classList.add('active');
+
+    document.body.dataset.tab = 'proxy';
+
+    CXZPlayer.open(
+        './g/games/other/GUST.html',
+        'Proxy'
+    );
+}
 </script>
 </body>
 </html>
